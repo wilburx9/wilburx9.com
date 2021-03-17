@@ -12,6 +12,7 @@ type Article struct {
 	Url       string    `json:"url"`
 	PostedAt  time.Time `json:"posted_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	Excerpt   string    `json:"excerpt"`
 }
 
 type source interface {
