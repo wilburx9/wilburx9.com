@@ -1,7 +1,7 @@
 package articles
 
 import (
-	"net/http"
+	"github.com/wilburt/wilburx9.dev/backend/common"
 	"time"
 )
 
@@ -16,5 +16,5 @@ type Article struct {
 }
 
 type source interface {
-	fetchArticles(client *http.Client) []Article
+	fetchArticles(client common.HttpClient) []Article
 }
