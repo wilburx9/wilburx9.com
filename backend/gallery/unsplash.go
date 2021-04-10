@@ -21,7 +21,7 @@ func (u unsplash) fetchImage(client common.HttpClient, fetched []Image, page int
 	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?page=%d&per_page=5", u.username, page) // TODO: Increment per_page to 30 after testing this
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		common.Logger.Errorf("An error while creating http request for %s :: \"%v\"", url, err)
+		fmt.Println(fmt.Sprintf("An error while creating http request for %s :: \"%v\"", url, err))
 		return fetched
 	}
 
@@ -30,7 +30,7 @@ func (u unsplash) fetchImage(client common.HttpClient, fetched []Image, page int
 
 	res, err := client.Do(req)
 	if err != nil {
-		common.Logger.Errorf("An error occurred while sending request for %s :: \"%v\"", url, err)
+		fmt.Println(fmt.Sprintf("An error occurred while sending request for %s :: \"%v\"", url, err))
 		return fetched
 	}
 	defer res.Body.Close()
@@ -38,7 +38,7 @@ func (u unsplash) fetchImage(client common.HttpClient, fetched []Image, page int
 	var results imageResults
 	err = json.NewDecoder(res.Body).Decode(&results)
 	if err != nil {
-		common.Logger.Errorf("An error occurred while decoging response for %s :: \"%v\"", url, err)
+		fmt.Println(fmt.Sprintf("An error occurred while decoding response for %s :: \"%v\"", url, err))
 		return fetched
 	}
 

@@ -2,6 +2,7 @@ package articles
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 )
@@ -13,13 +14,13 @@ type wordpress struct {
 func (w wordpress) fetchArticles(client common.HttpClient) []Article {
 	req, err := http.NewRequest(http.MethodGet, w.url, nil)
 	if err != nil {
-		common.Logger.Errorf("An error while creating http request for %s :: \"%v\"", w.url, err)
+		fmt.Println(fmt.Sprintf("An error while creating http request for %s :: \"%v\"", w.url, err))
 		return nil
 	}
 
 	res, err := client.Do(req)
 	if err != nil {
-		common.Logger.Errorf("An error occurred while sending request for %s :: \"%v\"", w.url, err)
+		fmt.Println(fmt.Sprintf("An error occurred while sending request for %s :: \"%v\"", w.url, err))
 		return nil
 	}
 	defer res.Body.Close()
@@ -27,7 +28,7 @@ func (w wordpress) fetchArticles(client common.HttpClient) []Article {
 	var posts posts
 	err = json.NewDecoder(res.Body).Decode(&posts)
 	if err != nil {
-		common.Logger.Errorf("An error occurred while decoging response for %s :: \"%v\"", w.url, err)
+		fmt.Println(fmt.Sprintf("An error occurred while decoding response for %s :: \"%v\"", w.url, err))
 		return nil
 	}
 	return posts.toArticles()
