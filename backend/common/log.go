@@ -4,8 +4,10 @@ import (
 	"go.uber.org/zap"
 )
 
+// Logger is used fo logging. Ensure SetUpLogger is called way before using it.
 var Logger *zap.SugaredLogger
 
+// SetUpLogger configures Logger
 func SetUpLogger(isProd bool) {
 	var l *zap.Logger
 	if isProd {
@@ -15,4 +17,3 @@ func SetUpLogger(isProd bool) {
 	}
 	Logger = l.Sugar()
 }
-

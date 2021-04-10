@@ -2,15 +2,14 @@ package articles
 
 import (
 	"github.com/wilburt/wilburx9.dev/backend/common"
-	"net/http"
-	"os"
 	"testing"
 )
 
-func TestFetchArticles(t *testing.T) {
+func TestMediumFetchArticles(t *testing.T) {
 	common.SetUpLogger(false)
 	var m = medium{name: "testUser"}
-	var articles = m.fetchArticles(&HttpClientMock{})
+	clientMock := httpClientMock{"./testdata/medium_response.xml"}
+	var articles = m.fetchArticles(&clientMock)
 
 	first := articles[0]
 	second := articles[1]
@@ -28,15 +27,4 @@ func TestFetchArticles(t *testing.T) {
 	if second.Thumbnail != "" {
 		t.Error()
 	}
-}
-
-type HttpClientMock struct{}
-
-func (cm *HttpClientMock) Do(_ *http.Request) (*http.Response, error) {
-	file, err := os.Open("./testdata/medium_response.xml")
-	if err != nil {
-		return nil, err
-	}
-
-	return &http.Response{Body: file}, nil
 }

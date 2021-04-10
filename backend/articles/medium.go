@@ -10,12 +10,12 @@ import (
 )
 
 type medium struct {
-	name string
+	name string // should be medium username (e.g "@Wilburx9") or publication
 }
 
 func (m medium) fetchArticles(client common.HttpClient) []Article {
 	url := fmt.Sprintf("https://medium.com/feed/%s", m.name)
-	req, err := http.NewRequest(http.MethodPost, url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		common.Logger.Errorf("An error while creating http request for %s :: \"%v\"", url, err)
 		return nil
@@ -26,7 +26,6 @@ func (m medium) fetchArticles(client common.HttpClient) []Article {
 		common.Logger.Errorf("An error occurred while sending request for %s :: \"%v\"", url, err)
 		return nil
 	}
-
 	defer res.Body.Close()
 
 	var rss rss
@@ -52,13 +51,13 @@ type rss struct {
 
 func (r rss) toArticles() []Article {
 	var articles = make([]Article, len(r.Channel.Item))
-	for i, s := range r.Channel.Item {
+	for i, e := range r.Channel.Item {
 		articles[i] = Article{
-			Title:     s.Title,
-			Url:       s.Link,
-			Thumbnail: getThumbnail(s.Encoded),
-			PostedAt:  stringToTime(time.RFC1123, s.PubDate),
-			UpdatedAt: stringToTime(time.RFC3339, s.Updated),
+			Title:     e.Title,
+			Url:       e.Link,
+			Thumbnail: getThumbnail(e.Encoded),
+			PostedAt:  common.StringToTime(time.RFC1123, e.PubDate),
+			UpdatedAt: common.StringToTime(time.RFC3339, e.Updated),
 		}
 	}
 	return articles
@@ -71,13 +70,4 @@ func getThumbnail(body string) string {
 		return ""
 	}
 	return subMatch[1]
-}
-
-func stringToTime(layout string, timeStr string) time.Time {
-	t, err := time.Parse(layout, timeStr)
-	if err != nil {
-		common.Logger.Infof("Could not parse time: \"%s\" with layout:\"%s\" :: \"%v\"", timeStr, layout, err)
-		return time.Now()
-	}
-	return t
 }
