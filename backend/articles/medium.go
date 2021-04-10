@@ -17,13 +17,13 @@ func (m medium) fetchArticles(client common.HttpClient) []Article {
 	url := fmt.Sprintf("https://medium.com/feed/%s", m.name)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		common.Logger.Errorf("An error while creating http request for %s :: \"%v\"", url, err)
+		fmt.Println(fmt.Sprintf("An error while creating http request for %s :: \"%v\"", url, err))
 		return nil
 	}
 
 	res, err := client.Do(req)
 	if err != nil {
-		common.Logger.Errorf("An error occurred while sending request for %s :: \"%v\"", url, err)
+		fmt.Println(fmt.Sprintf("An error occurred while sending request for %s :: \"%v\"", url, err))
 		return nil
 	}
 	defer res.Body.Close()
@@ -31,7 +31,7 @@ func (m medium) fetchArticles(client common.HttpClient) []Article {
 	var rss rss
 	err = xml.NewDecoder(res.Body).Decode(&rss)
 	if err != nil {
-		common.Logger.Errorf("An error occurred while decoging response for %s :: \"%v\"", url, err)
+		fmt.Println(fmt.Sprintf("An error occurred while decoding response for %s :: \"%v\"", url, err))
 		return nil
 	}
 	return rss.toArticles()

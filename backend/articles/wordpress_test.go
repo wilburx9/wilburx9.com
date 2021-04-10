@@ -6,7 +6,6 @@ import (
 )
 
 func TestWordPressFetchArticles(t *testing.T) {
-	common.SetUpLogger(false)
 	var w = wordpress{"https://example.com/wp-json/wp/v2/posts"}
 	clientMock := common.HttpClientMock{ResponseFilePath: "./testdata/wordpress_response.json"}
 	var articles = w.fetchArticles(&clientMock)

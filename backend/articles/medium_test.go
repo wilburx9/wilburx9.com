@@ -6,7 +6,6 @@ import (
 )
 
 func TestMediumFetchArticles(t *testing.T) {
-	common.SetUpLogger(false)
 	var m = medium{name: "testUser"}
 	clientMock := common.HttpClientMock{ResponseFilePath: "./testdata/medium_response.xml"}
 	var articles = m.fetchArticles(&clientMock)
