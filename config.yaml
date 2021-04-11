@@ -1,0 +1,6 @@
+server_port: "8080"
+medium_username: ""
+wp_url: ""
+unsplash_username: ""
+unsplash_access_key: ""
+env: "debug"
