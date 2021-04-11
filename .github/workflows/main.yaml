@@ -1,8 +1,8 @@
-name: Run tests and deploy to Google App Engine
+name: Run tests and deploy to GAE
 
 on:
   push:
-    branches: [ live, develop ]
+    branches: [ live ]
 
 env:
   WILBURX9_MEDIUM_USERNAME: ${{ secrets.WILBURX9_MEDIUM_USERNAME }}
