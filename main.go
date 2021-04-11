@@ -12,7 +12,7 @@ import (
 
 func main() {
 	// Attempt to load config
-	if err := common.LoadConfig("../"); err != nil {
+	if err := common.LoadConfig("./"); err != nil {
 		panic(fmt.Errorf("invalid application configuration: %s", err))
 	}
 	gin.ForceConsoleColor()
@@ -20,7 +20,7 @@ func main() {
 	router := gin.Default()
 
 	// Serve frontend static files
-	router.Use(static.Serve("/", static.LocalFile("../frontend/build", true)))
+	router.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 
 	// Setup API route
 	api := router.Group("/api")
