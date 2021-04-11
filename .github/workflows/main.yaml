@@ -44,11 +44,11 @@ jobs:
       - name: Build backend
         run: go build
 
-      - name: Create Env for GAE
+      - name: Create config file for GAE
         run: |
           envsubst < app.yaml.template > app.yaml
 
-      - name: Deploy to Google App Engine
+      - name: Deploy to GAE
         uses: google-github-actions/deploy-appengine@main
         with:
           credentials: ${{ secrets.GAE_DEPLOY_SA_KEY }}
