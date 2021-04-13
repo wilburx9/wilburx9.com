@@ -3,6 +3,8 @@ name: Run tests and deploy to GAE
 on:
   push:
     branches: [ live ]
+  pull_request:
+    branches: [ develop ]
 
 env:
   WILBURX9_MEDIUM_USERNAME: ${{ secrets.WILBURX9_MEDIUM_USERNAME }}
@@ -45,10 +47,12 @@ jobs:
         run: go build
 
       - name: Create config file for GAE
+        if: github.ref == 'refs/heads/live'
         run: |
           envsubst < app.yaml.template > app.yaml
 
       - name: Deploy to GAE
+        if: github.ref == 'refs/heads/live'
         uses: google-github-actions/deploy-appengine@main
         with:
           credentials: ${{ secrets.GAE_DEPLOY_SA_KEY }}
