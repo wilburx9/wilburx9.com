@@ -4,7 +4,7 @@ on:
   push:
     branches: [ live ]
   pull_request:
-    branches: [ live ]
+    branches: [ live, develop ]
 
 env:
   WILBURX9_MEDIUM_USERNAME: ${{ secrets.WILBURX9_MEDIUM_USERNAME }}
@@ -17,7 +17,7 @@ env:
 
 jobs:
   test_build_deploy:
-    name: Run tests, build both frontend & backend and deploy to GAE
+    name: Run tests, build and maybe deploy to GAE
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -48,12 +48,12 @@ jobs:
         run: go build
 
       - name: Create config file for GAE
-        if: github.event_name == 'push'
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/live' }}
         run: |
           envsubst < app.yaml.template > app.yaml
 
       - name: Deploy to GAE
-        if: github.event_name == 'push'
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/live' }}
         uses: google-github-actions/deploy-appengine@main
         with:
           credentials: ${{ secrets.GAE_DEPLOY_SA_KEY }}

@@ -46,8 +46,8 @@ func (u unsplash) fetchImage(client common.HttpClient, fetched []Image, page int
 
 	totalImages, err := strconv.Atoi(res.Header.Get("X-Total"))
 
-	// Return if an error is encountered or if all images has been
-	if err != nil || len(results) >= totalImages {
+	// Return if an error is encountered or if all images has been fetched
+	if err != nil || len(fetched) >= totalImages {
 		return fetched
 	}
 
@@ -61,11 +61,12 @@ func (m imageResults) toImages() []Image {
 
 	for i, e := range m {
 		images[i] = Image{
-			Thumbnail:  e.Urls.Small,
-			Url:        e.Urls.Full,
-			Caption:    e.Description,
-			UploadedAt: common.StringToTime(timeLayout, e.CreatedAt),
-			Source:     "unsplash",
+			SrcThumbnail: e.Urls.Small,
+			Src:          e.Urls.Full,
+			Url:          e.Links.HTML,
+			Caption:      e.Description,
+			UploadedAt:   common.StringToTime(timeLayout, e.CreatedAt),
+			Source:       "unsplash",
 			Meta: map[string]interface{}{
 				"user": e.User,
 			},
@@ -80,6 +81,7 @@ type imageResult struct {
 	CreatedAt   string `json:"created_at"`
 	Color       string `json:"color"`
 	Description string `json:"description"`
+	User        user   `json:"user"`
 	Urls        struct {
 		Full  string `json:"full"`
 		Small string `json:"small"`
@@ -87,8 +89,9 @@ type imageResult struct {
 	Links struct {
 		HTML string `json:"html"`
 	} `json:"links"`
-	User struct {
-		Username string `json:"username"`
-		Name     string `json:"name"`
-	} `json:"user"`
+}
+
+type user struct {
+	Username string `json:"username"`
+	Name     string `json:"name"`
 }
