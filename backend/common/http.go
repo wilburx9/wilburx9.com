@@ -13,7 +13,7 @@ type HttpClient interface {
 // HttpClientMock is a mock HttpClient for testing
 type HttpClientMock struct {
 	ResponseFilePath string
-	Header http.Header
+	Header           http.Header
 }
 
 // Do returns an is instance http.Response with body set to the file at cm.ResponseFilePath

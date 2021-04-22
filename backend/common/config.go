@@ -15,6 +15,11 @@ type appConfig struct {
 	UnsplashUsername  string `mapstructure:"unsplash_username"`
 	UnsplashAccessKey string `mapstructure:"unsplash_access_key"`
 	Env               string `mapstructure:"env"`
+	SentryDsn         string `mapstructure:"sentry_dsn"`
+}
+
+func (c appConfig) isRelease() bool {
+	return c.Env == "release"
 }
 
 // LoadConfig loads config variables from a config file or environment variables
