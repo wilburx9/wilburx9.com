@@ -3,6 +3,7 @@ module github.com/wilburt/wilburx9.dev
 go 1.15
 
 require (
+	cloud.google.com/go/firestore v1.5.0 // indirect
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19
 	github.com/gin-gonic/gin v1.7.1

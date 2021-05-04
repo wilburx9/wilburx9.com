@@ -16,6 +16,8 @@ type appConfig struct {
 	UnsplashAccessKey string `mapstructure:"unsplash_access_key"`
 	Env               string `mapstructure:"env"`
 	SentryDsn         string `mapstructure:"sentry_dsn"`
+	GcpSaKey          string `mapstructure:"gcp_backend_sa_key"`
+	GcpProjectId      string `mapstructure:"gcp_project_id"`
 }
 
 func (c appConfig) isRelease() bool {

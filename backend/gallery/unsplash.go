@@ -3,6 +3,7 @@ package gallery
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wilburt/wilburx9.dev/backend"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 	"strconv"
@@ -11,13 +12,14 @@ import (
 type unsplash struct {
 	username  string
 	accessKey string
+	backend.Fetcher
 }
 
-func (u unsplash) fetchImages(client common.HttpClient) []Image {
-	return u.fetchImage(client, []Image{}, 1)
+func (u unsplash) fetchImages() []Image {
+	return u.fetchImage([]Image{}, 1)
 }
 
-func (u unsplash) fetchImage(client common.HttpClient, fetched []Image, page int) []Image {
+func (u unsplash) fetchImage(fetched []Image, page int) []Image {
 	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?page=%d&per_page=5", u.username, page) // TODO: Increment per_page to 30 after testing this
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -28,14 +30,14 @@ func (u unsplash) fetchImage(client common.HttpClient, fetched []Image, page int
 	req.Header.Add("Accept-Version", "v1")
 	req.Header.Add("Authorization", fmt.Sprintf("Client-ID %s", u.accessKey))
 
-	res, err := client.Do(req)
+	res, err := u.HttpClient.Do(req)
 	if err != nil {
 		common.LogError(err)
 		return fetched
 	}
 	defer res.Body.Close()
 
-	var results imageResults
+	var results unsplashImgSlice
 	err = json.NewDecoder(res.Body).Decode(&results)
 	if err != nil {
 		common.LogError(err)
@@ -52,10 +54,10 @@ func (u unsplash) fetchImage(client common.HttpClient, fetched []Image, page int
 	}
 
 	page++
-	return u.fetchImage(client, fetched, page)
+	return u.fetchImage(fetched, page)
 }
 
-func (m imageResults) toImages() []Image {
+func (m unsplashImgSlice) toImages() []Image {
 	var timeLayout = "2006-01-02T03:04:05-07:00"
 	var images = make([]Image, len(m))
 
@@ -75,9 +77,9 @@ func (m imageResults) toImages() []Image {
 	return images
 }
 
-type imageResults []imageResult
+type unsplashImgSlice []unsplashImg
 
-type imageResult struct {
+type unsplashImg struct {
 	CreatedAt   string `json:"created_at"`
 	Color       string `json:"color"`
 	Description string `json:"description"`

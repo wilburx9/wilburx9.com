@@ -1,6 +1,9 @@
 package common
 
 import (
+	"cloud.google.com/go/firestore"
+	"context"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
 )
@@ -24,4 +27,13 @@ func (cm *HttpClientMock) Do(_ *http.Request) (*http.Response, error) {
 	}
 
 	return &http.Response{Body: file, Header: cm.Header}, nil
+}
+
+// ApiMiddleware adds custom params to request contexts
+func ApiMiddleware(dbCtx context.Context, fsClient *firestore.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(StorageCtxt, dbCtx)
+		c.Set(StorageFirestore, fsClient)
+		c.Next()
+	}
 }
