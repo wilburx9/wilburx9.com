@@ -2,7 +2,6 @@ package gallery
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 	"time"
 )
@@ -27,5 +26,5 @@ type Image struct {
 }
 
 type source interface {
-	fetchImages(client common.HttpClient) []Image
+	fetchImages() []Image
 }
