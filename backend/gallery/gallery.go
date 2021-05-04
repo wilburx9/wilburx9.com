@@ -1,7 +1,11 @@
 package gallery
 
 import (
+	"cloud.google.com/go/firestore"
+	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 	"time"
 )
@@ -27,4 +31,25 @@ type Image struct {
 
 type source interface {
 	fetchImages() []Image
+	fetchCachedImages() []Image
+	persistImages(images []Image)
+}
+
+func getImagesFrmFirestore(fsClient *firestore.Client, ctx context.Context, key string) []Image {
+	cacheKey := common.GetCacheKey(common.FirestoreGallery, key)
+	dSnap, err := fsClient.Collection(common.FirestoreCache).Doc(cacheKey).Get(ctx)
+
+	if err != nil {
+		if dSnap != nil && dSnap.Exists() {
+			common.LogError(fmt.Errorf("error while fetching cached images for %v :: %v", key, dSnap))
+		}
+		return nil
+	}
+	var data []Image
+	err = dSnap.DataTo(&data)
+	if err != nil {
+		common.LogError(fmt.Errorf("error while unmarshalling cached images for %v :: %v", key, dSnap))
+		return nil
+	}
+	return data
 }

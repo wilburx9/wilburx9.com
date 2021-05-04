@@ -19,6 +19,14 @@ func (u unsplash) fetchImages() []Image {
 	return u.fetchImage([]Image{}, 1)
 }
 
+func (u unsplash) persistImages(images []Image) {
+
+}
+
+func (u unsplash) fetchCachedImages() []Image {
+	return nil
+}
+
 func (u unsplash) fetchImage(fetched []Image, page int) []Image {
 	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?page=%d&per_page=5", u.username, page) // TODO: Increment per_page to 30 after testing this
 	req, err := http.NewRequest(http.MethodGet, url, nil)
