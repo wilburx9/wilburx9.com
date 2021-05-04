@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	firestoreKey          = "Instagram"
+	instagramFirestoreKey = "instagram"
 	minTokenRemainingLife = 5 * time.Minute // 5 Minutes
 )
 
@@ -22,11 +22,64 @@ type instagram struct {
 }
 
 func (i instagram) fetchImages() []Image {
-	return nil
+	accessToken := i.getAccessToken()
+	fields := "caption,media_type,id,media_url,timestamp,permalink,thumbnail_url,media_type"
+	u := fmt.Sprintf("https://graph.instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
+	allResults := i.fetchImage([]Image{}, u)
+
+	// Return cached result if the it fails to fetch live result
+	if len(allResults) == 0 {
+		return i.fetchCachedImages()
+	}
+
+	i.persistImages(allResults)
+	return allResults
+}
+func (i instagram) persistImages(images []Image) {
+	cacheKey := common.GetCacheKey(common.FirestoreGallery, instagramFirestoreKey)
+	_, err := i.FsClient.Collection(common.FirestoreCache).Doc(cacheKey).Set(i.DbCtxt, images)
+	if err != nil {
+		common.LogError(fmt.Errorf("error while persisting instagram images to GCP Firestore: %v", err))
+	}
+}
+
+func (i instagram) fetchCachedImages() []Image {
+	return getImagesFrmFirestore(i.FsClient, i.DbCtxt, instagramFirestoreKey)
+}
+
+func (i instagram) fetchImage(fetched []Image, url string) []Image {
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		common.LogError(err)
+		return fetched
+	}
+
+	res, err := i.HttpClient.Do(req)
+	if err != nil {
+		common.LogError(err)
+		return fetched
+	}
+	defer res.Body.Close()
+
+	var data instaImgResult
+	err = json.NewDecoder(res.Body).Decode(&data)
+	if err != nil {
+		common.LogError(err)
+		return fetched
+	}
+
+	fetched = append(fetched, data.Data.toImages()...)
+
+	// Return the fetched images if there are no more images to fetch
+	if data.Paging.Next == "" {
+		return fetched
+	}
+
+	return i.fetchImage(fetched, data.Paging.Next)
 }
 
 func (i instagram) getAccessToken() string {
-	dSnap, err := i.FsClient.Collection(common.FirestoreTokens).Doc(firestoreKey).Get(i.DbCtxt)
+	dSnap, err := i.FsClient.Collection(common.FirestoreTokens).Doc(instagramFirestoreKey).Get(i.DbCtxt)
 
 	// Set the access token if it doesn't exist otherwise log an error and return an empty string
 	if err != nil {
@@ -90,11 +143,12 @@ func (i instagram) refreshAccessToken(oldToken string) string {
 }
 
 func (i instagram) persistAccessToken(t token) {
-	_, err := i.FsClient.Collection(common.FirestoreTokens).Doc(firestoreKey).Set(i.DbCtxt, t)
+	_, err := i.FsClient.Collection(common.FirestoreTokens).Doc(instagramFirestoreKey).Set(i.DbCtxt, t)
 	if err != nil {
 		common.LogError(fmt.Errorf("error while persisting instagram access token to GCP Firestore: %v", err))
 	}
 }
+
 func (t token) expired() bool {
 	var now = time.Now()
 	var expireTime = t.RefreshedAt.Add(time.Minute * time.Duration(t.ExpiresIn))
@@ -109,6 +163,23 @@ func (t token) shouldRefresh() bool {
 	return diff <= minTokenRemainingLife
 }
 
+func (s instaImgSlice) toImages() []Image {
+	var timeLayout = "2006-02-01T15:04:05-0700"
+	var images = make([]Image, len(s))
+
+	for i, e := range s {
+		images[i] = Image{
+			SrcThumbnail: e.MediaURL,
+			Src:          e.MediaURL,
+			Url:          e.Permalink,
+			Caption:      e.Caption,
+			UploadedAt:   common.StringToTime(timeLayout, e.Timestamp),
+			Source:       "instagram",
+		}
+	}
+	return images
+}
+
 type token struct {
 	Value       string    `firestore:"value" json:"access_token"`
 	ExpiresIn   int64     `firestore:"expires_in" json:"expires_in"`
@@ -116,16 +187,19 @@ type token struct {
 }
 
 type instaImgSlice []instaImg
-type instaImg struct {
-	Data []struct {
-		Caption   string `json:"caption"`
-		MediaType string `json:"media_type"`
-		ID        string `json:"id"`
-		MediaURL  string `json:"media_url"`
-		Timestamp string `json:"timestamp"`
-		Permalink string `json:"permalink"`
-	} `json:"data"`
+
+type instaImgResult struct {
+	Data   instaImgSlice `json:"data"`
 	Paging struct {
 		Next string `json:"next"`
 	} `json:"paging"`
+}
+
+type instaImg struct {
+	Caption   string `json:"caption"`
+	MediaType string `json:"media_type"`
+	ID        string `json:"id"`
+	MediaURL  string `json:"media_url"`
+	Timestamp string `json:"timestamp"`
+	Permalink string `json:"permalink"`
 }
