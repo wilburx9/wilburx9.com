@@ -25,9 +25,7 @@ jobs:
           node-version: '14'
 
       - name: Run backend tests
-        run: |
-          echo "${{{ secrets.SSHKEY }}}"
-          go test ./...
+        run: go test ./...
 
       - name: Install frontend dependencies
         run: npm ci
@@ -46,7 +44,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           port: ${{ secrets.PORT }}
-          key: ${{ secrets.SSHKEY }}
+          KEY: ${{ secrets.SSHKEY }}
         with:
           source: "./"
           target: "/opt/wilburx9"
