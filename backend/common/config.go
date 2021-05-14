@@ -9,7 +9,7 @@ import (
 var Config appConfig
 
 type appConfig struct {
-	ServerPort        string `mapstructure:"port"`
+	Port              string `mapstructure:"port"`
 	MediumUsername    string `mapstructure:"medium_username"`
 	WPUrl             string `mapstructure:"wp_url"`
 	UnsplashUsername  string `mapstructure:"unsplash_username"`

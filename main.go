@@ -29,6 +29,6 @@ func main() {
 	api.GET("/articles", articles.Handler)
 	api.GET("/gallery", gallery.Handler)
 
-	s := &http.Server{Addr: fmt.Sprintf(":%s", common.Config.ServerPort), Handler: router}
+	s := &http.Server{Addr: fmt.Sprintf(":%s", common.Config.Port), Handler: router}
 	s.ListenAndServe()
 }
