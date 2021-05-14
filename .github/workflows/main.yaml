@@ -59,6 +59,7 @@ jobs:
           PORT: ${{ secrets.PORT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           script: |
+            source ~/.profile
             cd /opt/wilburx9/frontend
             npm install
             npm run build
