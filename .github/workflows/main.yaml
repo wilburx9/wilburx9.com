@@ -1,4 +1,4 @@
-name: Run tests and deploy to GAE
+name: Run tests and deploy
 
 on:
   push:
@@ -14,29 +14,29 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v2
 
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.15
-
-      - name: Set up Node 14x
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Run backend tests
-        run: go test ./...
-
-      - name: Install frontend dependencies
-        run: npm ci
-        working-directory: frontend
-
-      - name: Build frontend
-        run: npm run build
-        working-directory: frontend
-
-      - name: Build backend
-        run: go build
+#      - name: Set up Go 1.x
+#        uses: actions/setup-go@v2
+#        with:
+#          go-version: ^1.15
+#
+#      - name: Set up Node 14x
+#        uses: actions/setup-node@v2
+#        with:
+#          node-version: '14'
+#
+#      - name: Run backend tests
+#        run: go test ./...
+#
+#      - name: Install frontend dependencies
+#        run: npm ci
+#        working-directory: frontend
+#
+#      - name: Build frontend
+#        run: npm run build
+#        working-directory: frontend
+#
+#      - name: Build backend
+#        run: go build
 
       - name: Copy file via scp
         uses: appleboy/scp-action@master
@@ -49,7 +49,7 @@ jobs:
           source: "./"
           target: "/opt/wilburx9"
 
-      - name: Building and restrting web service
+      - name: Building and restarting web service
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
