@@ -65,5 +65,5 @@ jobs:
             npm run build
             cd ../
             go build -v main.go
-            sudo service wilburx9 start
-            sudo service wilburx9 status
+            sudo /bin/systemctl start wilburx9
+            service wilburx9 status
