@@ -67,5 +67,5 @@ jobs:
             cd ../
             go build main.go
              echo "I2 am at $(pwd)"
-            sudo service wilburx9 start
-            sudo service wilburx9 status
+            service wilburx9 start
+            service wilburx9 status
