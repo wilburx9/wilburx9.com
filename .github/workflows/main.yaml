@@ -62,7 +62,9 @@ jobs:
             cd /opt/wilburx9/frontend
             npm install
             npm run build
+            echo "I am at $(pwd)"
             cd ../
             go build main.go
+             echo "I2 am at $(pwd)"
             sudo service wilburx9 start
             sudo service wilburx9 status
