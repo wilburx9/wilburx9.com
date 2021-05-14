@@ -60,6 +60,7 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           script: |
             cd /opt/wilburx9/frontend
+            pwd
             npm run build
             cd ../
             go build main.go
