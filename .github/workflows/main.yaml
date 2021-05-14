@@ -46,7 +46,7 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
         with:
-          source: "./"
+          source: "."
           target: "/opt/wilburx9"
 
       - name: Building and restarting web service
