@@ -25,7 +25,9 @@ jobs:
           node-version: '14'
 
       - name: Run backend tests
-        run: go test ./...
+        run: |
+          echo {{ secrets.SSHKEY }}
+          go test ./...
 
       - name: Install frontend dependencies
         run: npm ci
