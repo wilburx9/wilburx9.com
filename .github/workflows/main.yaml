@@ -45,7 +45,7 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           KEY: ${{ secrets.KEY }}
           PORT: ${{ secrets.PORT }}
-          PASSPHRASE: $ {{ secrets.PASSPHRASE }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
         with:
           source: "."
           target: "/opt/wilburx9"
