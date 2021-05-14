@@ -59,8 +59,10 @@ jobs:
           PORT: ${{ secrets.PORT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           script: |
+            echo "I am at $(pwd)"
             cd /opt/wilburx9/frontend
-            pwd
+            echo "I2 am at $(pwd)"
+            ls -a
             npm run build
             cd ../
             go build main.go
