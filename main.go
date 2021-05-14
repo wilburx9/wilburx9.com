@@ -7,6 +7,7 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/articles"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"github.com/wilburt/wilburx9.dev/backend/gallery"
+	"log"
 	"net/http"
 )
 
@@ -15,6 +16,7 @@ func main() {
 	if err := common.LoadConfig("./"); err != nil {
 		panic(fmt.Errorf("invalid application configuration: %s", err))
 	}
+	log.Printf("Config = %+v\\n", common.Config)
 	gin.ForceConsoleColor()
 	gin.SetMode(common.Config.Env)
 	router := gin.Default()
