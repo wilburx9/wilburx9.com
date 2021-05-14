@@ -59,11 +59,13 @@ jobs:
           PORT: ${{ secrets.PORT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           script: |
+            echo "E1 $(printenv WILBURX9_ENV)"
             source ~/.profile
+            echo "E2 $(printenv WILBURX9_ENV)"
             cd /opt/wilburx9/frontend
             npm install
             npm run build
             cd ../
             go build -v main.go
-            sudo /bin/systemctl start wilburx9
+            sudo /bin/systemctl restart wilburx9
             service wilburx9 status
