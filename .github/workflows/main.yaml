@@ -44,7 +44,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           port: ${{ secrets.PORT }}
-          KEY: ${{ secrets.SSHKEY }}
+          key: ${{ secrets.SSHKEY }}
         with:
           source: "./"
           target: "/opt/wilburx9"
