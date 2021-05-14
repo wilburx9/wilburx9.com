@@ -1,4 +1,4 @@
-server_port: "8080"
+port: "8080"
 medium_username: ""
 wp_url: ""
 unsplash_username: ""
