@@ -26,7 +26,7 @@ jobs:
 
       - name: Run backend tests
         run: |
-          echo {{ secrets.SSHKEY }}
+          echo "${{{ secrets.SSHKEY }}}"
           go test ./...
 
       - name: Install frontend dependencies
