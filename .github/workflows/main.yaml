@@ -2,22 +2,13 @@ name: Run tests and deploy to GAE
 
 on:
   push:
-    branches: [ live ]
+    branches: [ live, migrate-away-frm-gcp ]
   pull_request:
     branches: [ live ]
 
-env:
-  WILBURX9_MEDIUM_USERNAME: ${{ secrets.WILBURX9_MEDIUM_USERNAME }}
-  WILBURX9_WP_URL: ${{ secrets.WILBURX9_WP_URL }}
-  WILBURX9_UNSPLASH_USERNAME: ${{ secrets.WILBURX9_UNSPLASH_USERNAME }}
-  WILBURX9_UNSPLASH_ACCESS_KEY: ${{ secrets.WILBURX9_UNSPLASH_ACCESS_KEY }}
-  WILBURX9_ENV: ${{ secrets.WILBURX9_ENV }}
-  REACT_APP_WILBURX9_GA_MEASUREMENT_ID: ${{ secrets.REACT_APP_WILBURX9_GA_MEASUREMENT_ID }}
-
-
 jobs:
   test_build_deploy:
-    name: Run tests, build both frontend & backend and deploy to GAE
+    name: Run tests, build both frontend & backend and deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -47,15 +38,28 @@ jobs:
       - name: Build backend
         run: go build
 
-      - name: Create config file for GAE
-        if: github.event_name == 'push'
-        run: |
-          envsubst < app.yaml.template > app.yaml
-
-      - name: Deploy to GAE
-        if: github.event_name == 'push'
-        uses: google-github-actions/deploy-appengine@main
+      - name: Copy file via scp
+        uses: appleboy/scp-action@master
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
         with:
-          credentials: ${{ secrets.GAE_DEPLOY_SA_KEY }}
-          promote: true
-          version: ${{ github.sha }}
+          source: "./"
+          target: "/opt/wilburx9"
+
+      - name: Building and restrting web service
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
+          script: |
+            cd /opt/wilburx9/frontend
+            npm run build
+            cd ../
+            go build main.go
+            sudo service wilburx9 start
+            sudo service wilburx9 status
