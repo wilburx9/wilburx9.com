@@ -48,7 +48,7 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
         with:
           source: "."
-          target: "/opt/wilburx9"
+          target: ${{ secrets.APP_DIR }}
 
       - name: Building and restarting web service
         uses: appleboy/ssh-action@master
