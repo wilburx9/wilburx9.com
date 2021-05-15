@@ -60,7 +60,7 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           script: |
             source ~/.profile
-            cd ${{ secrets.PASSPHRASE }}/frontend
+            cd '${{ secrets.APP_DIR }}/frontend'
             npm install
             npm run build
             cd ../
