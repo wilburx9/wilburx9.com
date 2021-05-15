@@ -1,4 +1,4 @@
-name: Run tests and deploy to GAE
+name: Run tests and deploy
 
 on:
   push:
@@ -6,18 +6,9 @@ on:
   pull_request:
     branches: [ live ]
 
-env:
-  WILBURX9_MEDIUM_USERNAME: ${{ secrets.WILBURX9_MEDIUM_USERNAME }}
-  WILBURX9_WP_URL: ${{ secrets.WILBURX9_WP_URL }}
-  WILBURX9_UNSPLASH_USERNAME: ${{ secrets.WILBURX9_UNSPLASH_USERNAME }}
-  WILBURX9_UNSPLASH_ACCESS_KEY: ${{ secrets.WILBURX9_UNSPLASH_ACCESS_KEY }}
-  WILBURX9_ENV: ${{ secrets.WILBURX9_ENV }}
-  REACT_APP_WILBURX9_GA_MEASUREMENT_ID: ${{ secrets.REACT_APP_WILBURX9_GA_MEASUREMENT_ID }}
-
-
 jobs:
   test_build_deploy:
-    name: Run tests, build both frontend & backend and deploy to GAE
+    name: Run tests, build both frontend & backend and deploy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
@@ -47,15 +38,34 @@ jobs:
       - name: Build backend
         run: go build
 
-      - name: Create config file for GAE
+      - name: Copy file via scp
         if: github.event_name == 'push'
-        run: |
-          envsubst < app.yaml.template > app.yaml
-
-      - name: Deploy to GAE
-        if: github.event_name == 'push'
-        uses: google-github-actions/deploy-appengine@main
+        uses: appleboy/scp-action@master
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          KEY: ${{ secrets.KEY }}
+          PORT: ${{ secrets.PORT }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
         with:
-          credentials: ${{ secrets.GAE_DEPLOY_SA_KEY }}
-          promote: true
-          version: ${{ github.sha }}
+          source: "."
+          target: ${{ secrets.APP_DIR }}
+
+      - name: Building and restarting web service
+        if: github.event_name == 'push'
+        uses: appleboy/ssh-action@master
+        with:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          KEY: ${{ secrets.KEY }}
+          PORT: ${{ secrets.PORT }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+          script: |
+            source ~/.profile
+            cd '${{ secrets.APP_DIR }}/frontend'
+            npm ci
+            npm run build
+            cd ../
+            go build main.go
+            sudo /bin/systemctl restart wilburx9
+            service wilburx9 status
