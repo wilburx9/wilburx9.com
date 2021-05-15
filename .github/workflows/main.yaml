@@ -62,8 +62,8 @@ jobs:
             echo "E1 $(printenv REACT_APP_PLAUSIBLE_HOST)"
             echo "E11 $(printenv WILBURX9_ENV)"
             source ~/.profile
-            echo "E2 $(printenv REACT_APP_PLAUSIBLE_HOST)"
-            echo "E22 $(printenv WILBURX9_ENV)"
+            echo "E1 $(printenv REACT_APP_PLAUSIBLE_HOST)"
+            echo "E11 $(printenv WILBURX9_ENV)"
             cd '${{ secrets.APP_DIR }}/frontend'
             npm ci
             npm run build
