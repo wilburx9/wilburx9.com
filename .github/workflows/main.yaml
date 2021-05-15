@@ -63,7 +63,7 @@ jobs:
             source ~/.profile
             echo "E1 $(printenv REACT_APP_PLAUSIBLE_HOST)"
             pwd
-            cd '${{ secrets.APP_DIR }}/frontend'
+            cd ${{ secrets.APP_DIR }}/frontend
             pwd
             npm ci
             npm run build
