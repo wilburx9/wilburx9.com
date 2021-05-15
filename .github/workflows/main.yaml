@@ -59,7 +59,9 @@ jobs:
           PORT: ${{ secrets.PORT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           script: |
+            echo "E1 $(printenv REACT_APP_PLAUSIBLE_HOST)"
             source ~/.profile
+            echo "E2 $(printenv REACT_APP_PLAUSIBLE_HOST)"
             cd '${{ secrets.APP_DIR }}/frontend'
             npm ci
             npm run build
