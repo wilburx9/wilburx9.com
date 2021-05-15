@@ -47,9 +47,8 @@ jobs:
           PORT: ${{ secrets.PORT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
         with:
-          source: "."
+          source: ".,!.git/,!.idea/,!frontend/.idea/"
           target: ${{ secrets.APP_DIR }}
-          rm: true
 
       - name: Building and restarting web service
         uses: appleboy/ssh-action@master
