@@ -47,8 +47,9 @@ jobs:
           PORT: ${{ secrets.PORT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
         with:
-          source: "."
+          source: ".,!.git/,!.idea/,!frontend/.idea/"
           target: ${{ secrets.APP_DIR }}
+          rm: true
 
       - name: Building and restarting web service
         uses: appleboy/ssh-action@master
@@ -59,12 +60,8 @@ jobs:
           PORT: ${{ secrets.PORT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           script: |
-            echo "E1 $(printenv REACT_APP_PLAUSIBLE_HOST)"
             source ~/.profile
-            echo "E1 $(printenv REACT_APP_PLAUSIBLE_HOST)"
-            pwd
             cd ${{ secrets.APP_DIR }}/frontend
-            pwd
             npm ci
             npm run build
             cd ../
