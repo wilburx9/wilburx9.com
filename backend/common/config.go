@@ -9,7 +9,7 @@ import (
 var Config appConfig
 
 type appConfig struct {
-	ServerPort        string `mapstructure:"server_port"`
+	Port              string `mapstructure:"port"`
 	MediumUsername    string `mapstructure:"medium_username"`
 	WPUrl             string `mapstructure:"wp_url"`
 	UnsplashUsername  string `mapstructure:"unsplash_username"`
@@ -25,10 +25,6 @@ func LoadConfig(path string) error {
 	v.SetEnvPrefix("WilburX9")
 	v.AutomaticEnv()
 	v.AddConfigPath(path)
-
-	if err := v.BindEnv("server_port", "PORT"); err != nil {
-		return fmt.Errorf("unable to bind ServerPort to Port env: %s", err)
-	}
 
 	if err := v.ReadInConfig(); err != nil {
 		return fmt.Errorf("failed to read the configuration file: %s", err)
