@@ -59,11 +59,7 @@ jobs:
           PORT: ${{ secrets.PORT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           script: |
-            echo "E1 $(printenv REACT_APP_PLAUSIBLE_HOST)"
-            echo "E11 $(printenv WILBURX9_ENV)"
             source ~/.profile
-            echo "E1 $(printenv REACT_APP_PLAUSIBLE_HOST)"
-            echo "E11 $(printenv WILBURX9_ENV)"
             cd '${{ secrets.APP_DIR }}/frontend'
             npm ci
             npm run build
