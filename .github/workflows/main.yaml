@@ -47,7 +47,7 @@ jobs:
           PORT: ${{ secrets.PORT }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
         with:
-          source: ".,!.git/,!.idea/,!frontend/.idea/"
+          source: "."
           target: ${{ secrets.APP_DIR }}
           rm: true
 
