@@ -62,7 +62,8 @@ jobs:
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           script: |
             source ~/.profile
-            cd '${{ secrets.APP_DIR }}/frontend'
+            cd ${{ secrets.APP_DIR }}/frontend
+            rm -rf node_modules
             npm ci
             npm run build
             cd ../
