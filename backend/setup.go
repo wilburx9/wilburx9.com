@@ -10,7 +10,6 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/articles"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"github.com/wilburt/wilburx9.dev/backend/gallery"
-	"log"
 	"net/http"
 	"time"
 )
@@ -41,7 +40,6 @@ func SetUpServer(db *badger.DB) *http.Server {
 
 // SetLogger configures the custom logger
 func SetLogger() error {
-	log.Println(fmt.Sprintf("Sentry DSN = %s", common.Config.SentryDsn))
 	return sentry.Init(sentry.ClientOptions{
 		Dsn:              common.Config.SentryDsn,
 		AttachStacktrace: true,
