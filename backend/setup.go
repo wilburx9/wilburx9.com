@@ -1,9 +1,8 @@
 package backend
 
 import (
-	"cloud.google.com/go/firestore"
-	"context"
 	"fmt"
+	"github.com/dgraph-io/badger/v3"
 	"github.com/getsentry/sentry-go"
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/contrib/static"
@@ -11,14 +10,13 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/articles"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"github.com/wilburt/wilburx9.dev/backend/gallery"
-	"google.golang.org/api/option"
 	"log"
 	"net/http"
 	"time"
 )
 
 // SetUpServer sets the Http Server. Call SetLogger before this.
-func SetUpServer(dbCtx context.Context, fsClient *firestore.Client) *http.Server {
+func SetUpServer(db *badger.DB) *http.Server {
 	gin.ForceConsoleColor()
 	gin.SetMode(common.Config.Env)
 	router := gin.Default()
@@ -27,7 +25,7 @@ func SetUpServer(dbCtx context.Context, fsClient *firestore.Client) *http.Server
 	router.Use(sentrygin.New(sentrygin.Options{}))
 
 	// Attach API middleware
-	router.Use(common.ApiMiddleware(dbCtx, fsClient))
+	router.Use(common.ApiMiddleware(db))
 
 	// Serve frontend static files
 	router.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
@@ -37,7 +35,7 @@ func SetUpServer(dbCtx context.Context, fsClient *firestore.Client) *http.Server
 	api.GET("/gallery", gallery.Handler)
 
 	// Start Http server
-	s := &http.Server{Addr: fmt.Sprintf(":%s", common.Config.ServerPort), Handler: router}
+	s := &http.Server{Addr: fmt.Sprintf(":%s", common.Config.Port), Handler: router}
 	return s
 }
 
@@ -56,14 +54,4 @@ func SetLogger() error {
 // CleanUpLogger flushes buffered events
 func CleanUpLogger() {
 	sentry.Flush(2 * time.Second)
-}
-
-// CreateFireStoreClient configures and returns a pointer for Firestore client
-func CreateFireStoreClient(ctx context.Context) *firestore.Client {
-	var options = option.WithCredentialsJSON([]byte(common.Config.GcpSaKey))
-	client, err := firestore.NewClient(ctx, common.Config.GcpProjectId, options)
-	if err != nil {
-		common.LogError(err)
-	}
-	return client
 }

@@ -3,6 +3,7 @@ package gallery
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/dgraph-io/badger/v3"
 	"github.com/wilburt/wilburx9.dev/backend"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 )
 
 const (
-	instagramFirestoreKey = "instagram"
+	instagramKey          = "instagram"
 	minTokenRemainingLife = 5 * time.Minute // 5 Minutes
 )
 
@@ -21,30 +22,16 @@ type instagram struct {
 	backend.Fetcher
 }
 
-func (i instagram) fetchImages() []Image {
-	accessToken := i.getAccessToken()
+func (i instagram) cacheImages() {
+	accessToken := i.getToken()
 	fields := "caption,media_type,id,media_url,timestamp,permalink,thumbnail_url,media_type"
 	u := fmt.Sprintf("https://graph.instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
 	allResults := i.fetchImage([]Image{}, u)
-
-	// Return cached result if the it fails to fetch live result
-	if len(allResults) == 0 {
-		return i.fetchCachedImages()
-	}
-
-	i.persistImages(allResults)
-	return allResults
-}
-func (i instagram) persistImages(images []Image) {
-	cacheKey := common.GetCacheKey(common.FirestoreGallery, instagramFirestoreKey)
-	_, err := i.FsClient.Collection(common.FirestoreCache).Doc(cacheKey).Set(i.DbCtxt, images)
-	if err != nil {
-		common.LogError(fmt.Errorf("error while persisting instagram images to GCP Firestore: %v", err))
-	}
+	saveImages(i.Db, instagramKey, allResults)
 }
 
-func (i instagram) fetchCachedImages() []Image {
-	return getImagesFrmFirestore(i.FsClient, i.DbCtxt, instagramFirestoreKey)
+func (i instagram) getCachedImages() []Image {
+	return getImagesFrmDb(i.Db, instagramKey)
 }
 
 func (i instagram) fetchImage(fetched []Image, url string) []Image {
@@ -78,40 +65,39 @@ func (i instagram) fetchImage(fetched []Image, url string) []Image {
 	return i.fetchImage(fetched, data.Paging.Next)
 }
 
-func (i instagram) getAccessToken() string {
-	dSnap, err := i.FsClient.Collection(common.FirestoreTokens).Doc(instagramFirestoreKey).Get(i.DbCtxt)
-
-	// Set the access token if it doesn't exist otherwise log an error and return an empty string
-	if err != nil {
-		if dSnap != nil && !dSnap.Exists() {
-			return i.refreshAccessToken(i.AccessToken)
-		} else {
-			common.LogError(fmt.Errorf("error while fetching instagram access token %v", dSnap))
-			return ""
+func (i instagram) getToken() string {
+	var tk token
+	err := i.Db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(getInstagramToken()))
+		if err != nil {
+			return err
 		}
-	}
-	var t token
-	err = dSnap.DataTo(&t)
+
+		return item.Value(func(val []byte) error {
+			return json.Unmarshal(val, &tk)
+		})
+	})
+
 	if err != nil {
-		common.LogError(fmt.Errorf("error while unmarshalling instagram access token %v", dSnap))
+		common.LogError(fmt.Errorf("error while fetching instagram access token %v", err))
 		return ""
 	}
 
 	// Check if access token has expired
-	if t.expired() {
+	if tk.expired() {
 		// Access token has expired. We can't refresh it
 		common.LogError(fmt.Errorf("instagram access token has expired"))
 		return ""
 	}
 
 	// Check if access token should be refresh
-	if t.shouldRefresh() {
-		return i.refreshAccessToken(t.Value)
+	if tk.shouldRefresh() {
+		return i.refreshToken(tk.Value)
 	}
-	return t.Value
+	return tk.Value
 }
 
-func (i instagram) refreshAccessToken(oldToken string) string {
+func (i instagram) refreshToken(oldToken string) string {
 	u := "https://graph.instagram.com/refresh_access_token"
 
 	params := url.Values{}
@@ -138,14 +124,21 @@ func (i instagram) refreshAccessToken(oldToken string) string {
 		common.LogError(err)
 		return newT.Value
 	}
-	i.persistAccessToken(newT)
+	newT.RefreshedAt = time.Now()
+	i.saveToken(newT)
 	return newT.Value
 }
 
-func (i instagram) persistAccessToken(t token) {
-	_, err := i.FsClient.Collection(common.FirestoreTokens).Doc(instagramFirestoreKey).Set(i.DbCtxt, t)
+func (i instagram) saveToken(t token) {
+	err := i.Db.Update(func(txn *badger.Txn) error {
+		buf, err := json.Marshal(t)
+		if err != nil {
+			return err
+		}
+		return txn.Set([]byte(getInstagramToken()), buf)
+	})
 	if err != nil {
-		common.LogError(fmt.Errorf("error while persisting instagram access token to GCP Firestore: %v", err))
+		common.LogError(fmt.Errorf("error while persisting instagram access token to Db: %v", err))
 	}
 }
 
@@ -161,6 +154,10 @@ func (t token) shouldRefresh() bool {
 	var expireTime = t.RefreshedAt.Add(time.Minute * time.Duration(t.ExpiresIn))
 	diff := expireTime.Sub(now)
 	return diff <= minTokenRemainingLife
+}
+
+func getInstagramToken() string {
+	return common.GetCacheKey(common.Access, instagramKey)
 }
 
 func (s instaImgSlice) toImages() []Image {
@@ -181,9 +178,9 @@ func (s instaImgSlice) toImages() []Image {
 }
 
 type token struct {
-	Value       string    `firestore:"value" json:"access_token"`
-	ExpiresIn   int64     `firestore:"expires_in" json:"expires_in"`
-	RefreshedAt time.Time `firestore:"refreshed_at,serverTimestamp"`
+	Value       string    `json:"access_token"`
+	ExpiresIn   int64     `json:"expires_in"`
+	RefreshedAt time.Time `json:"refreshed_at"`
 }
 
 type instaImgSlice []instaImg

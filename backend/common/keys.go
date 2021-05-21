@@ -4,20 +4,17 @@ import "fmt"
 
 const (
 
-	// StorageCtxt is the key for storage context
-	StorageCtxt = "storage/context"
+	// Db is the key for the Db
+	Db = "storage"
 
-	// StorageFirestore is the key fore Firestore
-	StorageFirestore = "storage/GCPFirestore"
+	// Access is the prefix for keys that have to do with API keys, access tokens
+	Access = "Access"
 
-	// FirestoreTokens is the key to the tokens collection on GCP Firestore
-	FirestoreTokens = "tokens"
+	// StorageCache is the key to caches of fetched data
+	StorageCache = "cache"
 
-	// FirestoreCache is the key to caches of fetched data
-	FirestoreCache = "cache"
-
-	// FirestoreGallery is the key to cache of all gallery document in GCP Firestore
-	FirestoreGallery = "gallery"
+	// StorageGallery is the key to cache of all gallery document in Db
+	StorageGallery = "gallery"
 )
 
 // GetCacheKey returns the key of cache

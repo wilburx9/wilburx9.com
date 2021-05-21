@@ -1,8 +1,7 @@
 package common
 
 import (
-	"cloud.google.com/go/firestore"
-	"context"
+	"github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
@@ -30,10 +29,9 @@ func (cm *HttpClientMock) Do(_ *http.Request) (*http.Response, error) {
 }
 
 // ApiMiddleware adds custom params to request contexts
-func ApiMiddleware(dbCtx context.Context, fsClient *firestore.Client) gin.HandlerFunc {
+func ApiMiddleware(db *badger.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Set(StorageCtxt, dbCtx)
-		c.Set(StorageFirestore, fsClient)
+		c.Set(Db, db)
 		c.Next()
 	}
 }
