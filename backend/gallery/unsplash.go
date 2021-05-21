@@ -3,7 +3,6 @@ package gallery
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wilburt/wilburx9.dev/backend"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 	"strconv"
@@ -16,7 +15,7 @@ const (
 type unsplash struct {
 	username  string
 	accessKey string
-	backend.Fetcher
+	common.Fetcher
 }
 
 func (u unsplash) cacheImages() {

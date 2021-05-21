@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
-	"github.com/wilburt/wilburx9.dev/backend"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 	"net/url"
@@ -19,7 +18,7 @@ const (
 
 type instagram struct {
 	AccessToken string
-	backend.Fetcher
+	common.Fetcher
 }
 
 func (i instagram) cacheImages() {
