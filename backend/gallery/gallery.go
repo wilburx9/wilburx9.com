@@ -1,9 +1,9 @@
 package gallery
 
 import (
-	"cloud.google.com/go/firestore"
-	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
@@ -30,26 +30,41 @@ type Image struct {
 }
 
 type source interface {
-	fetchImages() []Image
-	fetchCachedImages() []Image
-	persistImages(images []Image)
+	cacheImages()
+	getCachedImages() []Image
 }
 
-func getImagesFrmFirestore(fsClient *firestore.Client, ctx context.Context, key string) []Image {
-	cacheKey := common.GetCacheKey(common.FirestoreGallery, key)
-	dSnap, err := fsClient.Collection(common.FirestoreCache).Doc(cacheKey).Get(ctx)
-
-	if err != nil {
-		if dSnap != nil && dSnap.Exists() {
-			common.LogError(fmt.Errorf("error while fetching cached images for %v :: %v", key, dSnap))
+func saveImages(db *badger.DB, key string, images []Image) {
+	err := db.Update(func(txn *badger.Txn) error {
+		buf, err := json.Marshal(images)
+		if err != nil {
+			return err
 		}
-		return nil
-	}
-	var data []Image
-	err = dSnap.DataTo(&data)
+		return txn.Set([]byte(imagesCacheKey(key)), buf)
+	})
 	if err != nil {
-		common.LogError(fmt.Errorf("error while unmarshalling cached images for %v :: %v", key, dSnap))
-		return nil
+		common.LogError(fmt.Errorf("error while saving images for %v : %v", key, err))
 	}
-	return data
+}
+
+func getImagesFrmDb(db *badger.DB, key string) []Image {
+	var images []Image
+	err := db.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte(imagesCacheKey(key)))
+		if err != nil {
+			return err
+		}
+
+		return item.Value(func(val []byte) error {
+			return json.Unmarshal(val, &images)
+		})
+	})
+	if err != nil {
+		common.LogError(fmt.Errorf("error while getting images for %v : %v", key, err))
+	}
+	return images
+}
+
+func imagesCacheKey(suffix string) string {
+	return common.GetCacheKey(common.StorageGallery, suffix)
 }

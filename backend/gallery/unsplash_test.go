@@ -14,7 +14,7 @@ func TestUnsplashFetchImages(t *testing.T) {
 	var header = http.Header{}
 	header.Add("X-Total", strconv.Itoa(expectedResults))
 	clientMock := common.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header}
-	var images = u.fetchImages(&clientMock)
+	var images = u.cacheImages(&clientMock)
 
 	if len(images) != expectedResults {
 		t.Errorf("Recursive fetching of images failed. Expected 2 but got %d", len(images))

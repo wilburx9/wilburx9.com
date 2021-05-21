@@ -1,7 +1,8 @@
 package main
 
 import (
-	"context"
+	"fmt"
+	"github.com/dgraph-io/badger/v3"
 	"github.com/wilburt/wilburx9.dev/backend"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"log"
@@ -16,10 +17,6 @@ func main() {
 		log.Fatalf("invalid application configuration: %s", err)
 	}
 
-	dbCtx := context.Background()
-	fsClient := backend.CreateFireStoreClient(dbCtx)
-	defer fsClient.Close()
-
 	// Setup custom logger
 	err := backend.SetLogger()
 	if err != nil {
@@ -27,7 +24,13 @@ func main() {
 	}
 	defer backend.CleanUpLogger()
 
+	db, err := badger.Open(badger.DefaultOptions("/db/cache"))
+
+	if err != nil {
+		common.LogError(fmt.Errorf("setting up badger failed %v", err))
+	}
+
 	// Setup and start Http server
-	s := backend.SetUpServer(dbCtx, fsClient)
+	s := backend.SetUpServer(db)
 	s.ListenAndServe()
 }
