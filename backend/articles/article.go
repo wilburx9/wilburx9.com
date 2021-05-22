@@ -25,6 +25,6 @@ type Article struct {
 	Excerpt   string    `json:"excerpt"`
 }
 
-type source interface {
-	fetchArticles(client common.HttpClient) []Article
+func getCacheKey(suffix string) string {
+	return common.GetCacheKey(common.StorageArticles, suffix)
 }

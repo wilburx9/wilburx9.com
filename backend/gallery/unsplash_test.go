@@ -10,11 +10,13 @@ import (
 
 func TestUnsplashFetchImages(t *testing.T) {
 	const expectedResults = 3
-	var u = unsplash{username: "x", accessKey: "xa"}
 	var header = http.Header{}
 	header.Add("X-Total", strconv.Itoa(expectedResults))
-	clientMock := common.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header}
-	var images = u.cacheImages(&clientMock)
+
+	var u = Unsplash{Username: "x", AccessKey: "xa", Fetcher: common.Fetcher{
+		HttpClient: &common.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header},
+	}}
+	var images = u.fetchImage([]Image{}, 0)
 
 	if len(images) != expectedResults {
 		t.Errorf("Recursive fetching of images failed. Expected 2 but got %d", len(images))
@@ -33,7 +35,7 @@ func TestUnsplashFetchImages(t *testing.T) {
 		t.Error("Failed to parse image creation date")
 	}
 
-	if first.Src != "https://images.unsplash.com/photo-56789-098yhj?crop=entropy&cs=srgb&fm=jpg&ixid=OIFGHJIUGGH=rb-1.2.1&q=85" {
+	if first.Src != "https://images.Unsplash.com/photo-56789-098yhj?crop=entropy&cs=srgb&fm=jpg&ixid=OIFGHJIUGGH=rb-1.2.1&q=85" {
 		t.Error("Failed to parse image src")
 	}
 

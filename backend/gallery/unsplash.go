@@ -9,26 +9,30 @@ import (
 )
 
 const (
-	unsplashKey = "unsplash"
+	unsplashKey = "Unsplash"
 )
 
-type unsplash struct {
-	username  string
-	accessKey string
+// Unsplash handles fetching and caching of data from Unsplash. And also returning the cached data
+type Unsplash struct {
+	Username  string
+	AccessKey string
 	common.Fetcher
 }
 
-func (u unsplash) cacheImages() {
+// FetchAndCache fetches data from Unsplash and caches it
+func (u Unsplash) FetchAndCache() {
 	images := u.fetchImage([]Image{}, 1)
-	saveImages(u.Db, unsplashKey, images)
+	buf, _ := json.Marshal(images)
+	u.CacheData(getCacheKey(unsplashKey), buf)
 }
 
-func (u unsplash) getCachedImages() []Image {
-	return getImagesFrmDb(u.Db, unsplashKey)
+// GetCached returns data that was cached in Cache
+func (u Unsplash) GetCached() ([]byte, error) {
+	return u.GetCachedData(getCacheKey(unsplashKey))
 }
 
-func (u unsplash) fetchImage(fetched []Image, page int) []Image {
-	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?page=%d&per_page=5", u.username, page) // TODO: Increment per_page to 30 after testing this
+func (u Unsplash) fetchImage(fetched []Image, page int) []Image {
+	url := fmt.Sprintf("https://api.Unsplash.com/users/%s/photos?page=%d&per_page=5", u.Username, page) // TODO: Increment per_page to 30 after testing this
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		common.LogError(err)
@@ -36,7 +40,7 @@ func (u unsplash) fetchImage(fetched []Image, page int) []Image {
 	}
 
 	req.Header.Add("Accept-Version", "v1")
-	req.Header.Add("Authorization", fmt.Sprintf("Client-ID %s", u.accessKey))
+	req.Header.Add("Authorization", fmt.Sprintf("Client-ID %s", u.AccessKey))
 
 	res, err := u.HttpClient.Do(req)
 	if err != nil {
@@ -76,7 +80,7 @@ func (m unsplashImgSlice) toImages() []Image {
 			Url:          e.Links.HTML,
 			Caption:      e.Description,
 			UploadedAt:   common.StringToTime(timeLayout, e.CreatedAt),
-			Source:       "unsplash",
+			Source:       "Unsplash",
 			Meta: map[string]interface{}{
 				"user": e.User,
 			},
@@ -102,6 +106,6 @@ type unsplashImg struct {
 }
 
 type user struct {
-	Username string `json:"username"`
+	Username string `json:"Username"`
 	Name     string `json:"name"`
 }

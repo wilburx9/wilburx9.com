@@ -6,7 +6,7 @@ import (
 )
 
 func TestWordPressFetchArticles(t *testing.T) {
-	var w = wordpress{"https://example.com/wp-json/wp/v2/posts"}
+	var w = Wordpress{"https://example.com/wp-json/wp/v2/posts"}
 	clientMock := common.HttpClientMock{ResponseFilePath: "./testdata/wordpress_response.json"}
 	var articles = w.fetchArticles(&clientMock)
 	if len(articles) != 2 {
