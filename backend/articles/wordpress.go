@@ -2,6 +2,7 @@ package articles
 
 import (
 	"encoding/json"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 )
@@ -31,13 +32,13 @@ func (w Wordpress) GetCached() ([]byte, error) {
 func (w Wordpress) fetchArticles() []Article {
 	req, err := http.NewRequest(http.MethodGet, w.URL, nil)
 	if err != nil {
-		common.LogError(err)
+		log.Warning(err)
 		return nil
 	}
 
 	res, err := w.HttpClient.Do(req)
 	if err != nil {
-		common.LogError(err)
+		log.Warning(err)
 		return nil
 	}
 	defer res.Body.Close()
@@ -45,7 +46,7 @@ func (w Wordpress) fetchArticles() []Article {
 	var posts posts
 	err = json.NewDecoder(res.Body).Decode(&posts)
 	if err != nil {
-		common.LogError(err)
+		log.Error(err)
 		return nil
 	}
 	return posts.toArticles()

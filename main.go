@@ -1,24 +1,21 @@
 package main
 
 import (
-	"fmt"
 	"github.com/dgraph-io/badger/v3"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend"
 	"github.com/wilburt/wilburx9.dev/backend/common"
-	"log"
 )
 
 func main() {
-	// Enable date, time and line number for log outputs
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	backend.SetUpLogrus()
 
 	// Attempt to load config
 	if err := common.LoadConfig("./"); err != nil {
 		log.Fatalf("invalid application configuration: %s", err)
 	}
 
-	// Setup custom logger
-	err := backend.SetLogger()
+	err := backend.SetUpSentry()
 	if err != nil {
 		log.Fatalf("sentry.Init: failed %s", err)
 	}
@@ -27,7 +24,7 @@ func main() {
 	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
 
 	if err != nil {
-		common.LogError(fmt.Errorf("setting up badger failed %v", err))
+		log.Fatalf("setting up badger failed %v", err)
 		return
 	}
 

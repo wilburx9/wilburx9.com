@@ -1,7 +1,7 @@
 package common
 
 import (
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -9,7 +9,11 @@ import (
 func StringToTime(layout string, timeStr string) time.Time {
 	t, err := time.Parse(layout, timeStr)
 	if err != nil {
-		LogMsg(fmt.Sprintf("Could not parse time: \"%s\" with layout:\"%s\" :: \"%v\"", timeStr, layout, err))
+		log.WithFields(log.Fields{
+			"source": timeStr,
+			"layout": layout,
+			"error":  err,
+		}).Warning("Could not parse time")
 		return time.Now()
 	}
 	return t

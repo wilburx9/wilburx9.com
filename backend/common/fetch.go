@@ -1,8 +1,8 @@
 package common
 
 import (
-	"fmt"
 	"github.com/dgraph-io/badger/v3"
+	log "github.com/sirupsen/logrus"
 )
 
 // Fetcher has the fields needed by data fetcher structs
@@ -23,7 +23,10 @@ func (f Fetcher) CacheData(key string, data []byte) {
 		return txn.Set([]byte(key), data)
 	})
 	if err != nil {
-		LogError(fmt.Errorf("error while saving dat for %v : %v", key, err))
+		log.WithFields(log.Fields{
+			"key":   key,
+			"error": err,
+		}).Error("error while saving data")
 	}
 }
 
@@ -42,7 +45,10 @@ func (f Fetcher) GetCachedData(key string) ([]byte, error) {
 		})
 	})
 	if err != nil {
-		LogError(fmt.Errorf("error while getting images for %v : %v", key, err))
+		log.WithFields(log.Fields{
+			"key":   key,
+			"error": err,
+		}).Error("error while getting data")
 	}
 	return data, err
 }

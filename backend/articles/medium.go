@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 	"regexp"
@@ -36,13 +37,13 @@ func (m Medium) fetchArticles() []Article {
 	url := fmt.Sprintf("https://Medium.com/feed/%s", m.Name)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		common.LogError(err)
+		log.Warning(err)
 		return nil
 	}
 
 	res, err := m.HttpClient.Do(req)
 	if err != nil {
-		common.LogError(err)
+		log.Warning(err)
 		return nil
 	}
 	defer res.Body.Close()
@@ -50,7 +51,7 @@ func (m Medium) fetchArticles() []Article {
 	var rss rss
 	err = xml.NewDecoder(res.Body).Decode(&rss)
 	if err != nil {
-		common.LogError(err)
+		log.Error(err)
 		return nil
 	}
 	return rss.toArticles()
@@ -83,7 +84,7 @@ func (r rss) toArticles() []Article {
 }
 
 func getThumbnail(body string) string {
-	// Yes bobince, I am parsing HTML with regex. Bite me! (https://stackoverflow.com/a/1732454/6181476)
+	// Yes, I am parsing HTML with regex. Bite me!
 	var imgReg = regexp.MustCompile(`<img[^>]+\bsrc=["']([^"']+)["']`)
 	subMatch := imgReg.FindStringSubmatch(body)
 	if subMatch == nil {
