@@ -3,6 +3,7 @@ package gallery
 import (
 	"encoding/json"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 	"strconv"
@@ -35,7 +36,7 @@ func (u Unsplash) fetchImage(fetched []Image, page int) []Image {
 	url := fmt.Sprintf("https://api.Unsplash.com/users/%s/photos?page=%d&per_page=5", u.Username, page) // TODO: Increment per_page to 30 after testing this
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		common.LogError(err)
+		log.Warning(err)
 		return fetched
 	}
 
@@ -44,7 +45,7 @@ func (u Unsplash) fetchImage(fetched []Image, page int) []Image {
 
 	res, err := u.HttpClient.Do(req)
 	if err != nil {
-		common.LogError(err)
+		log.Warning(err)
 		return fetched
 	}
 	defer res.Body.Close()
@@ -52,7 +53,7 @@ func (u Unsplash) fetchImage(fetched []Image, page int) []Image {
 	var results unsplashImgSlice
 	err = json.NewDecoder(res.Body).Decode(&results)
 	if err != nil {
-		common.LogError(err)
+		log.Error(err)
 		return fetched
 	}
 

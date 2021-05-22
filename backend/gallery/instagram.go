@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 )
-
-var logError = common.LogError
 
 const (
 	instagramKey          = "Instagram"
@@ -44,13 +43,13 @@ func (i Instagram) GetCached() ([]byte, error) {
 func (i Instagram) fetchImage(fetched []Image, url string) []Image {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		logError(err)
+		log.Warning(err)
 		return fetched
 	}
 
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
-		logError(err)
+		log.Warning(err)
 		return fetched
 	}
 	defer res.Body.Close()
@@ -58,7 +57,7 @@ func (i Instagram) fetchImage(fetched []Image, url string) []Image {
 	var data instaImgResult
 	err = json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
-		logError(err)
+		log.Error(err)
 		return fetched
 	}
 
@@ -89,14 +88,14 @@ func (i Instagram) getToken() string {
 
 	// If we haven't saved the token before, log and error and refresh the token we have
 	if err != nil {
-		logError(fmt.Errorf("error while fetching Instagram access token %v", err))
+		log.Warningf("error while fetching Instagram access token %v", err)
 		return i.refreshToken(i.AccessToken)
 	}
 
 	// Check for expired token. This shouldn't happen normally
 	if tk.expired() {
 		// Access token has expired. We can't refresh it
-		logError(fmt.Errorf("instagram access token has expired"))
+		log.Error("instagram access token has expired")
 		return ""
 	}
 
@@ -118,12 +117,12 @@ func (i Instagram) refreshToken(oldToken string) string {
 	req, err := http.NewRequest(http.MethodGet, u, payload)
 
 	if err != nil {
-		logError(err)
+		log.Warning(err)
 		return oldToken
 	}
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
-		logError(err)
+		log.Warning(err)
 		return oldToken
 	}
 	defer res.Body.Close()
@@ -131,7 +130,7 @@ func (i Instagram) refreshToken(oldToken string) string {
 	var newT token
 	err = json.NewDecoder(res.Body).Decode(&newT)
 	if err != nil {
-		logError(err)
+		log.Error(err)
 		return newT.Value
 	}
 	newT.RefreshedAt = time.Now()
@@ -148,7 +147,7 @@ func (i Instagram) saveToken(t token) {
 		return txn.Set([]byte(getInstagramToken()), buf)
 	})
 	if err != nil {
-		logError(fmt.Errorf("error while persisting Instagram access token to Db: %v", err))
+		log.Errorf("error while persisting Instagram access token to Db: %v", err)
 	}
 }
 

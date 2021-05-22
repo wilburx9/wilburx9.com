@@ -7,6 +7,7 @@ import (
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/articles"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"github.com/wilburt/wilburx9.dev/backend/gallery"
@@ -16,7 +17,7 @@ import (
 
 var config = common.Config
 
-// SetUpServer sets the Http Server. Call SetLogger before this.
+// SetUpServer sets the Http Server. Call SetUpLogrus before this.
 func SetUpServer(db *badger.DB) *http.Server {
 	gin.ForceConsoleColor()
 	gin.SetMode(config.Env)
@@ -40,15 +41,36 @@ func SetUpServer(db *badger.DB) *http.Server {
 	return s
 }
 
-// SetLogger configures the custom logger
-func SetLogger() error {
-	return sentry.Init(sentry.ClientOptions{
+// SetUpLogrus configures the Logrus
+func SetUpLogrus() {
+	// Setup Logrus
+	log.SetReportCaller(true)
+	log.SetFormatter(&log.TextFormatter{
+		ForceColors:   true,
+		FullTimestamp: true,
+		PadLevelText:  true,
+	})
+}
+
+// SetUpSentry configures Sentry and attaches a Logrus hook
+func SetUpSentry() error {
+	var hook = common.NewSentryLogrusHook([]log.Level{
+		log.PanicLevel,
+		log.FatalLevel,
+		log.ErrorLevel,
+		log.WarnLevel,
+	})
+
+	// Setup Sentry
+	err := sentry.Init(sentry.ClientOptions{
 		Dsn:              config.SentryDsn,
 		AttachStacktrace: true,
 		Debug:            config.Env == "debug",
 		Environment:      config.Env,
 		TracesSampleRate: 1.0,
 	})
+	log.AddHook(&hook)
+	return err
 }
 
 // CleanUpLogger flushes buffered events
