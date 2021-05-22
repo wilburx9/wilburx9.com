@@ -11,38 +11,46 @@ import (
 	"time"
 )
 
+var logError = common.LogError
+
 const (
-	instagramKey          = "instagram"
+	instagramKey          = "Instagram"
 	minTokenRemainingLife = 5 * time.Minute // 5 Minutes
 )
 
-type instagram struct {
+// Instagram encapsulates the fetching data from Instagram, caching the data,
+// fetching cached data, and refreshing Instagram access token
+type Instagram struct {
 	AccessToken string
 	common.Fetcher
 }
 
-func (i instagram) cacheImages() {
+// FetchAndCache fetches and caches data fetched from Instagram
+func (i Instagram) FetchAndCache() {
 	accessToken := i.getToken()
 	fields := "caption,media_type,id,media_url,timestamp,permalink,thumbnail_url,media_type"
-	u := fmt.Sprintf("https://graph.instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
+	u := fmt.Sprintf("https://graph.Instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
 	allResults := i.fetchImage([]Image{}, u)
-	saveImages(i.Db, instagramKey, allResults)
+	buf, _ := json.Marshal(allResults)
+	i.CacheData(getCacheKey(instagramKey), buf)
 }
 
-func (i instagram) getCachedImages() []Image {
-	return getImagesFrmDb(i.Db, instagramKey)
+// GetCached fetches Instagram images from the db that was previously saved in Cache
+func (i Instagram) GetCached() ([]byte, error) {
+	return i.GetCachedData(getCacheKey(instagramKey))
 }
 
-func (i instagram) fetchImage(fetched []Image, url string) []Image {
+// Recursively fetch all the images
+func (i Instagram) fetchImage(fetched []Image, url string) []Image {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		common.LogError(err)
+		logError(err)
 		return fetched
 	}
 
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
-		common.LogError(err)
+		logError(err)
 		return fetched
 	}
 	defer res.Body.Close()
@@ -50,7 +58,7 @@ func (i instagram) fetchImage(fetched []Image, url string) []Image {
 	var data instaImgResult
 	err = json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
-		common.LogError(err)
+		logError(err)
 		return fetched
 	}
 
@@ -61,11 +69,13 @@ func (i instagram) fetchImage(fetched []Image, url string) []Image {
 		return fetched
 	}
 
+	// Fetch the next page
 	return i.fetchImage(fetched, data.Paging.Next)
 }
 
-func (i instagram) getToken() string {
+func (i Instagram) getToken() string {
 	var tk token
+	// Attempt to get token from Db
 	err := i.Db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(getInstagramToken()))
 		if err != nil {
@@ -77,27 +87,28 @@ func (i instagram) getToken() string {
 		})
 	})
 
+	// If we haven't saved the token before, log and error and refresh the token we have
 	if err != nil {
-		common.LogError(fmt.Errorf("error while fetching instagram access token %v", err))
-		return ""
+		logError(fmt.Errorf("error while fetching Instagram access token %v", err))
+		return i.refreshToken(i.AccessToken)
 	}
 
-	// Check if access token has expired
+	// Check for expired token. This shouldn't happen normally
 	if tk.expired() {
 		// Access token has expired. We can't refresh it
-		common.LogError(fmt.Errorf("instagram access token has expired"))
+		logError(fmt.Errorf("instagram access token has expired"))
 		return ""
 	}
 
-	// Check if access token should be refresh
+	// Refresh the token if needs be
 	if tk.shouldRefresh() {
 		return i.refreshToken(tk.Value)
 	}
 	return tk.Value
 }
 
-func (i instagram) refreshToken(oldToken string) string {
-	u := "https://graph.instagram.com/refresh_access_token"
+func (i Instagram) refreshToken(oldToken string) string {
+	u := "https://graph.Instagram.com/refresh_access_token"
 
 	params := url.Values{}
 	params.Set("grant_type", "ig_refresh_token")
@@ -107,12 +118,12 @@ func (i instagram) refreshToken(oldToken string) string {
 	req, err := http.NewRequest(http.MethodGet, u, payload)
 
 	if err != nil {
-		common.LogError(err)
+		logError(err)
 		return oldToken
 	}
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
-		common.LogError(err)
+		logError(err)
 		return oldToken
 	}
 	defer res.Body.Close()
@@ -120,7 +131,7 @@ func (i instagram) refreshToken(oldToken string) string {
 	var newT token
 	err = json.NewDecoder(res.Body).Decode(&newT)
 	if err != nil {
-		common.LogError(err)
+		logError(err)
 		return newT.Value
 	}
 	newT.RefreshedAt = time.Now()
@@ -128,7 +139,7 @@ func (i instagram) refreshToken(oldToken string) string {
 	return newT.Value
 }
 
-func (i instagram) saveToken(t token) {
+func (i Instagram) saveToken(t token) {
 	err := i.Db.Update(func(txn *badger.Txn) error {
 		buf, err := json.Marshal(t)
 		if err != nil {
@@ -137,7 +148,7 @@ func (i instagram) saveToken(t token) {
 		return txn.Set([]byte(getInstagramToken()), buf)
 	})
 	if err != nil {
-		common.LogError(fmt.Errorf("error while persisting instagram access token to Db: %v", err))
+		logError(fmt.Errorf("error while persisting Instagram access token to Db: %v", err))
 	}
 }
 
@@ -170,7 +181,7 @@ func (s instaImgSlice) toImages() []Image {
 			Url:          e.Permalink,
 			Caption:      e.Caption,
 			UploadedAt:   common.StringToTime(timeLayout, e.Timestamp),
-			Source:       "instagram",
+			Source:       "Instagram",
 		}
 	}
 	return images

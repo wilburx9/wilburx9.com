@@ -13,8 +13,11 @@ const (
 	// StorageCache is the key to caches of fetched data
 	StorageCache = "cache"
 
-	// StorageGallery is the key to cache of all gallery document in Db
+	// StorageGallery is the key to cache of all gallery response in Db
 	StorageGallery = "gallery"
+
+	// StorageArticles is the key to cache of all articles response in Db
+	StorageArticles = "articles"
 )
 
 // GetCacheKey returns the key of cache

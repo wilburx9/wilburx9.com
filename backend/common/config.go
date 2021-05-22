@@ -9,15 +9,16 @@ import (
 var Config appConfig
 
 type appConfig struct {
-	Port              string `mapstructure:"port"`
-	MediumUsername    string `mapstructure:"medium_username"`
-	WPUrl             string `mapstructure:"wp_url"`
-	UnsplashUsername  string `mapstructure:"unsplash_username"`
-	UnsplashAccessKey string `mapstructure:"unsplash_access_key"`
-	Env               string `mapstructure:"env"`
-	SentryDsn         string `mapstructure:"sentry_dsn"`
-	GcpSaKey          string `mapstructure:"gcp_backend_sa_key"`
-	GcpProjectId      string `mapstructure:"gcp_project_id"`
+	Port                 string `mapstructure:"port"`
+	MediumUsername       string `mapstructure:"medium_username"`
+	WPUrl                string `mapstructure:"wp_url"`
+	UnsplashUsername     string `mapstructure:"unsplash_username"`
+	UnsplashAccessKey    string `mapstructure:"unsplash_access_key"`
+	InstagramAccessToken string `mapstructure:"instagram_access_token"`
+	Env                  string `mapstructure:"env"`
+	SentryDsn            string `mapstructure:"sentry_dsn"`
+	GcpSaKey             string `mapstructure:"gcp_backend_sa_key"`
+	GcpProjectId         string `mapstructure:"gcp_project_id"`
 }
 
 func (c appConfig) isRelease() bool {

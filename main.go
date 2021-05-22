@@ -24,11 +24,14 @@ func main() {
 	}
 	defer backend.CleanUpLogger()
 
-	db, err := badger.Open(badger.DefaultOptions("/db/cache"))
+	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
 
 	if err != nil {
 		common.LogError(fmt.Errorf("setting up badger failed %v", err))
+		return
 	}
+
+	go backend.CacheDataSources(db)
 
 	// Setup and start Http server
 	s := backend.SetUpServer(db)

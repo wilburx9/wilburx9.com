@@ -6,18 +6,36 @@ import (
 	"net/http"
 )
 
-type wordpress struct {
-	url string // WP V2 post url URL e.g https://example.com/wp-json/wp/v2/posts
+const (
+	wordpressKey = "Wordpress"
+)
+
+// Wordpress encapsulates fetching and caching of wordpress blog posts
+type Wordpress struct {
+	URL string // WP V2 post URL URL e.g https://example.com/wp-json/wp/v2/posts
+	common.Fetcher
 }
 
-func (w wordpress) fetchArticles(client common.HttpClient) []Article {
-	req, err := http.NewRequest(http.MethodGet, w.url, nil)
+// FetchAndCache fetches and caches wordpress articles
+func (w Wordpress) FetchAndCache() {
+	articles := w.fetchArticles()
+	buf, _ := json.Marshal(articles)
+	w.CacheData(getCacheKey(wordpressKey), buf)
+}
+
+// GetCached returns cached Wordpress articles
+func (w Wordpress) GetCached() ([]byte, error) {
+	return w.GetCachedData(getCacheKey(wordpressKey))
+}
+
+func (w Wordpress) fetchArticles() []Article {
+	req, err := http.NewRequest(http.MethodGet, w.URL, nil)
 	if err != nil {
 		common.LogError(err)
 		return nil
 	}
 
-	res, err := client.Do(req)
+	res, err := w.HttpClient.Do(req)
 	if err != nil {
 		common.LogError(err)
 		return nil
