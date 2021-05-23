@@ -18,8 +18,8 @@ func Handler(c *gin.Context) {
 	}
 
 	medium := Medium{Name: common.Config.MediumUsername, Fetcher: fetcher}
-	// wordpress := articles.Wordpress{URL: config.WPUrl, Fetcher: fetcher}
-	sources := [...]common.Source{medium}
+	wordpress := Wordpress{URL: common.Config.WPUrl, Fetcher: fetcher}
+	sources := [...]common.Source{medium, wordpress}
 
 	var allArticles = make([]Article, 0)
 	for _, source := range sources {
