@@ -12,7 +12,7 @@ import (
 
 const (
 	instagramKey          = "Instagram"
-	minTokenRemainingLife = 5 * time.Minute // 5 Minutes
+	minTokenRemainingLife = 24 * time.Hour * 5  // 5 Days
 )
 
 // Instagram encapsulates the fetching data from Instagram, caching the data,
@@ -28,12 +28,8 @@ func (i Instagram) FetchAndCache() {
 	fields := "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type"
 	u := fmt.Sprintf("https://graph.instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
 	allResults := i.fetchImage([]Image{}, u)
-	log.Infof("Total results = %v", len(allResults))
-	buf, err := json.Marshal(allResults)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't marshall Instagram images")
-	}
-	i.CacheData(getCacheKey(instagramKey), buf)
+	bytes, _ := json.Marshal(allResults)
+	i.CacheData(getCacheKey(instagramKey), bytes)
 }
 
 // GetCached fetches Instagram images from the db that was previously saved in Cache
@@ -88,7 +84,7 @@ func (i Instagram) getToken() string {
 		})
 	})
 
-	// If we haven't saved the token before, log and error and refresh the token we have
+	// If we haven't saved the token before, log and error and refresh the token we have noq
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't fetch Instagram token")
 		return i.refreshToken(i.AccessToken)
@@ -97,7 +93,7 @@ func (i Instagram) getToken() string {
 	// Check for expired token. This shouldn't happen normally
 	if tk.expired() {
 		// Access token has expired. We can't refresh it
-		log.Error("instagram access token has expired")
+		log.Error("Instagram access token has expired")
 		return ""
 	}
 
@@ -150,14 +146,14 @@ func (i Instagram) saveToken(t token) {
 
 func (t token) expired() bool {
 	var now = time.Now()
-	var expireTime = t.RefreshedAt.Add(time.Minute * time.Duration(t.ExpiresIn))
+	var expireTime = t.RefreshedAt.Add(time.Second * time.Duration(t.ExpiresIn))
 	return now.Equal(expireTime) || now.After(expireTime)
 }
 
 // It should be refreshed if the remaining life of the access token is less than 5 days
 func (t token) shouldRefresh() bool {
 	var now = time.Now()
-	var expireTime = t.RefreshedAt.Add(time.Minute * time.Duration(t.ExpiresIn))
+	var expireTime = t.RefreshedAt.Add(time.Second * time.Duration(t.ExpiresIn))
 	diff := expireTime.Sub(now)
 	return diff <= minTokenRemainingLife
 }
