@@ -39,6 +39,9 @@ func (hook *SentryLogrusHook) Levels() []log.Level {
 
 // Fire logs to Sentry
 func (hook *SentryLogrusHook) Fire(entry *log.Entry) error {
+	if Config.IsDebug() {
+		return nil
+	}
 	var exception error
 
 	if err, ok := entry.Data[log.ErrorKey].(error); ok && err != nil {

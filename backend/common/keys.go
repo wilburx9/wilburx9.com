@@ -10,9 +10,6 @@ const (
 	// Access is the prefix for keys that have to do with API keys, access tokens
 	Access = "Access"
 
-	// StorageCache is the key to caches of fetched data
-	StorageCache = "cache"
-
 	// StorageGallery is the key to cache of all gallery response in Db
 	StorageGallery = "gallery"
 
