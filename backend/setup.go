@@ -80,10 +80,10 @@ func CacheDataSources(db *badger.DB) {
 
 	instagram := gallery.Instagram{AccessToken: config.InstagramAccessToken, Fetcher: fetcher}
 	unsplash := gallery.Unsplash{Username: config.UnsplashUsername, AccessKey: config.UnsplashAccessKey, Fetcher: fetcher}
-	// medium := articles.Medium{Name: config.MediumUsername, Fetcher: fetcher}
+	medium := articles.Medium{Name: config.MediumUsername, Fetcher: fetcher}
 	// wordpress := articles.Wordpress{URL: config.WPUrl, Fetcher: fetcher}
 
-	sources := [...]common.Source{instagram, unsplash}
+	sources := [...]common.Source{instagram, unsplash, medium}
 	for _, source := range sources {
 		source.FetchAndCache()
 	}

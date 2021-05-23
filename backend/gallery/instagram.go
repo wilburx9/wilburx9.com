@@ -55,7 +55,7 @@ func (i Instagram) fetchImage(fetched []Image, url string) []Image {
 	var data instaImgResult
 	err = json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall Instagram data")
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
 		return fetched
 	}
 
@@ -123,7 +123,7 @@ func (i Instagram) refreshToken(oldToken string) string {
 	var newT token
 	err = json.NewDecoder(res.Body).Decode(&newT)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall Instagram refresh token response")
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall refresh token response")
 		return newT.Value
 	}
 	newT.RefreshedAt = time.Now()
