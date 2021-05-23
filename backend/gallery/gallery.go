@@ -19,8 +19,8 @@ func Handler(c *gin.Context) {
 	}
 
 	instagram := Instagram{AccessToken: common.Config.InstagramAccessToken, Fetcher: fetcher}
-	// unsplash := Unsplash{Username: common.Config.UnsplashUsername, AccessKey: common.Config.UnsplashAccessKey, Fetcher: fetcher}
-	sources := [...]common.Source{instagram}
+	unsplash := Unsplash{Username: common.Config.UnsplashUsername, AccessKey: common.Config.UnsplashAccessKey, Fetcher: fetcher}
+	sources := [...]common.Source{instagram, unsplash}
 
 	var allImages []Image
 	for _, source := range sources {
