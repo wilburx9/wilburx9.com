@@ -12,7 +12,6 @@ import (
 
 // Handler retrieves a list of all the images
 func Handler(c *gin.Context) {
-	c.Header("Content-Type", "application/json")
 	fetcher := common.Fetcher{
 		Db:         c.MustGet(common.Db).(*badger.DB),
 		HttpClient: &http.Client{},
@@ -22,7 +21,7 @@ func Handler(c *gin.Context) {
 	unsplash := Unsplash{Username: common.Config.UnsplashUsername, AccessKey: common.Config.UnsplashAccessKey, Fetcher: fetcher}
 	sources := [...]common.Source{instagram, unsplash}
 
-	var allImages []Image
+	var allImages = make([]Image, 0)
 	for _, source := range sources {
 		var images []Image
 		bytes, _ := source.GetCached()
