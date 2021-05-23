@@ -5,6 +5,8 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
+	"regexp"
+	"strings"
 )
 
 const (
@@ -62,10 +64,21 @@ func (p posts) toArticles() []Article {
 			Url:       e.Link,
 			PostedAt:  common.StringToTime(timeLayout, e.Date),
 			UpdatedAt: common.StringToTime(timeLayout, e.Date),
-			Excerpt:   e.Excerpt.Rendered,
+			Excerpt:   cleanWpExcept(e),
 		}
 	}
 	return articles
+}
+
+func cleanWpExcept(p post) string {
+	strings.NewReplacer()
+	var rt = regexp.MustCompile(`<[^>]*>`)                    // Tags regex
+	var noTags = rt.ReplaceAllString(p.Excerpt.Rendered, " ") // Remove tags
+
+	var rs = regexp.MustCompile(`/\\s{2,}`)        // Double spaces regex
+	var noSpaces = rs.ReplaceAllString(noTags, "") // Remove double spaces
+
+	return strings.TrimSpace(noSpaces)
 }
 
 type posts []post
