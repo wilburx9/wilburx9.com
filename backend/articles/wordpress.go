@@ -64,16 +64,16 @@ func (p posts) toArticles() []Article {
 			Url:       e.Link,
 			PostedAt:  common.StringToTime(timeLayout, e.Date),
 			UpdatedAt: common.StringToTime(timeLayout, e.Date),
-			Excerpt:   cleanWpExcept(e),
+			Excerpt:   getWpExcept(e.Excerpt.Rendered),
 		}
 	}
 	return articles
 }
 
-func cleanWpExcept(p post) string {
-	strings.NewReplacer()
-	var rt = regexp.MustCompile(`<[^>]*>`)                    // Tags regex
-	var noTags = rt.ReplaceAllString(p.Excerpt.Rendered, " ") // Remove tags
+// Remove Html tag and leading & trailing spaces from the except
+func getWpExcept(s string) string {
+	var rt = regexp.MustCompile(`<[^>]*>`)   // Tags regex
+	var noTags = rt.ReplaceAllString(s, " ") // Remove tags
 
 	var rs = regexp.MustCompile(`/\\s{2,}`)        // Double spaces regex
 	var noSpaces = rs.ReplaceAllString(noTags, "") // Remove double spaces
