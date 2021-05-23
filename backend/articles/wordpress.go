@@ -32,13 +32,13 @@ func (w Wordpress) GetCached() ([]byte, error) {
 func (w Wordpress) fetchArticles() []Article {
 	req, err := http.NewRequest(http.MethodGet, w.URL, nil)
 	if err != nil {
-		log.Warning(err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
 		return nil
 	}
 
 	res, err := w.HttpClient.Do(req)
 	if err != nil {
-		log.Warning(err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
 		return nil
 	}
 	defer res.Body.Close()
@@ -46,7 +46,7 @@ func (w Wordpress) fetchArticles() []Article {
 	var posts posts
 	err = json.NewDecoder(res.Body).Decode(&posts)
 	if err != nil {
-		log.Error(err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
 		return nil
 	}
 	return posts.toArticles()
