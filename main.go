@@ -2,9 +2,11 @@ package main
 
 import (
 	"github.com/dgraph-io/badger/v3"
+	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend"
 	"github.com/wilburt/wilburx9.dev/backend/common"
+	"time"
 )
 
 func main() {
@@ -19,7 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("sentry.Init: failed %s", err)
 	}
-	defer backend.CleanUpLogger()
+	defer sentry.Flush(2 * time.Second)
 
 	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
 

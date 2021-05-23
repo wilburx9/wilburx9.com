@@ -2,6 +2,8 @@ package common
 
 import (
 	"fmt"
+	"github.com/fatih/structs"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -17,12 +19,16 @@ type appConfig struct {
 	InstagramAccessToken string `mapstructure:"instagram_access_token"`
 	Env                  string `mapstructure:"env"`
 	SentryDsn            string `mapstructure:"sentry_dsn"`
-	GcpSaKey             string `mapstructure:"gcp_backend_sa_key"`
-	GcpProjectId         string `mapstructure:"gcp_project_id"`
 }
 
-func (c appConfig) isRelease() bool {
+// IsRelease returns true for release Env and false otherwise
+func (c appConfig) IsRelease() bool {
 	return c.Env == "release"
+}
+
+// IsDebug returns true for debug Env and false otherwise
+func (c appConfig) IsDebug() bool {
+	return c.Env == "debug"
 }
 
 // LoadConfig loads config variables from a config file or environment variables
@@ -38,5 +44,7 @@ func LoadConfig(path string) error {
 		return fmt.Errorf("failed to read the configuration file: %s", err)
 	}
 
-	return v.Unmarshal(&Config)
+	err := v.Unmarshal(&Config)
+	log.WithFields(structs.Map(Config)).Info("App started with config")
+	return err
 }

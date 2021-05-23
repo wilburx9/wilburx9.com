@@ -7,8 +7,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
-	"net/url"
-	"strings"
 	"time"
 )
 
@@ -27,10 +25,14 @@ type Instagram struct {
 // FetchAndCache fetches and caches data fetched from Instagram
 func (i Instagram) FetchAndCache() {
 	accessToken := i.getToken()
-	fields := "caption,media_type,id,media_url,timestamp,permalink,thumbnail_url,media_type"
-	u := fmt.Sprintf("https://graph.Instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
+	fields := "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type"
+	u := fmt.Sprintf("https://graph.instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
 	allResults := i.fetchImage([]Image{}, u)
-	buf, _ := json.Marshal(allResults)
+	log.Infof("Total results = %v", len(allResults))
+	buf, err := json.Marshal(allResults)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't marshall Instagram images")
+	}
 	i.CacheData(getCacheKey(instagramKey), buf)
 }
 
@@ -43,13 +45,13 @@ func (i Instagram) GetCached() ([]byte, error) {
 func (i Instagram) fetchImage(fetched []Image, url string) []Image {
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Warning(err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
 		return fetched
 	}
 
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
-		log.Warning(err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
 		return fetched
 	}
 	defer res.Body.Close()
@@ -57,7 +59,7 @@ func (i Instagram) fetchImage(fetched []Image, url string) []Image {
 	var data instaImgResult
 	err = json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
-		log.Error(err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall Instagram data")
 		return fetched
 	}
 
@@ -88,7 +90,7 @@ func (i Instagram) getToken() string {
 
 	// If we haven't saved the token before, log and error and refresh the token we have
 	if err != nil {
-		log.Warningf("error while fetching Instagram access token %v", err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't fetch Instagram token")
 		return i.refreshToken(i.AccessToken)
 	}
 
@@ -107,22 +109,17 @@ func (i Instagram) getToken() string {
 }
 
 func (i Instagram) refreshToken(oldToken string) string {
-	u := "https://graph.Instagram.com/refresh_access_token"
+	url := fmt.Sprintf("https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=%v", oldToken)
 
-	params := url.Values{}
-	params.Set("grant_type", "ig_refresh_token")
-	params.Set("access_token", oldToken)
-	payload := strings.NewReader(params.Encode())
-
-	req, err := http.NewRequest(http.MethodGet, u, payload)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 
 	if err != nil {
-		log.Warning(err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
 		return oldToken
 	}
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
-		log.Warning(err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
 		return oldToken
 	}
 	defer res.Body.Close()
@@ -130,7 +127,7 @@ func (i Instagram) refreshToken(oldToken string) string {
 	var newT token
 	err = json.NewDecoder(res.Body).Decode(&newT)
 	if err != nil {
-		log.Error(err)
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall Instagram refresh token response")
 		return newT.Value
 	}
 	newT.RefreshedAt = time.Now()
@@ -170,7 +167,7 @@ func getInstagramToken() string {
 }
 
 func (s instaImgSlice) toImages() []Image {
-	var timeLayout = "2006-02-01T15:04:05-0700"
+	var timeLayout = "2006-01-02T15:04:05-0700"
 	var images = make([]Image, len(s))
 
 	for i, e := range s {
