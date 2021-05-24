@@ -22,7 +22,7 @@ const (
 // Medium encapsulates the fetching and caching of medium articles
 type Medium struct {
 	Name string // should be Medium username (e.g "@Wilburx9") or publication (e.g flutter-community)
-	internal.Fetcher
+	internal.Fetch
 }
 
 // FetchAndCache fetches and caches all Medium Articles

@@ -7,14 +7,17 @@ const (
 	// Db is the key for the Db
 	Db = "storage"
 
-	// Access is the prefix for keys that have to do with API keys, access tokens
-	Access = "Access"
+	// DbAccessKey is the prefix for keys that have to do with API keys, access tokens
+	DbAccessKey = "DbAccessKey"
 
-	// StorageGallery is the key to cache of all gallery response in Db
-	StorageGallery = "gallery"
+	// DbGalleryKey is the key to cache of all gallery response in Db
+	DbGalleryKey = "gallery"
 
-	// StorageArticles is the key to cache of all articles response in Db
-	StorageArticles = "articles"
+	// DbArticlesKey is the key to cache of all articles response in Db
+	DbArticlesKey = "articles"
+
+	// DbReposKey is the key to cache of all git repos response in Db
+	DbReposKey = "repositories"
 )
 
 // GetCacheKey returns the key of cache

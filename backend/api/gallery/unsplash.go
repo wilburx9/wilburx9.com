@@ -17,7 +17,7 @@ const (
 type Unsplash struct {
 	Username  string
 	AccessKey string
-	internal.Fetcher
+	internal.Fetch
 }
 
 // FetchAndCache fetches data from Unsplash and caches it
