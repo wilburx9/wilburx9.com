@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
-	"github.com/wilburt/wilburx9.dev/backend/configs"
 )
 
 var (
@@ -38,7 +37,7 @@ func (hook *SentryLogrusHook) Levels() []log.Level {
 
 // Fire logs to Sentry
 func (hook *SentryLogrusHook) Fire(entry *log.Entry) error {
-	if configs.Config.IsDebug() {
+	if Config.IsDebug() {
 		return nil
 	}
 	var exception error

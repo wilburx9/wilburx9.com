@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
-	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"sort"
@@ -18,8 +17,8 @@ func Handler(c *gin.Context) {
 		HttpClient: &http.Client{},
 	}
 
-	instagram := Instagram{AccessToken: configs.Config.InstagramAccessToken, Fetcher: fetcher}
-	unsplash := Unsplash{Username: configs.Config.UnsplashUsername, AccessKey: configs.Config.UnsplashAccessKey, Fetcher: fetcher}
+	instagram := Instagram{AccessToken: internal.Config.InstagramAccessToken, Fetcher: fetcher}
+	unsplash := Unsplash{Username: internal.Config.UnsplashUsername, AccessKey: internal.Config.UnsplashAccessKey, Fetcher: fetcher}
 	sources := [...]internal.Source{instagram, unsplash}
 
 	var allImages = make([]Image, 0)

@@ -5,7 +5,6 @@ import (
 	"github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
-	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 	"sort"
 	"time"
@@ -18,8 +17,8 @@ func Handler(c *gin.Context) {
 		HttpClient: &http.Client{},
 	}
 
-	medium := Medium{Name: configs.Config.MediumUsername, Fetcher: fetcher}
-	wordpress := Wordpress{URL: configs.Config.WPUrl, Fetcher: fetcher}
+	medium := Medium{Name: internal.Config.MediumUsername, Fetcher: fetcher}
+	wordpress := Wordpress{URL: internal.Config.WPUrl, Fetcher: fetcher}
 	sources := [...]internal.Source{medium, wordpress}
 
 	var allArticles = make([]Article, 0)

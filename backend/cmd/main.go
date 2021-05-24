@@ -5,7 +5,6 @@ import (
 	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api"
-	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"time"
 )
 
@@ -13,7 +12,7 @@ func main() {
 	api.SetUpLogrus()
 
 	// Attempt to load config
-	if err := configs.LoadConfig("../configs"); err != nil {
+	if err := api.LoadConfig(); err != nil {
 		log.Fatalf("invalid application configuration: %s", err)
 	}
 
