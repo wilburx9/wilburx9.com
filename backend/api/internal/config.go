@@ -1,4 +1,4 @@
-package configs
+package internal
 
 import (
 	"fmt"
