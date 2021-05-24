@@ -3,42 +3,57 @@ package gallery
 import (
 	"encoding/json"
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
 	"strconv"
 )
 
-type unsplash struct {
-	username  string
-	accessKey string
+const (
+	unsplashKey = "Unsplash"
+)
+
+// Unsplash handles fetching and caching of data from Unsplash. And also returning the cached data
+type Unsplash struct {
+	Username  string
+	AccessKey string
+	common.Fetcher
 }
 
-func (u unsplash) fetchImages(client common.HttpClient) []Image {
-	return u.fetchImage(client, []Image{}, 1)
+// FetchAndCache fetches data from Unsplash and caches it
+func (u Unsplash) FetchAndCache() {
+	images := u.fetchImage([]Image{}, 1)
+	buf, _ := json.Marshal(images)
+	u.CacheData(getCacheKey(unsplashKey), buf)
 }
 
-func (u unsplash) fetchImage(client common.HttpClient, fetched []Image, page int) []Image {
-	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?page=%d&per_page=5", u.username, page) // TODO: Increment per_page to 30 after testing this
+// GetCached returns data that was cached in Cache
+func (u Unsplash) GetCached() ([]byte, error) {
+	return u.GetCachedData(getCacheKey(unsplashKey))
+}
+
+func (u Unsplash) fetchImage(fetched []Image, page int) []Image {
+	url := fmt.Sprintf("https://api.Unsplash.com/users/%s/photos?page=%d&per_page=5", u.Username, page) // TODO: Increment per_page to 30 after testing this
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("An error while creating http request for %s :: \"%v\"", url, err))
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
 		return fetched
 	}
 
 	req.Header.Add("Accept-Version", "v1")
-	req.Header.Add("Authorization", fmt.Sprintf("Client-ID %s", u.accessKey))
+	req.Header.Add("Authorization", fmt.Sprintf("Client-ID %s", u.AccessKey))
 
-	res, err := client.Do(req)
+	res, err := u.HttpClient.Do(req)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("An error occurred while sending request for %s :: \"%v\"", url, err))
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
 		return fetched
 	}
 	defer res.Body.Close()
 
-	var results imageResults
+	var results unsplashImgSlice
 	err = json.NewDecoder(res.Body).Decode(&results)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("An error occurred while decoding response for %s :: \"%v\"", url, err))
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
 		return fetched
 	}
 
@@ -46,26 +61,27 @@ func (u unsplash) fetchImage(client common.HttpClient, fetched []Image, page int
 
 	totalImages, err := strconv.Atoi(res.Header.Get("X-Total"))
 
-	// Return if an error is encountered or if all images has been
-	if err != nil || len(results) >= totalImages {
+	// Return if an error is encountered or if all images has been fetched
+	if err != nil || len(fetched) >= totalImages {
 		return fetched
 	}
 
 	page++
-	return u.fetchImage(client, fetched, page)
+	return u.fetchImage(fetched, page)
 }
 
-func (m imageResults) toImages() []Image {
+func (m unsplashImgSlice) toImages() []Image {
 	var timeLayout = "2006-01-02T03:04:05-07:00"
 	var images = make([]Image, len(m))
 
 	for i, e := range m {
 		images[i] = Image{
-			Thumbnail:  e.Urls.Small,
-			Url:        e.Urls.Full,
-			Caption:    e.Description,
-			UploadedAt: common.StringToTime(timeLayout, e.CreatedAt),
-			Source:     "unsplash",
+			SrcThumbnail: e.Urls.Small,
+			Src:          e.Urls.Full,
+			Url:          e.Links.HTML,
+			Caption:      e.Description,
+			UploadedAt:   common.StringToTime(timeLayout, e.CreatedAt),
+			Source:       "Unsplash",
 			Meta: map[string]interface{}{
 				"user": e.User,
 			},
@@ -74,12 +90,13 @@ func (m imageResults) toImages() []Image {
 	return images
 }
 
-type imageResults []imageResult
+type unsplashImgSlice []unsplashImg
 
-type imageResult struct {
+type unsplashImg struct {
 	CreatedAt   string `json:"created_at"`
 	Color       string `json:"color"`
 	Description string `json:"description"`
+	User        user   `json:"user"`
 	Urls        struct {
 		Full  string `json:"full"`
 		Small string `json:"small"`
@@ -87,8 +104,9 @@ type imageResult struct {
 	Links struct {
 		HTML string `json:"html"`
 	} `json:"links"`
-	User struct {
-		Username string `json:"username"`
-		Name     string `json:"name"`
-	} `json:"user"`
+}
+
+type user struct {
+	Username string `json:"Username"`
+	Name     string `json:"name"`
 }

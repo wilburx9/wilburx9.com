@@ -6,9 +6,11 @@ import (
 )
 
 func TestMediumFetchArticles(t *testing.T) {
-	var m = medium{name: "testUser"}
-	clientMock := common.HttpClientMock{ResponseFilePath: "./testdata/medium_response.xml"}
-	var articles = m.fetchArticles(&clientMock)
+	var m = Medium{Name: "testUser", Fetcher: common.Fetcher{
+		Db:         nil,
+		HttpClient: &common.HttpClientMock{ResponseFilePath: "./testdata/medium_response.xml"},
+	}}
+	var articles = m.fetchArticles()
 
 	first := articles[0]
 	second := articles[1]

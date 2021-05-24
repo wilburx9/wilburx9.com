@@ -2,25 +2,45 @@ package articles
 
 import (
 	"encoding/json"
-	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/common"
 	"net/http"
+	"regexp"
+	"strings"
 )
 
-type wordpress struct {
-	url string // WP V2 post url URL e.g https://example.com/wp-json/wp/v2/posts
+const (
+	wordpressKey = "Wordpress"
+)
+
+// Wordpress encapsulates fetching and caching of wordpress blog posts
+type Wordpress struct {
+	URL string // WP V2 post URL URL e.g https://example.com/wp-json/wp/v2/posts
+	common.Fetcher
 }
 
-func (w wordpress) fetchArticles(client common.HttpClient) []Article {
-	req, err := http.NewRequest(http.MethodGet, w.url, nil)
+// FetchAndCache fetches and caches wordpress articles
+func (w Wordpress) FetchAndCache() {
+	articles := w.fetchArticles()
+	buf, _ := json.Marshal(articles)
+	w.CacheData(getCacheKey(wordpressKey), buf)
+}
+
+// GetCached returns cached Wordpress articles
+func (w Wordpress) GetCached() ([]byte, error) {
+	return w.GetCachedData(getCacheKey(wordpressKey))
+}
+
+func (w Wordpress) fetchArticles() []Article {
+	req, err := http.NewRequest(http.MethodGet, w.URL, nil)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("An error while creating http request for %s :: \"%v\"", w.url, err))
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
 		return nil
 	}
 
-	res, err := client.Do(req)
+	res, err := w.HttpClient.Do(req)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("An error occurred while sending request for %s :: \"%v\"", w.url, err))
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
 		return nil
 	}
 	defer res.Body.Close()
@@ -28,7 +48,7 @@ func (w wordpress) fetchArticles(client common.HttpClient) []Article {
 	var posts posts
 	err = json.NewDecoder(res.Body).Decode(&posts)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("An error occurred while decoding response for %s :: \"%v\"", w.url, err))
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
 		return nil
 	}
 	return posts.toArticles()
@@ -44,10 +64,21 @@ func (p posts) toArticles() []Article {
 			Url:       e.Link,
 			PostedAt:  common.StringToTime(timeLayout, e.Date),
 			UpdatedAt: common.StringToTime(timeLayout, e.Date),
-			Excerpt:   e.Excerpt.Rendered,
+			Excerpt:   getWpExcept(e.Excerpt.Rendered),
 		}
 	}
 	return articles
+}
+
+// Remove Html tag and leading & trailing spaces from the except
+func getWpExcept(s string) string {
+	var rt = regexp.MustCompile(`<[^>]*>`)   // Tags regex
+	var noTags = rt.ReplaceAllString(s, " ") // Remove tags
+
+	var rs = regexp.MustCompile(`/\\s{2,}`)        // Double spaces regex
+	var noSpaces = rs.ReplaceAllString(noTags, "") // Remove double spaces
+
+	return strings.TrimSpace(noSpaces)
 }
 
 type posts []post

@@ -1,32 +1,38 @@
 package main
 
 import (
-	"fmt"
-	"github.com/gin-gonic/contrib/static"
-	"github.com/gin-gonic/gin"
-	"github.com/wilburt/wilburx9.dev/backend/articles"
+	"github.com/dgraph-io/badger/v3"
+	"github.com/getsentry/sentry-go"
+	log "github.com/sirupsen/logrus"
+	"github.com/wilburt/wilburx9.dev/backend"
 	"github.com/wilburt/wilburx9.dev/backend/common"
-	"github.com/wilburt/wilburx9.dev/backend/gallery"
-	"net/http"
+	"time"
 )
 
 func main() {
+	backend.SetUpLogrus()
+
 	// Attempt to load config
 	if err := common.LoadConfig("./"); err != nil {
-		panic(fmt.Errorf("invalid application configuration: %s", err))
+		log.Fatalf("invalid application configuration: %s", err)
 	}
-	gin.ForceConsoleColor()
-	gin.SetMode(common.Config.Env)
-	router := gin.Default()
 
-	// Serve frontend static files
-	router.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
+	err := backend.SetUpSentry()
+	if err != nil {
+		log.Fatalf("sentry.Init: failed %s", err)
+	}
+	defer sentry.Flush(2 * time.Second)
 
-	// Setup API route
-	api := router.Group("/api")
-	api.GET("/articles", articles.Handler)
-	api.GET("/gallery", gallery.Handler)
+	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
 
-	s := &http.Server{Addr: fmt.Sprintf(":%s", common.Config.Port), Handler: router}
+	if err != nil {
+		log.Fatalf("setting up badger failed %v", err)
+		return
+	}
+
+	go backend.CacheDataSources(db)
+
+	// Setup and start Http server
+	s := backend.SetUpServer(db)
 	s.ListenAndServe()
 }
