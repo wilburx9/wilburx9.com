@@ -36,7 +36,7 @@ func ApiMiddleware(db *badger.DB) gin.HandlerFunc {
 	}
 }
 
-// MakeSuccessResponse returns a template of a success full response
+// MakeSuccessResponse returns a template of a successful response
 func MakeSuccessResponse(data interface{}) gin.H {
 	return gin.H{"success": true, "data": data}
 }

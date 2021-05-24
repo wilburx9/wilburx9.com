@@ -18,11 +18,11 @@ func TestMediumFetchArticles(t *testing.T) {
 	if first.Title != "Lorem ipsum dolor sit amet, consectetur adipiscing elit" {
 		t.Error()
 	}
-	if first.Thumbnail != "https://cdn-images-1.Medium.com/max/960/1*bbkcrsggiQLxNDRAgHiSBQ.png" {
+	if first.Thumbnail != "https://cdn-images-1.medium.com/max/960/1*bbkcrsggiQLxNDRAgHiSBQ.png" {
 		t.Error()
 	}
 
-	if first.Url != "https://Medium.com/lorem/lorem---q" {
+	if first.Url != "https://medium.com/lorem/lorem---q" {
 		t.Error()
 	}
 	if second.Thumbnail != "" {

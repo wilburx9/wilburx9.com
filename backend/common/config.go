@@ -45,6 +45,6 @@ func LoadConfig(path string) error {
 	}
 
 	err := v.Unmarshal(&Config)
-	log.WithFields(structs.Map(Config)).Info("App started with config")
+	log.WithFields(structs.Map(Config)).Info("App started with these config")
 	return err
 }
