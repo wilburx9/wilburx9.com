@@ -3,7 +3,7 @@ package articles
 import (
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
-	"github.com/wilburt/wilburx9.dev/backend/common"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"regexp"
 	"strings"
@@ -16,12 +16,12 @@ const (
 // Wordpress encapsulates fetching and caching of wordpress blog posts
 type Wordpress struct {
 	URL string // WP V2 post URL URL e.g https://example.com/wp-json/wp/v2/posts
-	common.Fetcher
+	internal.Fetcher
 }
 
 // FetchAndCache fetches and caches wordpress articles
 func (w Wordpress) FetchAndCache() {
-	articles := w.fetchArticles()
+	articles := w.FetchArticles()
 	buf, _ := json.Marshal(articles)
 	w.CacheData(getCacheKey(wordpressKey), buf)
 }
@@ -31,7 +31,8 @@ func (w Wordpress) GetCached() ([]byte, error) {
 	return w.GetCachedData(getCacheKey(wordpressKey))
 }
 
-func (w Wordpress) fetchArticles() []Article {
+// FetchArticles gets articles from Wordpress via HTTP
+func (w Wordpress) FetchArticles() []Article {
 	req, err := http.NewRequest(http.MethodGet, w.URL, nil)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
@@ -62,8 +63,8 @@ func (p posts) toArticles() []Article {
 			Title:     e.Title.Rendered,
 			Thumbnail: e.Meta.Thumbnail,
 			Url:       e.Link,
-			PostedAt:  common.StringToTime(timeLayout, e.Date),
-			UpdatedAt: common.StringToTime(timeLayout, e.Date),
+			PostedAt:  internal.StringToTime(timeLayout, e.Date),
+			UpdatedAt: internal.StringToTime(timeLayout, e.Date),
 			Excerpt:   getWpExcept(e.Excerpt.Rendered),
 		}
 	}

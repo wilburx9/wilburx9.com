@@ -1,4 +1,4 @@
-package backend
+package api
 
 import (
 	"fmt"
@@ -8,13 +8,14 @@ import (
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"github.com/wilburt/wilburx9.dev/backend/articles"
-	"github.com/wilburt/wilburx9.dev/backend/common"
-	"github.com/wilburt/wilburx9.dev/backend/gallery"
+	"github.com/wilburt/wilburx9.dev/backend/api/articles"
+	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 )
 
-var config = &common.Config
+var config = &configs.Config
 
 // SetUpServer sets the Http Server. Call SetUpLogrus before this.
 func SetUpServer(db *badger.DB) *http.Server {
@@ -26,10 +27,8 @@ func SetUpServer(db *badger.DB) *http.Server {
 	router.Use(sentrygin.New(sentrygin.Options{}))
 
 	// Attach API middleware
-	router.Use(common.ApiMiddleware(db))
-
-	// Serve frontend static files
-	router.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
+	router.Use(apiMiddleware(db))
+	router.Use(static.Serve("/", static.LocalFile("../../frontend/build", true)))
 	// Setup API route
 	api := router.Group("/api")
 	api.GET("/articles", articles.Handler)
@@ -53,7 +52,7 @@ func SetUpLogrus() {
 
 // SetUpSentry configures Sentry and attaches a Logrus hook
 func SetUpSentry() error {
-	var hook = common.NewSentryLogrusHook([]log.Level{
+	var hook = internal.NewSentryLogrusHook([]log.Level{
 		log.PanicLevel,
 		log.FatalLevel,
 		log.ErrorLevel,
@@ -73,7 +72,7 @@ func SetUpSentry() error {
 
 // CacheDataSources iteratively calls FetchAndCache all all data sources
 func CacheDataSources(db *badger.DB) {
-	fetcher := common.Fetcher{
+	fetcher := internal.Fetcher{
 		Db:         db,
 		HttpClient: &http.Client{},
 	}
@@ -83,9 +82,17 @@ func CacheDataSources(db *badger.DB) {
 	medium := articles.Medium{Name: config.MediumUsername, Fetcher: fetcher}
 	wordpress := articles.Wordpress{URL: config.WPUrl, Fetcher: fetcher}
 
-	sources := [...]common.Source{instagram, unsplash, medium, wordpress}
+	sources := [...]internal.Source{instagram, unsplash, medium, wordpress}
 	for _, source := range sources {
 		source.FetchAndCache()
 	}
 	db.RunValueLogGC(0.7)
+}
+
+// ApiMiddleware adds custom params to request contexts
+func apiMiddleware(db *badger.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(internal.Db, db)
+		c.Next()
+	}
 }

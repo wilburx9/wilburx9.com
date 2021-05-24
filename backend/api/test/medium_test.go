@@ -1,19 +1,20 @@
-package articles
+package test
 
 import (
-	"github.com/wilburt/wilburx9.dev/backend/common"
+	"github.com/wilburt/wilburx9.dev/backend/api/articles"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"testing"
 )
 
 func TestMediumFetchArticles(t *testing.T) {
-	var m = Medium{Name: "testUser", Fetcher: common.Fetcher{
+	var m = articles.Medium{Name: "testUser", Fetcher: internal.Fetcher{
 		Db:         nil,
-		HttpClient: &common.HttpClientMock{ResponseFilePath: "./testdata/medium_response.xml"},
+		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/medium_response.xml"},
 	}}
-	var articles = m.fetchArticles()
+	var result = m.FetchArticles()
 
-	first := articles[0]
-	second := articles[1]
+	first := result[0]
+	second := result[1]
 
 	if first.Title != "Lorem ipsum dolor sit amet, consectetur adipiscing elit" {
 		t.Error()

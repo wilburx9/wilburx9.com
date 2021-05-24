@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
-	"github.com/wilburt/wilburx9.dev/backend/common"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"sort"
 	"time"
@@ -12,14 +13,14 @@ import (
 
 // Handler retrieves a list of all the images
 func Handler(c *gin.Context) {
-	fetcher := common.Fetcher{
-		Db:         c.MustGet(common.Db).(*badger.DB),
+	fetcher := internal.Fetcher{
+		Db:         c.MustGet(internal.Db).(*badger.DB),
 		HttpClient: &http.Client{},
 	}
 
-	instagram := Instagram{AccessToken: common.Config.InstagramAccessToken, Fetcher: fetcher}
-	unsplash := Unsplash{Username: common.Config.UnsplashUsername, AccessKey: common.Config.UnsplashAccessKey, Fetcher: fetcher}
-	sources := [...]common.Source{instagram, unsplash}
+	instagram := Instagram{AccessToken: configs.Config.InstagramAccessToken, Fetcher: fetcher}
+	unsplash := Unsplash{Username: configs.Config.UnsplashUsername, AccessKey: configs.Config.UnsplashAccessKey, Fetcher: fetcher}
+	sources := [...]internal.Source{instagram, unsplash}
 
 	var allImages = make([]Image, 0)
 	for _, source := range sources {
@@ -33,7 +34,7 @@ func Handler(c *gin.Context) {
 	sort.Slice(allImages, func(i, j int) bool {
 		return allImages[i].UploadedAt.After(allImages[j].UploadedAt)
 	})
-	c.JSON(http.StatusOK, common.MakeSuccessResponse(allImages))
+	c.JSON(http.StatusOK, internal.MakeSuccessResponse(allImages))
 }
 
 // Image is a container for each object returned by Handler
@@ -48,5 +49,5 @@ type Image struct {
 }
 
 func getCacheKey(suffix string) string {
-	return common.GetCacheKey(common.StorageGallery, suffix)
+	return internal.GetCacheKey(internal.StorageGallery, suffix)
 }

@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
-	"github.com/wilburt/wilburx9.dev/backend/common"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 	"sort"
 	"time"
@@ -12,14 +13,14 @@ import (
 
 // Handler retrieves a list of all the articles
 func Handler(c *gin.Context) {
-	fetcher := common.Fetcher{
-		Db:         c.MustGet(common.Db).(*badger.DB),
+	fetcher := internal.Fetcher{
+		Db:         c.MustGet(internal.Db).(*badger.DB),
 		HttpClient: &http.Client{},
 	}
 
-	medium := Medium{Name: common.Config.MediumUsername, Fetcher: fetcher}
-	wordpress := Wordpress{URL: common.Config.WPUrl, Fetcher: fetcher}
-	sources := [...]common.Source{medium, wordpress}
+	medium := Medium{Name: configs.Config.MediumUsername, Fetcher: fetcher}
+	wordpress := Wordpress{URL: configs.Config.WPUrl, Fetcher: fetcher}
+	sources := [...]internal.Source{medium, wordpress}
 
 	var allArticles = make([]Article, 0)
 	for _, source := range sources {
@@ -33,7 +34,7 @@ func Handler(c *gin.Context) {
 	sort.Slice(allArticles, func(i, j int) bool {
 		return allArticles[i].PostedAt.After(allArticles[j].PostedAt)
 	})
-	c.JSON(http.StatusOK, common.MakeSuccessResponse(allArticles))
+	c.JSON(http.StatusOK, internal.MakeSuccessResponse(allArticles))
 }
 
 // Article represents a single blog article
@@ -47,5 +48,5 @@ type Article struct {
 }
 
 func getCacheKey(suffix string) string {
-	return common.GetCacheKey(common.StorageArticles, suffix)
+	return internal.GetCacheKey(internal.StorageArticles, suffix)
 }

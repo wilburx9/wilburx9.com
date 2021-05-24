@@ -1,7 +1,8 @@
-package gallery
+package test
 
 import (
-	"github.com/wilburt/wilburx9.dev/backend/common"
+	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"strconv"
 	"testing"
@@ -13,10 +14,10 @@ func TestUnsplashFetchImages(t *testing.T) {
 	var header = http.Header{}
 	header.Add("X-Total", strconv.Itoa(expectedResults))
 
-	var u = Unsplash{Username: "x", AccessKey: "xa", Fetcher: common.Fetcher{
-		HttpClient: &common.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header},
+	var u = gallery.Unsplash{Username: "x", AccessKey: "xa", Fetcher: internal.Fetcher{
+		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header},
 	}}
-	var images = u.fetchImage([]Image{}, 0)
+	var images = u.FetchImage([]gallery.Image{}, 0)
 
 	if len(images) != expectedResults {
 		t.Errorf("Recursive fetching of images failed. Expected 2 but got %d", len(images))
@@ -39,7 +40,7 @@ func TestUnsplashFetchImages(t *testing.T) {
 		t.Error("Failed to parse image src")
 	}
 
-	user, ok := first.Meta["user"].(user)
+	user, ok := first.Meta["user"].(gallery.User)
 	if !ok {
 		t.Errorf("Failed to parse image user. Got %T but wanted user", first.Meta["user"])
 	}
