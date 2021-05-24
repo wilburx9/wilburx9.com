@@ -6,8 +6,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Sentry hook for Logrus. Source: https://gist.github.com/HakShak/a5a92e21545206cb185dea54cd9974b5.
-// Follow https://github.com/getsentry/sentry-go/issues/43 and remove these code when implemented
 var (
 	logrusLevelsToSentryLevels = map[log.Level]sentry.Level{
 		log.PanicLevel: sentry.LevelFatal,
@@ -21,8 +19,8 @@ var (
 )
 
 // SentryLogrusHook is a Sentry hook for Logrus.
-// Source: https://gist.github.com/HakShak/a5a92e21545206cb185dea54cd9974b5.
-// Remove this when https://github.com/getsentry/sentry-go/issues/43 is implemented
+// Original source: https://gist.github.com/HakShak/a5a92e21545206cb185dea54cd9974b5.
+// TODO: Remove this when https://github.com/getsentry/sentry-go/issues/43 is implemented
 type SentryLogrusHook struct {
 	levels []log.Level
 }
