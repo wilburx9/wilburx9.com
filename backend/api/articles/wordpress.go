@@ -16,7 +16,7 @@ const (
 // Wordpress encapsulates fetching and caching of wordpress blog posts
 type Wordpress struct {
 	URL string // WP V2 post URL URL e.g https://example.com/wp-json/wp/v2/posts
-	internal.Fetcher
+	internal.Fetch
 }
 
 // FetchAndCache fetches and caches wordpress articles

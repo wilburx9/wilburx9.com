@@ -29,7 +29,7 @@ func main() {
 		return
 	}
 
-	go api.CacheDataSources(db)
+	go api.FetchAndCache(db)
 
 	// Setup and start Http server
 	s := api.SetUpServer(db)

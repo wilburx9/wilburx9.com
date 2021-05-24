@@ -11,6 +11,7 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/api/articles"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/repos"
 	"net/http"
 )
 
@@ -30,6 +31,10 @@ func SetUpServer(db *badger.DB) *http.Server {
 	// Attach sentry middleware
 	router.Use(sentrygin.New(sentrygin.Options{}))
 
+	router.NoRoute(func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{"message":  "It seems you are lost? Find your way buddy 😂"})
+	})
+
 	// Attach API middleware
 	router.Use(apiMiddleware(db))
 	router.Use(static.Serve("/", static.LocalFile("../../frontend/build", true)))
@@ -37,6 +42,7 @@ func SetUpServer(db *badger.DB) *http.Server {
 	api := router.Group("/api")
 	api.GET("/articles", articles.Handler)
 	api.GET("/gallery", gallery.Handler)
+	api.GET("/repos", repos.Handler)
 
 	// Start Http server
 	s := &http.Server{Addr: fmt.Sprintf(":%s", config.Port), Handler: router}
@@ -74,21 +80,21 @@ func SetUpSentry() error {
 	return err
 }
 
-// CacheDataSources iteratively calls FetchAndCache all all data sources
-func CacheDataSources(db *badger.DB) {
-	fetcher := internal.Fetcher{
+// FetchAndCache iteratively calls FetchAndCache all all fetchers
+func FetchAndCache(db *badger.DB) {
+	fetcher := internal.Fetch{
 		Db:         db,
 		HttpClient: &http.Client{},
 	}
 
-	instagram := gallery.Instagram{AccessToken: config.InstagramAccessToken, Fetcher: fetcher}
-	unsplash := gallery.Unsplash{Username: config.UnsplashUsername, AccessKey: config.UnsplashAccessKey, Fetcher: fetcher}
-	medium := articles.Medium{Name: config.MediumUsername, Fetcher: fetcher}
-	wordpress := articles.Wordpress{URL: config.WPUrl, Fetcher: fetcher}
+	instagram := gallery.Instagram{AccessToken: config.InstagramAccessToken, Fetch: fetcher}
+	unsplash := gallery.Unsplash{Username: config.UnsplashUsername, AccessKey: config.UnsplashAccessKey, Fetch: fetcher}
+	medium := articles.Medium{Name: config.MediumUsername, Fetch: fetcher}
+	wordpress := articles.Wordpress{URL: config.WPUrl, Fetch: fetcher}
 
-	sources := [...]internal.Source{instagram, unsplash, medium, wordpress}
-	for _, source := range sources {
-		source.FetchAndCache()
+	fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress}
+	for _, f := range fetchers {
+		f.FetchAndCache()
 	}
 	db.RunValueLogGC(0.7)
 }

@@ -14,7 +14,7 @@ func TestUnsplashFetchImages(t *testing.T) {
 	var header = http.Header{}
 	header.Add("X-Total", strconv.Itoa(expectedResults))
 
-	var u = gallery.Unsplash{Username: "x", AccessKey: "xa", Fetcher: internal.Fetcher{
+	var u = gallery.Unsplash{Username: "x", AccessKey: "xa", Fetch: internal.Fetch{
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header},
 	}}
 	var images = u.FetchImage([]gallery.Image{}, 0)

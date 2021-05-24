@@ -10,21 +10,21 @@ import (
 	"time"
 )
 
-// Handler retrieves a list of all the images
+// Handler retrieves a list of all the images sorted in descending creation date
 func Handler(c *gin.Context) {
-	fetcher := internal.Fetcher{
+	fetcher := internal.Fetch{
 		Db:         c.MustGet(internal.Db).(*badger.DB),
 		HttpClient: &http.Client{},
 	}
 
-	instagram := Instagram{AccessToken: internal.Config.InstagramAccessToken, Fetcher: fetcher}
-	unsplash := Unsplash{Username: internal.Config.UnsplashUsername, AccessKey: internal.Config.UnsplashAccessKey, Fetcher: fetcher}
-	sources := [...]internal.Source{instagram, unsplash}
+	instagram := Instagram{AccessToken: internal.Config.InstagramAccessToken, Fetch: fetcher}
+	unsplash := Unsplash{Username: internal.Config.UnsplashUsername, AccessKey: internal.Config.UnsplashAccessKey, Fetch: fetcher}
+	fetchers := [...]internal.Fetcher{instagram, unsplash}
 
 	var allImages = make([]Image, 0)
-	for _, source := range sources {
+	for _, f := range fetchers {
 		var images []Image
-		bytes, _ := source.GetCached()
+		bytes, _ := f.GetCached()
 		json.Unmarshal(bytes, &images)
 		allImages = append(allImages, images...)
 	}
@@ -48,5 +48,5 @@ type Image struct {
 }
 
 func getCacheKey(suffix string) string {
-	return internal.GetCacheKey(internal.StorageGallery, suffix)
+	return internal.GetCacheKey(internal.DbGalleryKey, suffix)
 }

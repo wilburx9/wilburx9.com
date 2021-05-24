@@ -7,7 +7,7 @@ import (
 )
 
 func TestMediumFetchArticles(t *testing.T) {
-	var m = articles.Medium{Name: "testUser", Fetcher: internal.Fetcher{
+	var m = articles.Medium{Name: "testUser", Fetch: internal.Fetch{
 		Db:         nil,
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/medium_response.xml"},
 	}}

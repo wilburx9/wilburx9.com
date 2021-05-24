@@ -19,7 +19,7 @@ const (
 // fetching cached data, and refreshing Instagram access token
 type Instagram struct {
 	AccessToken string
-	internal.Fetcher
+	internal.Fetch
 }
 
 // FetchAndCache fetches and caches data fetched from Instagram
@@ -92,7 +92,7 @@ func (i Instagram) getToken() string {
 
 	// Check for expired token. This shouldn't happen normally
 	if tk.expired() {
-		// Access token has expired. We can't refresh it
+		// DbAccessKey token has expired. We can't refresh it
 		log.Error("Instagram access token has expired")
 		return ""
 	}
@@ -159,7 +159,7 @@ func (t token) shouldRefresh() bool {
 }
 
 func getInstagramToken() string {
-	return internal.GetCacheKey(internal.Access, instagramKey)
+	return internal.GetCacheKey(internal.DbAccessKey, instagramKey)
 }
 
 func (s instaImgSlice) toImages() []Image {

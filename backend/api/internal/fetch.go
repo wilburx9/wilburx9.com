@@ -5,20 +5,20 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Fetcher has the fields needed by data fetcher structs
-type Fetcher struct {
+// Fetch has the fields needed by data fetcher structs
+type Fetch struct {
 	Db         *badger.DB
 	HttpClient HttpClient
 }
 
-// Source is an interface implemented all data sources. E.g gallery.instagram
-type Source interface {
+// Fetcher is an interface implemented all data fetchers. E.g gallery.instagram
+type Fetcher interface {
 	FetchAndCache()
 	GetCached() ([]byte, error)
 }
 
 // CacheData caches the data with key
-func (f Fetcher) CacheData(key string, data []byte) {
+func (f Fetch) CacheData(key string, data []byte) {
 	err := f.Db.Update(func(txn *badger.Txn) error {
 		return txn.Set([]byte(key), data)
 	})
@@ -31,7 +31,7 @@ func (f Fetcher) CacheData(key string, data []byte) {
 }
 
 // GetCachedData returns the data stored with key.
-func (f Fetcher) GetCachedData(key string) ([]byte, error) {
+func (f Fetch) GetCachedData(key string) ([]byte, error) {
 	var data []byte
 	err := f.Db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(key))

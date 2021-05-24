@@ -10,21 +10,21 @@ import (
 	"time"
 )
 
-// Handler retrieves a list of all the articles
+// Handler retrieves a list of all the articles sorted in descending creation date
 func Handler(c *gin.Context) {
-	fetcher := internal.Fetcher{
+	fetcher := internal.Fetch{
 		Db:         c.MustGet(internal.Db).(*badger.DB),
 		HttpClient: &http.Client{},
 	}
 
-	medium := Medium{Name: internal.Config.MediumUsername, Fetcher: fetcher}
-	wordpress := Wordpress{URL: internal.Config.WPUrl, Fetcher: fetcher}
-	sources := [...]internal.Source{medium, wordpress}
+	medium := Medium{Name: internal.Config.MediumUsername, Fetch: fetcher}
+	wordpress := Wordpress{URL: internal.Config.WPUrl, Fetch: fetcher}
+	fetchers := [...]internal.Fetcher{medium, wordpress}
 
 	var allArticles = make([]Article, 0)
-	for _, source := range sources {
+	for _, f := range fetchers {
 		var articles []Article
-		bytes, _ := source.GetCached()
+		bytes, _ := f.GetCached()
 		json.Unmarshal(bytes, &articles)
 		allArticles = append(allArticles, articles...)
 	}
@@ -47,5 +47,5 @@ type Article struct {
 }
 
 func getCacheKey(suffix string) string {
-	return internal.GetCacheKey(internal.StorageArticles, suffix)
+	return internal.GetCacheKey(internal.DbArticlesKey, suffix)
 }
