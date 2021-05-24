@@ -6,7 +6,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"github.com/wilburt/wilburx9.dev/backend/common"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 	"net/http"
@@ -22,12 +22,12 @@ const (
 // Medium encapsulates the fetching and caching of medium articles
 type Medium struct {
 	Name string // should be Medium username (e.g "@Wilburx9") or publication (e.g flutter-community)
-	common.Fetcher
+	internal.Fetcher
 }
 
 // FetchAndCache fetches and caches all Medium Articles
 func (m Medium) FetchAndCache() {
-	articles := m.fetchArticles()
+	articles := m.FetchArticles()
 	buf, _ := json.Marshal(articles)
 	m.CacheData(getCacheKey(mediumKey), buf)
 }
@@ -37,7 +37,8 @@ func (m Medium) GetCached() ([]byte, error) {
 	return m.GetCachedData(getCacheKey(mediumKey))
 }
 
-func (m Medium) fetchArticles() []Article {
+// FetchArticles fetches articles via HTTP
+func (m Medium) FetchArticles() []Article {
 	url := fmt.Sprintf("https://medium.com/feed/%s", m.Name)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -81,8 +82,8 @@ func (r rss) toArticles() []Article {
 			Title:     e.Title,
 			Url:       e.Link,
 			Thumbnail: thumbnail,
-			PostedAt:  common.StringToTime(time.RFC1123, e.PubDate),
-			UpdatedAt: common.StringToTime(time.RFC3339, e.Updated),
+			PostedAt:  internal.StringToTime(time.RFC1123, e.PubDate),
+			UpdatedAt: internal.StringToTime(time.RFC3339, e.Updated),
 			Excerpt:   excerpt,
 		}
 	}
@@ -118,7 +119,7 @@ func getMediumThumbAndExcerpt(content string) (thumbnail string, excerpt string)
 		if excerpt == "" && node.Type == html.ElementNode && node.DataAtom == atom.P {
 			buffer := &bytes.Buffer{}
 			collectText(node.FirstChild, buffer)
-			cleaned := strings.TrimSpace(common.GetFirstNCodePoints(buffer.String(), 200))
+			cleaned := strings.TrimSpace(internal.GetFirstNCodePoints(buffer.String(), 200))
 			if utf8.RuneCountInString(cleaned) >= 80 {
 				excerpt = fmt.Sprintf("%v.", strings.Split(cleaned, ".")[0])
 			}

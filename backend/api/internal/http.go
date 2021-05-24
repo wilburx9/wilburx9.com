@@ -1,7 +1,6 @@
-package common
+package internal
 
 import (
-	"github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"os"
@@ -26,14 +25,6 @@ func (cm *HttpClientMock) Do(_ *http.Request) (*http.Response, error) {
 	}
 
 	return &http.Response{Body: file, Header: cm.Header}, nil
-}
-
-// ApiMiddleware adds custom params to request contexts
-func ApiMiddleware(db *badger.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set(Db, db)
-		c.Next()
-	}
 }
 
 // MakeSuccessResponse returns a template of a successful response

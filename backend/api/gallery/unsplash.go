@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
-	"github.com/wilburt/wilburx9.dev/backend/common"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"strconv"
 )
@@ -17,12 +17,12 @@ const (
 type Unsplash struct {
 	Username  string
 	AccessKey string
-	common.Fetcher
+	internal.Fetcher
 }
 
 // FetchAndCache fetches data from Unsplash and caches it
 func (u Unsplash) FetchAndCache() {
-	images := u.fetchImage([]Image{}, 1)
+	images := u.FetchImage([]Image{}, 1)
 	buf, _ := json.Marshal(images)
 	u.CacheData(getCacheKey(unsplashKey), buf)
 }
@@ -32,7 +32,8 @@ func (u Unsplash) GetCached() ([]byte, error) {
 	return u.GetCachedData(getCacheKey(unsplashKey))
 }
 
-func (u Unsplash) fetchImage(fetched []Image, page int) []Image {
+// FetchImage fetches images via HTTP
+func (u Unsplash) FetchImage(fetched []Image, page int) []Image {
 	url := fmt.Sprintf("https://api.Unsplash.com/users/%s/photos?page=%d&per_page=5", u.Username, page) // TODO: Increment per_page to 30 after testing this
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -67,7 +68,7 @@ func (u Unsplash) fetchImage(fetched []Image, page int) []Image {
 	}
 
 	page++
-	return u.fetchImage(fetched, page)
+	return u.FetchImage(fetched, page)
 }
 
 func (m unsplashImgSlice) toImages() []Image {
@@ -80,10 +81,10 @@ func (m unsplashImgSlice) toImages() []Image {
 			Src:          e.Urls.Full,
 			Url:          e.Links.HTML,
 			Caption:      e.Description,
-			UploadedAt:   common.StringToTime(timeLayout, e.CreatedAt),
+			UploadedAt:   internal.StringToTime(timeLayout, e.CreatedAt),
 			Source:       "Unsplash",
 			Meta: map[string]interface{}{
-				"user": e.User,
+				"User": e.User,
 			},
 		}
 	}
@@ -96,7 +97,7 @@ type unsplashImg struct {
 	CreatedAt   string `json:"created_at"`
 	Color       string `json:"color"`
 	Description string `json:"description"`
-	User        user   `json:"user"`
+	User        User   `json:"User"`
 	Urls        struct {
 		Full  string `json:"full"`
 		Small string `json:"small"`
@@ -106,7 +107,8 @@ type unsplashImg struct {
 	} `json:"links"`
 }
 
-type user struct {
+// User represents the user details of an Unsplash image
+type User struct {
 	Username string `json:"Username"`
 	Name     string `json:"name"`
 }

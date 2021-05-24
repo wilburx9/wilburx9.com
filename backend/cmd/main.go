@@ -4,20 +4,20 @@ import (
 	"github.com/dgraph-io/badger/v3"
 	"github.com/getsentry/sentry-go"
 	log "github.com/sirupsen/logrus"
-	"github.com/wilburt/wilburx9.dev/backend"
-	"github.com/wilburt/wilburx9.dev/backend/common"
+	"github.com/wilburt/wilburx9.dev/backend/api"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"time"
 )
 
 func main() {
-	backend.SetUpLogrus()
+	api.SetUpLogrus()
 
 	// Attempt to load config
-	if err := common.LoadConfig("./"); err != nil {
+	if err := configs.LoadConfig("../configs"); err != nil {
 		log.Fatalf("invalid application configuration: %s", err)
 	}
 
-	err := backend.SetUpSentry()
+	err := api.SetUpSentry()
 	if err != nil {
 		log.Fatalf("sentry.Init: failed %s", err)
 	}
@@ -30,9 +30,9 @@ func main() {
 		return
 	}
 
-	go backend.CacheDataSources(db)
+	go api.CacheDataSources(db)
 
 	// Setup and start Http server
-	s := backend.SetUpServer(db)
+	s := api.SetUpServer(db)
 	s.ListenAndServe()
 }

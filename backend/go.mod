@@ -1,6 +1,6 @@
-module github.com/wilburt/wilburx9.dev
+module github.com/wilburt/wilburx9.dev/backend
 
-go 1.15
+go 1.16
 
 require (
 	github.com/dgraph-io/badger/v3 v3.2011.1

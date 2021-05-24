@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
 	log "github.com/sirupsen/logrus"
-	"github.com/wilburt/wilburx9.dev/backend/common"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"time"
 )
@@ -19,7 +19,7 @@ const (
 // fetching cached data, and refreshing Instagram access token
 type Instagram struct {
 	AccessToken string
-	common.Fetcher
+	internal.Fetcher
 }
 
 // FetchAndCache fetches and caches data fetched from Instagram
@@ -159,7 +159,7 @@ func (t token) shouldRefresh() bool {
 }
 
 func getInstagramToken() string {
-	return common.GetCacheKey(common.Access, instagramKey)
+	return internal.GetCacheKey(internal.Access, instagramKey)
 }
 
 func (s instaImgSlice) toImages() []Image {
@@ -172,7 +172,7 @@ func (s instaImgSlice) toImages() []Image {
 			Src:          e.MediaURL,
 			Url:          e.Permalink,
 			Caption:      e.Caption,
-			UploadedAt:   common.StringToTime(timeLayout, e.Timestamp),
+			UploadedAt:   internal.StringToTime(timeLayout, e.Timestamp),
 			Source:       "Instagram",
 		}
 	}

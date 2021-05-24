@@ -1,4 +1,4 @@
-name: Run tests and deploy
+name: Deploy to a VM
 
 on:
   push:
@@ -8,35 +8,11 @@ on:
 
 jobs:
   test_build_deploy:
-    name: Run tests, build both frontend & backend and deploy
+    name: Deploy to a VM
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v2
-
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.15
-
-      - name: Set up Node 14x
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Run backend tests
-        run: go test ./...
-
-      - name: Install frontend dependencies
-        run: npm ci
-        working-directory: frontend
-
-      - name: Build frontend
-        run: npm run build
-        working-directory: frontend
-
-      - name: Build backend
-        run: go build
 
       - name: Copy file via scp
         if: github.event_name == 'push'
@@ -52,7 +28,6 @@ jobs:
           target: ${{ secrets.APP_DIR }}
 
       - name: Building and restarting web service
-        if: github.event_name == 'push'
         uses: appleboy/ssh-action@master
         with:
           HOST: ${{ secrets.HOST }}
