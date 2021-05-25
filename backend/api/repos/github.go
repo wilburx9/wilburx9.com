@@ -62,7 +62,7 @@ func (g Github) fetchRepos() []models.Repo {
 		return nil
 	}
 
-	return models.GithubToRepos(data)
+	return data.ToRepos()
 }
 
 func getGraphQlQuery() string {

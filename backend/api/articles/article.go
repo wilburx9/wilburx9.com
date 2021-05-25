@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
+	"github.com/wilburt/wilburx9.dev/backend/api/articles/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"sort"
-	"time"
 )
 
 // Handler retrieves a list of all the articles sorted in descending creation date
@@ -21,9 +21,9 @@ func Handler(c *gin.Context) {
 	wordpress := Wordpress{URL: internal.Config.WPUrl, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{medium, wordpress}
 
-	var allArticles = make([]Article, 0)
+	var allArticles = make([]models.Article, 0)
 	for _, f := range fetchers {
-		var articles []Article
+		var articles []models.Article
 		bytes, _ := f.GetCached()
 		json.Unmarshal(bytes, &articles)
 		allArticles = append(allArticles, articles...)
@@ -34,16 +34,6 @@ func Handler(c *gin.Context) {
 		return allArticles[i].PostedAt.After(allArticles[j].PostedAt)
 	})
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse(allArticles))
-}
-
-// Article represents a single blog article
-type Article struct {
-	Title     string    `json:"title"`
-	Thumbnail string    `json:"thumbnail"`
-	Url       string    `json:"url"`
-	PostedAt  time.Time `json:"posted_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	Excerpt   string    `json:"excerpt"`
 }
 
 func getCacheKey(suffix string) string {
