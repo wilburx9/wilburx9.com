@@ -19,6 +19,8 @@ type appConfig struct {
 	InstagramAccessToken string `mapstructure:"instagram_access_token"`
 	Env                  string `mapstructure:"env"`
 	SentryDsn            string `mapstructure:"sentry_dsn"`
+	GithubToken          string `mapstructure:"github_token"`
+	GithubUsername       string `mapstructure:"github_username"`
 }
 
 // IsRelease returns true for release Env and false otherwise

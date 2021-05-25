@@ -32,7 +32,7 @@ func SetUpServer(db *badger.DB) *http.Server {
 	router.Use(sentrygin.New(sentrygin.Options{}))
 
 	router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"message":  "It seems you are lost? Find your way buddy 😂"})
+		c.JSON(http.StatusNotFound, gin.H{"message": "It seems you are lost? Find your way buddy 😂"})
 	})
 
 	// Attach API middleware
@@ -91,8 +91,9 @@ func FetchAndCache(db *badger.DB) {
 	unsplash := gallery.Unsplash{Username: config.UnsplashUsername, AccessKey: config.UnsplashAccessKey, Fetch: fetcher}
 	medium := articles.Medium{Name: config.MediumUsername, Fetch: fetcher}
 	wordpress := articles.Wordpress{URL: config.WPUrl, Fetch: fetcher}
+	github := repos.Github{Auth: config.GithubToken, Username: config.UnsplashUsername, Fetch: fetcher}
 
-	fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress}
+	fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress, github}
 	for _, f := range fetchers {
 		f.FetchAndCache()
 	}
