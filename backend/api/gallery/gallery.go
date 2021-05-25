@@ -12,13 +12,13 @@ import (
 
 // Handler retrieves a list of all the images sorted in descending creation date
 func Handler(c *gin.Context) {
-	fetcher := internal.Fetch{
+	fetch := internal.Fetch{
 		Db:         c.MustGet(internal.Db).(*badger.DB),
 		HttpClient: &http.Client{},
 	}
 
-	instagram := Instagram{AccessToken: internal.Config.InstagramAccessToken, Fetch: fetcher}
-	unsplash := Unsplash{Username: internal.Config.UnsplashUsername, AccessKey: internal.Config.UnsplashAccessKey, Fetch: fetcher}
+	instagram := Instagram{AccessToken: internal.Config.InstagramAccessToken, Fetch: fetch}
+	unsplash := Unsplash{Username: internal.Config.UnsplashUsername, AccessKey: internal.Config.UnsplashAccessKey, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{instagram, unsplash}
 
 	var allImages = make([]Image, 0)

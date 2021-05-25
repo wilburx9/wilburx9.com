@@ -12,13 +12,13 @@ import (
 
 // Handler retrieves a list of all the articles sorted in descending creation date
 func Handler(c *gin.Context) {
-	fetcher := internal.Fetch{
+	fetch := internal.Fetch{
 		Db:         c.MustGet(internal.Db).(*badger.DB),
 		HttpClient: &http.Client{},
 	}
 
-	medium := Medium{Name: internal.Config.MediumUsername, Fetch: fetcher}
-	wordpress := Wordpress{URL: internal.Config.WPUrl, Fetch: fetcher}
+	medium := Medium{Name: internal.Config.MediumUsername, Fetch: fetch}
+	wordpress := Wordpress{URL: internal.Config.WPUrl, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{medium, wordpress}
 
 	var allArticles = make([]Article, 0)

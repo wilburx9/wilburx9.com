@@ -20,3 +20,8 @@ type language struct {
 	Name  string `json:"name"`
 	Color string `json:"color"`
 }
+
+// Score returns a sum of the stars and forks of this repo
+func (r Repo) Score() int {
+	return r.Stars + r.Forks
+}
