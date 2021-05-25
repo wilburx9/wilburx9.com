@@ -52,9 +52,9 @@ type licenseInfo struct {
 	Name string `json:"name"`
 }
 
-// GithubToRepos maps Github to a slice of Repo
-func GithubToRepos(model Github) []Repo {
-	nodes := model.Data.Viewer.Repositories.Nodes
+// ToRepos maps Github to a slice of Repo
+func (m Github) ToRepos() []Repo {
+	nodes := m.Data.Viewer.Repositories.Nodes
 	var repos = make([]Repo, len(nodes))
 
 	mapLanguages := func(node nodeElement) []language {

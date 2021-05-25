@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"strconv"
@@ -22,7 +23,7 @@ type Unsplash struct {
 
 // FetchAndCache fetches data from Unsplash and caches it
 func (u Unsplash) FetchAndCache() {
-	images := u.FetchImage([]Image{}, 1)
+	images := u.FetchImage([]models.Image{}, 1)
 	buf, _ := json.Marshal(images)
 	u.CacheData(getCacheKey(unsplashKey), buf)
 }
@@ -33,7 +34,7 @@ func (u Unsplash) GetCached() ([]byte, error) {
 }
 
 // FetchImage fetches images via HTTP
-func (u Unsplash) FetchImage(fetched []Image, page int) []Image {
+func (u Unsplash) FetchImage(fetched []models.Image, page int) []models.Image {
 	url := fmt.Sprintf("https://api.Unsplash.com/users/%s/photos?page=%d&per_page=5", u.Username, page) // TODO: Increment per_page to 30 after testing this
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -51,14 +52,14 @@ func (u Unsplash) FetchImage(fetched []Image, page int) []Image {
 	}
 	defer res.Body.Close()
 
-	var results unsplashImgSlice
+	var results models.UnsplashImgs
 	err = json.NewDecoder(res.Body).Decode(&results)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
 		return fetched
 	}
 
-	fetched = append(fetched, results.toImages()...)
+	fetched = append(fetched, results.ToImages()...)
 
 	totalImages, err := strconv.Atoi(res.Header.Get("X-Total"))
 
@@ -69,46 +70,4 @@ func (u Unsplash) FetchImage(fetched []Image, page int) []Image {
 
 	page++
 	return u.FetchImage(fetched, page)
-}
-
-func (m unsplashImgSlice) toImages() []Image {
-	var timeLayout = "2006-01-02T03:04:05-07:00"
-	var images = make([]Image, len(m))
-
-	for i, e := range m {
-		images[i] = Image{
-			SrcThumbnail: e.Urls.Small,
-			Src:          e.Urls.Full,
-			Url:          e.Links.HTML,
-			Caption:      e.Description,
-			UploadedAt:   internal.StringToTime(timeLayout, e.CreatedAt),
-			Source:       "Unsplash",
-			Meta: map[string]interface{}{
-				"User": e.User,
-			},
-		}
-	}
-	return images
-}
-
-type unsplashImgSlice []unsplashImg
-
-type unsplashImg struct {
-	CreatedAt   string `json:"created_at"`
-	Color       string `json:"color"`
-	Description string `json:"description"`
-	User        User   `json:"User"`
-	Urls        struct {
-		Full  string `json:"full"`
-		Small string `json:"small"`
-	} `json:"urls"`
-	Links struct {
-		HTML string `json:"html"`
-	} `json:"links"`
-}
-
-// User represents the user details of an Unsplash image
-type User struct {
-	Username string `json:"Username"`
-	Name     string `json:"name"`
 }
