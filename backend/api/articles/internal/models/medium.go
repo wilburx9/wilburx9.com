@@ -12,6 +12,11 @@ import (
 	"unicode/utf8"
 )
 
+const (
+	minAcceptableExcerpt = 80
+	minExcerpt           = 200
+)
+
 // Rss is a container for Medium Rss feed data
 type Rss struct {
 	Channel struct {
@@ -36,7 +41,7 @@ func (r Rss) ToArticles() []Article {
 			Thumbnail: thumbnail,
 			PostedAt:  internal.StringToTime(time.RFC1123, e.PubDate),
 			UpdatedAt: internal.StringToTime(time.RFC3339, e.Updated),
-			Excerpt:   excerpt,
+			Excerpt:   fmt.Sprintf("%v..", excerpt),
 		}
 	}
 	return articles
@@ -44,37 +49,59 @@ func (r Rss) ToArticles() []Article {
 
 func getMediumThumbAndExcerpt(content string) (thumbnail string, excerpt string) {
 	// Walk through the HTML nodes
+	var walker func(*html.Node)
+	walker = func(node *html.Node) {
+		if excerpt == "" && node.Type == html.ElementNode && node.DataAtom == atom.P {
+			buffer := &bytes.Buffer{}
+			collectText(node.FirstChild, buffer)
+			excerpt = getCleanedText(buffer.String())
+			return
+		}
+		if thumbnail == "" && node.Type == html.ElementNode && node.DataAtom == atom.Img {
+			thumbnail = collectImgSrc(node)
+			return
+		}
+
+		for child := node.FirstChild; child != nil; child = child.NextSibling {
+			if thumbnail != "" && excerpt != "" {
+				// Gotten both thumbnail and except. No need to continue the loop
+				return
+			}
+			walker(child)
+		}
+	}
+
 	node, err := html.Parse(strings.NewReader(content))
 	if err != nil {
 		log.WithFields(log.Fields{"error": err, "string": content}).Warning("Cannot parse content")
 		return
 	}
-	return walkNode(node)
+	walker(node)
+	return
 }
 
-func walkNode(node *html.Node) (thumbnail string, excerpt string) {
-	if excerpt == "" && node.Type == html.ElementNode && node.DataAtom == atom.P {
-		buffer := &bytes.Buffer{}
-		collectText(node.FirstChild, buffer)
-		cleaned := strings.TrimSpace(internal.GetFirstNCodePoints(buffer.String(), 200))
-		if utf8.RuneCountInString(cleaned) >= 80 {
-			excerpt = fmt.Sprintf("%v.", strings.Split(cleaned, ".")[0])
+// Concatenate the sentences until the concatenated string is approx. minExcerpt characters
+func getCleanedText(s string) string {
+	s = strings.TrimSpace(s)
+	buffer := &bytes.Buffer{}
+	if utf8.RuneCountInString(s) >= minAcceptableExcerpt {
+		splits := strings.Split(s, ".") // Separate it into sentences
+		for i := range splits {
+			str := splits[i]
+			lenStr := len(str)
+			if lenStr > 0 {
+				// End it with a dot if it doesn't already end with a dot
+				if "." != str[lenStr-1:] {
+					str = fmt.Sprintf("%v.", str)
+				}
+				buffer.WriteString(str)
+				if utf8.RuneCountInString(buffer.String()) >= minExcerpt {
+					return buffer.String()
+				}
+			}
 		}
-		return
 	}
-	if thumbnail == "" && node.Type == html.ElementNode && node.DataAtom == atom.Img {
-		thumbnail = collectImgSrc(node)
-		return
-	}
-
-	for child := node.FirstChild; child != nil; child = child.NextSibling {
-		if thumbnail != "" && excerpt != "" {
-			// Gotten both thumbnail and excerpt. No need to continue the loop
-			return
-		}
-		walkNode(child)
-	}
-	return
+	return buffer.String()
 }
 
 // Get texts in node

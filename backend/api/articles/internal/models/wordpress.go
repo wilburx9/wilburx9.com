@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"regexp"
 	"strings"
@@ -38,7 +39,7 @@ func (p WpPosts) ToArticles() []Article {
 			Url:       e.Link,
 			PostedAt:  internal.StringToTime(timeLayout, e.Date),
 			UpdatedAt: internal.StringToTime(timeLayout, e.Date),
-			Excerpt:   getWpExcept(e.Excerpt.Rendered),
+			Excerpt:   fmt.Sprintf("%v..", getWpExcept(e.Excerpt.Rendered)),
 		}
 	}
 	return articles
