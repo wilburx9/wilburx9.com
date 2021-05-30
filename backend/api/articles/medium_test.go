@@ -1,17 +1,16 @@
-package test
+package articles
 
 import (
-	"github.com/wilburt/wilburx9.dev/backend/api/articles"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"testing"
 )
 
 func TestMediumFetchArticles(t *testing.T) {
-	var m = articles.Medium{Name: "testUser", Fetch: internal.Fetch{
+	var m = Medium{Name: "testUser", Fetch: internal.Fetch{
 		Db:         nil,
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/medium_response.xml"},
 	}}
-	var result = m.FetchArticles()
+	var result = m.fetchArticles()
 
 	first := result[0]
 	second := result[1]

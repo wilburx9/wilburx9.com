@@ -1,7 +1,9 @@
 package internal
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 )
@@ -21,6 +23,7 @@ type HttpClientMock struct {
 func (cm *HttpClientMock) Do(_ *http.Request) (*http.Response, error) {
 	file, err := os.Open(cm.ResponseFilePath)
 	if err != nil {
+		log.Errorln(fmt.Sprintf("error while opening file %v", err))
 		return nil, err
 	}
 

@@ -20,7 +20,7 @@ type Wordpress struct {
 
 // FetchAndCache fetches and caches wordpress articles
 func (w Wordpress) FetchAndCache() {
-	articles := w.FetchArticles()
+	articles := w.fetchArticles()
 	buf, _ := json.Marshal(articles)
 	w.CacheData(getCacheKey(wordpressKey), buf)
 }
@@ -30,8 +30,8 @@ func (w Wordpress) GetCached() ([]byte, error) {
 	return w.GetCachedData(getCacheKey(wordpressKey))
 }
 
-// FetchArticles gets articles from Wordpress via HTTP
-func (w Wordpress) FetchArticles() []models.Article {
+// fetchArticles gets articles from Wordpress via HTTP
+func (w Wordpress) fetchArticles() []models.Article {
 	req, err := http.NewRequest(http.MethodGet, w.URL, nil)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")

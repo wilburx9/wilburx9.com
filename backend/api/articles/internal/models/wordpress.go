@@ -44,7 +44,7 @@ func (p WpPosts) ToArticles() []Article {
 	return articles
 }
 
-// Remove Html tag and leading & trailing spaces from the except
+// Remove Html tag, leading and trailing spaces from the excerpt
 func getWpExcept(s string) string {
 	var rt = regexp.MustCompile(`<[^>]*>`)   // Tags regex
 	var noTags = rt.ReplaceAllString(s, " ") // Remove tags
