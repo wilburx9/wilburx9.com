@@ -1,4 +1,4 @@
-name: Run test and build
+name: Run tests and build
 
 on:
   push:
@@ -38,4 +38,4 @@ jobs:
 
       - name: Build backend
         run: go build
-        working-directory: backend
+        working-directory: backend/cmd
