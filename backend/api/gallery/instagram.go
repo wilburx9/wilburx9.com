@@ -16,14 +16,13 @@ const (
 	minTokenRemainingLife = 24 * time.Hour * 5  // 5 Days
 )
 
-// Instagram encapsulates the fetching data from Instagram, caching the data,
-// fetching cached data, and refreshing Instagram access token
+// Instagram encapsulates the fetching of Instagram images and access token management
 type Instagram struct {
 	AccessToken string
 	internal.Fetch
 }
 
-// FetchAndCache fetches and caches data fetched from Instagram
+// FetchAndCache fetches and caches data from Instagram
 func (i Instagram) FetchAndCache() {
 	accessToken := i.getToken()
 	fields := "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type"
@@ -85,20 +84,20 @@ func (i Instagram) getToken() string {
 		})
 	})
 
-	// If we haven't saved the token before, log and error and refresh the token we have noq
+	// If we haven't saved the token before, log an error and refresh the token we have now
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't fetch Instagram token")
 		return i.refreshToken(i.AccessToken)
 	}
 
-	// Check for expired token. This shouldn't happen normally
+	// Check for expired token.
 	if tk.Expired() {
-		// DbAccessKey token has expired. We can't refresh it
+		// Token has expired and we can't refresh it. This should never happen.
 		log.Error("Instagram access token has expired")
 		return ""
 	}
 
-	// Refresh the token if needs be
+	// Refresh the token if need be
 	if tk.ShouldRefresh(minTokenRemainingLife) {
 		return i.refreshToken(tk.Value)
 	}

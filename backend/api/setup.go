@@ -12,14 +12,15 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 )
 
-var config = &internal.Config
+var config = &configs.Config
 
 // LoadConfig reads the configuration file and loads it into memory
 func LoadConfig() error {
-	return internal.LoadConfig("../configs")
+	return configs.LoadConfig("../configs")
 }
 
 // SetUpServer sets the Http Server. Call SetUpLogrus before this.

@@ -3,9 +3,6 @@ name: Deploy to a VM
 on:
   push:
     branches: [ live ]
-  pull_request:
-    branches: [ live ]
-
 jobs:
   test_build_deploy:
     name: Deploy to a VM

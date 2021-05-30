@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 	"sort"
 )
@@ -17,8 +18,8 @@ func Handler(c *gin.Context) {
 		HttpClient: &http.Client{},
 	}
 
-	instagram := Instagram{AccessToken: internal.Config.InstagramAccessToken, Fetch: fetch}
-	unsplash := Unsplash{Username: internal.Config.UnsplashUsername, AccessKey: internal.Config.UnsplashAccessKey, Fetch: fetch}
+	instagram := Instagram{AccessToken: configs.Config.InstagramAccessToken, Fetch: fetch}
+	unsplash := Unsplash{Username: configs.Config.UnsplashUsername, AccessKey: configs.Config.UnsplashAccessKey, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{instagram, unsplash}
 
 	var allImages = make([]models.Image, 0)

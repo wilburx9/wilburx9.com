@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos/internal/models"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 	"sort"
 )
@@ -17,7 +18,7 @@ func Handler(c *gin.Context) {
 		HttpClient: &http.Client{},
 	}
 
-	github := Github{Auth: internal.Config.GithubToken, Username: internal.Config.GithubUsername, Fetch: fetch}
+	github := Github{Auth: configs.Config.GithubToken, Username: configs.Config.GithubUsername, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{github}
 
 	var allRepos = make([]models.Repo, 0)

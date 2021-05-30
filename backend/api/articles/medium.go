@@ -22,7 +22,7 @@ type Medium struct {
 
 // FetchAndCache fetches and caches all Medium Articles
 func (m Medium) FetchAndCache() {
-	articles := m.FetchArticles()
+	articles := m.fetchArticles()
 	buf, _ := json.Marshal(articles)
 	m.CacheData(getCacheKey(mediumKey), buf)
 }
@@ -32,8 +32,8 @@ func (m Medium) GetCached() ([]byte, error) {
 	return m.GetCachedData(getCacheKey(mediumKey))
 }
 
-// FetchArticles fetches articles via HTTP
-func (m Medium) FetchArticles() []models.Article {
+// fetchArticles fetches articles via HTTP
+func (m Medium) fetchArticles() []models.Article {
 	url := fmt.Sprintf("https://medium.com/feed/%s", m.Name)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {

@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 	"sort"
 )
@@ -17,8 +18,8 @@ func Handler(c *gin.Context) {
 		HttpClient: &http.Client{},
 	}
 
-	medium := Medium{Name: internal.Config.MediumUsername, Fetch: fetch}
-	wordpress := Wordpress{URL: internal.Config.WPUrl, Fetch: fetch}
+	medium := Medium{Name: configs.Config.MediumUsername, Fetch: fetch}
+	wordpress := Wordpress{URL: configs.Config.WPUrl, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{medium, wordpress}
 
 	var allArticles = make([]models.Article, 0)
