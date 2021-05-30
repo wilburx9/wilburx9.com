@@ -19,7 +19,12 @@ func TestMediumFetchArticles(t *testing.T) {
 		t.Error()
 	}
 	if first.Thumbnail != "https://cdn-images-1.medium.com/max/960/1*bbkcrsggiQLxNDRAgHiSBQ.png" {
-		t.Error()
+		t.Errorf("Thumb is invalid")
+
+	}
+
+	if first.Excerpt == "" {
+		t.Errorf("Excerpt shouldn't be empty")
 	}
 
 	if first.Url != "https://medium.com/lorem/lorem---q" {
