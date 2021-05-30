@@ -39,7 +39,7 @@ func (m UnsplashImgs) ToImages() []Image {
 			UploadedAt:   internal.StringToTime(timeLayout, e.CreatedAt),
 			Source:       "Unsplash",
 			Meta: map[string]interface{}{
-				"User": e.User,
+				"user": e.User,
 			},
 		}
 	}

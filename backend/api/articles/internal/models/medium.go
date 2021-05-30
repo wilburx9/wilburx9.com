@@ -64,7 +64,7 @@ func getMediumThumbAndExcerpt(content string) (thumbnail string, excerpt string)
 
 		for child := node.FirstChild; child != nil; child = child.NextSibling {
 			if thumbnail != "" && excerpt != "" {
-				// Gotten both thumbnail and except. No need to continue the loop
+				// Gotten both thumbnail and excerpt. No need to continue the loop
 				return
 			}
 			walker(child)
