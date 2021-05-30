@@ -36,8 +36,9 @@ func TestUnsplashFetchImages(t *testing.T) {
 		t.Error("Failed to parse image creation date")
 	}
 
-	if first.Src != "https://images.Unsplash.com/photo-56789-098yhj?crop=entropy&cs=srgb&fm=jpg&ixid=OIFGHJIUGGH=rb-1.2.1&q=85" {
+	if first.Src != "https://images.unsplash.com/photo-56789-098yhj?crop=entropy&cs=srgb&fm=jpg&ixid=OIFGHJIUGGH=rb-1.2.1&q=85" {
 		t.Error("Failed to parse image src")
+		t.Errorf("Image %q", first.Src)
 	}
 
 	user, ok := first.Meta["user"].(models.User)
