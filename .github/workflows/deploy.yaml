@@ -38,7 +38,7 @@ jobs:
             rm -rf node_modules
             npm ci
             npm run build
-            cd ../
+            cd ../cmd
             go build main.go
             sudo /bin/systemctl restart wilburx9
             service wilburx9 status

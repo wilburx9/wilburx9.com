@@ -19,10 +19,11 @@ type Wordpress struct {
 }
 
 // FetchAndCache fetches and caches wordpress articles
-func (w Wordpress) FetchAndCache() {
+func (w Wordpress) FetchAndCache() int {
 	articles := w.fetchArticles()
 	buf, _ := json.Marshal(articles)
 	w.CacheData(getCacheKey(wordpressKey), buf)
+	return len(articles)
 }
 
 // GetCached returns cached Wordpress articles

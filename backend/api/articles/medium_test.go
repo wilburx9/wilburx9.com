@@ -1,6 +1,7 @@
 package articles
 
 import (
+	"github.com/stretchr/testify/assert"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"testing"
 )
@@ -15,22 +16,9 @@ func TestMediumFetchArticles(t *testing.T) {
 	first := result[0]
 	second := result[1]
 
-	if first.Title != "Lorem ipsum dolor sit amet, consectetur adipiscing elit" {
-		t.Error()
-	}
-	if first.Thumbnail != "https://cdn-images-1.medium.com/max/960/1*bbkcrsggiQLxNDRAgHiSBQ.png" {
-		t.Errorf("Thumb is invalid")
-
-	}
-
-	if first.Excerpt == "" {
-		t.Errorf("Excerpt shouldn't be empty")
-	}
-
-	if first.Url != "https://medium.com/lorem/lorem---q" {
-		t.Error()
-	}
-	if second.Thumbnail != "" {
-		t.Error()
-	}
+	assert.Equal(t, first.Title, "Lorem ipsum dolor sit amet, consectetur adipiscing elit")
+	assert.Equal(t, first.Thumbnail, "https://cdn-images-1.medium.com/max/960/1*bbkcrsggiQLxNDRAgHiSBQ.png")
+	assert.Equal(t, first.Url, "https://medium.com/lorem/lorem---q")
+	assert.NotEmpty(t, first.Excerpt)
+	assert.Empty(t, second.Thumbnail)
 }
