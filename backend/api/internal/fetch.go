@@ -13,7 +13,7 @@ type Fetch struct {
 
 // Fetcher is an interface implemented all data fetchers. E.g gallery.instagram
 type Fetcher interface {
-	FetchAndCache()
+	FetchAndCache() int
 	GetCached() ([]byte, error)
 }
 

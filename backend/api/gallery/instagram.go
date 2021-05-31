@@ -23,13 +23,14 @@ type Instagram struct {
 }
 
 // FetchAndCache fetches and caches data from Instagram
-func (i Instagram) FetchAndCache() {
+func (i Instagram) FetchAndCache() int {
 	accessToken := i.getToken()
 	fields := "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type"
 	u := fmt.Sprintf("https://graph.instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
 	allResults := i.fetchImage([]models.Image{}, u)
 	bytes, _ := json.Marshal(allResults)
 	i.CacheData(getCacheKey(instagramKey), bytes)
+	return len(allResults)
 }
 
 // GetCached fetches Instagram images from the db that was previously saved in Cache

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/dgraph-io/badger/v3"
 	"github.com/getsentry/sentry-go"
@@ -14,6 +15,9 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/api/repos"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
+	"reflect"
+	"sync"
+	"time"
 )
 
 var config = &configs.Config
@@ -53,6 +57,7 @@ func SetUpServer(db *badger.DB) *http.Server {
 // SetUpLogrus configures the Logrus
 func SetUpLogrus() {
 	// Setup Logrus
+	log.SetLevel(log.TraceLevel)
 	log.SetReportCaller(true)
 	log.SetFormatter(&log.TextFormatter{
 		ForceColors:   true,
@@ -68,6 +73,7 @@ func SetUpSentry() error {
 		log.FatalLevel,
 		log.ErrorLevel,
 		log.WarnLevel,
+		log.TraceLevel,
 	})
 	// Setup Sentry
 	err := sentry.Init(sentry.ClientOptions{
@@ -81,8 +87,24 @@ func SetUpSentry() error {
 	return err
 }
 
+// ApiMiddleware adds custom params to request contexts
+func apiMiddleware(db *badger.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set(internal.Db, db)
+		c.Next()
+	}
+}
+
+
+type result struct {
+	fetcher string
+	size    int
+}
+
 // FetchAndCache iteratively calls FetchAndCache all all fetchers
 func FetchAndCache(db *badger.DB) {
+	var startTime = time.Now()
+	var config = &configs.Config
 	fetcher := internal.Fetch{
 		Db:         db,
 		HttpClient: &http.Client{},
@@ -95,16 +117,32 @@ func FetchAndCache(db *badger.DB) {
 	github := repos.Github{Auth: config.GithubToken, Username: config.UnsplashUsername, Fetch: fetcher}
 
 	fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress, github}
+
+	results := make(chan result, len(fetchers))
+	var wg sync.WaitGroup
+
 	for _, f := range fetchers {
-		f.FetchAndCache()
+		wg.Add(1)
+		go fetchAndCache(&wg, f, results)
 	}
+	wg.Wait()
+	close(results)
+
+	buffer := &bytes.Buffer{}
+	for r := range results {
+		buffer.WriteString(fmt.Sprintf("	%v: %d\n", r.fetcher, r.size))
+	}
+	var message = `
+	==================== Cache Result ====================
+%v	-------------------- %v ---------------------
+	==================== Cache Result ====================
+	`
+	log.Tracef(message, buffer.String(), time.Since(startTime))
 	db.RunValueLogGC(0.7)
 }
 
-// ApiMiddleware adds custom params to request contexts
-func apiMiddleware(db *badger.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set(internal.Db, db)
-		c.Next()
-	}
+func fetchAndCache(wg *sync.WaitGroup, fetcher internal.Fetcher, out chan<- result) {
+	defer wg.Done()
+	size := fetcher.FetchAndCache()
+	out <- result{fetcher: reflect.TypeOf(fetcher).Name(), size: size}
 }

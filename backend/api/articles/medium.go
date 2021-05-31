@@ -21,10 +21,11 @@ type Medium struct {
 }
 
 // FetchAndCache fetches and caches all Medium Articles
-func (m Medium) FetchAndCache() {
+func (m Medium) FetchAndCache() int {
 	articles := m.fetchArticles()
 	buf, _ := json.Marshal(articles)
 	m.CacheData(getCacheKey(mediumKey), buf)
+	return len(articles)
 }
 
 // GetCached returns cached Medium articles

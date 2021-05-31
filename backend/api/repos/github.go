@@ -25,10 +25,11 @@ type Github struct {
 }
 
 // FetchAndCache fetches and saves Github repositories to DB
-func (g Github) FetchAndCache() {
+func (g Github) FetchAndCache() int {
 	repos := g.fetchRepos()
 	bytes, _ := json.Marshal(repos)
 	g.CacheData(getCacheKey(githubKey), bytes)
+	return len(repos)
 }
 
 // GetCached retrieves saved Github repositories
