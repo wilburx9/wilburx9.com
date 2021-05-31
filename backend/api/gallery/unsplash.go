@@ -22,10 +22,11 @@ type Unsplash struct {
 }
 
 // FetchAndCache fetches data from Unsplash and caches it
-func (u Unsplash) FetchAndCache() {
+func (u Unsplash) FetchAndCache() int {
 	images := u.FetchImage([]models.Image{}, 1)
 	buf, _ := json.Marshal(images)
 	u.CacheData(getCacheKey(unsplashKey), buf)
+	return len(images)
 }
 
 // GetCached returns data that was cached in Cache
