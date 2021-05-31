@@ -1,6 +1,7 @@
 package articles
 
 import (
+	"github.com/stretchr/testify/assert"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"testing"
 )
@@ -11,10 +12,7 @@ func TestWordPressFetchArticles(t *testing.T) {
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/wordpress_response.json"},
 	}}
 	var results = w.fetchArticles()
-	if len(results) != 2 {
-		t.Error()
-	}
-	if results[0].Title != "Lorem ipsum is placeholder text commonly used" {
-		t.Error()
-	}
+
+	assert.Equal(t, len(results), 2)
+	assert.Equal(t, results[0].Title, "Lorem ipsum is placeholder text commonly used")
 }
