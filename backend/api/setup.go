@@ -8,6 +8,7 @@ import (
 	sentrygin "github.com/getsentry/sentry-go/gin"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/go-co-op/gocron"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
@@ -95,14 +96,22 @@ func apiMiddleware(db *badger.DB) gin.HandlerFunc {
 	}
 }
 
+// ScheduleFetchAddCache schedules fetching and caching of data from fetchers
+func ScheduleFetchAddCache(db *badger.DB) {
+	s := gocron.NewScheduler(time.UTC)
+	s.Every(3).Days().Do(func(db *badger.DB) {
+		fetchAndCache(db)
+	}, db)
+	s.StartAsync()
+}
 
 type result struct {
 	fetcher string
 	size    int
 }
 
-// FetchAndCache iteratively calls FetchAndCache all all fetchers
-func FetchAndCache(db *badger.DB) {
+// fetchAndCache iteratively calls fetchAndCache all all fetchers
+func fetchAndCache(db *badger.DB) {
 	var startTime = time.Now()
 	var config = &configs.Config
 	fetcher := internal.Fetch{
@@ -123,7 +132,7 @@ func FetchAndCache(db *badger.DB) {
 
 	for _, f := range fetchers {
 		wg.Add(1)
-		go fetchAndCache(&wg, f, results)
+		go fetchAndCacheFetcher(&wg, f, results)
 	}
 	wg.Wait()
 	close(results)
@@ -141,7 +150,7 @@ func FetchAndCache(db *badger.DB) {
 	db.RunValueLogGC(0.7)
 }
 
-func fetchAndCache(wg *sync.WaitGroup, fetcher internal.Fetcher, out chan<- result) {
+func fetchAndCacheFetcher(wg *sync.WaitGroup, fetcher internal.Fetcher, out chan<- result) {
 	defer wg.Done()
 	size := fetcher.FetchAndCache()
 	out <- result{fetcher: reflect.TypeOf(fetcher).Name(), size: size}
