@@ -11,6 +11,7 @@ import (
 	"github.com/go-co-op/gocron"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles"
+	"github.com/wilburt/wilburx9.dev/backend/api/contact"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos"
@@ -49,6 +50,7 @@ func SetUpServer(db *badger.DB) *http.Server {
 	api.GET("/articles", articles.Handler)
 	api.GET("/gallery", gallery.Handler)
 	api.GET("/repos", repos.Handler)
+	api.POST("/contact", contact.Handler)
 
 	// Start Http server
 	s := &http.Server{Addr: fmt.Sprintf(":%s", config.Port), Handler: router}

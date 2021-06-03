@@ -21,6 +21,11 @@ type appConfig struct {
 	SentryDsn            string `mapstructure:"sentry_dsn"`
 	GithubToken          string `mapstructure:"github_token"`
 	GithubUsername       string `mapstructure:"github_username"`
+	SmtpHost             string `mapstructure:"smtp_host"`
+	SmtpPort             int    `mapstructure:"smtp_port"`
+	SmtpUsername         string `mapstructure:"smtp_username"`
+	SmtpPassword         string `mapstructure:"smtp_password"`
+	ContactEmail         string `mapstructure:"contact_email"`
 }
 
 // IsRelease returns true for release Env and false otherwise

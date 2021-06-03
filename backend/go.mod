@@ -11,12 +11,13 @@ require (
 	github.com/go-co-op/gocron v1.6.0
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.4.3 // indirect
-	github.com/magiconair/properties v1.8.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/viper v1.7.1
-	github.com/stretchr/testify v1.7.0 // indirect
+	github.com/stretchr/testify v1.7.0
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
 	golang.org/x/sys v0.0.0-20210223095934-7937bea0104d // indirect
 	golang.org/x/text v0.3.4 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
