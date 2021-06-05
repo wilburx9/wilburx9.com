@@ -26,6 +26,7 @@ type appConfig struct {
 	SmtpUsername         string `mapstructure:"smtp_username"`
 	SmtpPassword         string `mapstructure:"smtp_password"`
 	ContactEmail         string `mapstructure:"contact_email"`
+	RecaptchaSecret      string `mapstructure:"recaptcha_secret"`
 }
 
 // IsRelease returns true for release Env and false otherwise

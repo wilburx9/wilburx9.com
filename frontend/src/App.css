@@ -24,3 +24,8 @@
     height: 0.05em;
     border: none;
 }
+
+/*TODO: Add Google branding to contact form section. See: https://developers.google.com/recaptcha/docs/faq#id-like-to-hide-the-recaptcha-badge.-what-is-allowed*/
+.grecaptcha-badge {
+    visibility: hidden;
+}
