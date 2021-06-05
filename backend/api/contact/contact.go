@@ -11,23 +11,27 @@ import (
 )
 
 type requestData struct {
-	SenderEmail string `json:"sender_email"`
-	SenderName  string `json:"sender_name"`
-	Subject     string `json:"subject"`
-	Message     string `json:"message"`
+	SenderEmail    string `json:"sender_email"`
+	SenderName     string `json:"sender_name"`
+	Subject        string `json:"subject"`
+	Message        string `json:"message"`
+	RecaptchaToken string `json:"recaptcha_token"`
 }
 
 // Handler validates request body and reCAPTCHA and possibly sends an email
 func Handler(c *gin.Context) {
 	var data requestData
 	err := c.ShouldBindJSON(&data)
-	message := validate(data)
+	message := validateBody(data)
 	if err != nil || message != "" {
 		c.JSON(http.StatusBadRequest, internal.MakeErrorResponse(message))
 		return
 	}
 
-	// TODO: Validate reCAPTCHA
+	if !validateRecaptcha(configs.Config.RecaptchaSecret, data.RecaptchaToken, &http.Client{}) {
+		c.JSON(http.StatusForbidden, internal.MakeErrorResponse("Could not confirm humanness"))
+		return
+	}
 
 	err = sendEmail(data)
 	if err != nil {
@@ -48,16 +52,5 @@ func sendEmail(data requestData) error {
 	m.SetBody("text/plain", data.Message)
 
 	d := gomail.NewDialer(config.SmtpHost, config.SmtpPort, config.SmtpUsername, config.SmtpPassword)
-	err := d.DialAndSend(m)
-	if err != nil {
-		log.Error(err)
-	} else {
-		log.Info("Sent")
-	}
-	return err
-}
-
-func validateRecaptcha() error {
-	// TODO implement reCAPTCHA verification
-	return nil
+	return d.DialAndSend(m)
 }
