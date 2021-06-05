@@ -34,3 +34,8 @@ func (cm *HttpClientMock) Do(_ *http.Request) (*http.Response, error) {
 func MakeSuccessResponse(data interface{}) gin.H {
 	return gin.H{"success": true, "data": data}
 }
+
+// MakeErrorResponse returns a template of an error response
+func MakeErrorResponse(data interface{}) gin.H {
+	return gin.H{"success": false, "data": data}
+}
