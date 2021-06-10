@@ -22,7 +22,7 @@ type requestData struct {
 func Handler(c *gin.Context) {
 	var data requestData
 	err := c.ShouldBindJSON(&data)
-	message := validateBody(data)
+	message := validateData(data)
 	if err != nil || message != "" {
 		c.JSON(http.StatusBadRequest, internal.MakeErrorResponse(message))
 		return
@@ -33,7 +33,7 @@ func Handler(c *gin.Context) {
 		return
 	}
 
-	err = sendEmail(data)
+	err = send(data)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send email")
 		c.JSON(http.StatusBadGateway, internal.MakeErrorResponse("Email not sent"))
@@ -42,7 +42,7 @@ func Handler(c *gin.Context) {
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse("Email sent successfully"))
 }
 
-func sendEmail(data requestData) error {
+func send(data requestData) error {
 	config := configs.Config
 	sender := fmt.Sprintf("%v <%v>", data.SenderName, data.SenderEmail)
 	m := gomail.NewMessage()

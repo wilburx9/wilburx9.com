@@ -14,7 +14,7 @@ const (
 	minRecaptchaThresh = 0.5
 )
 
-func validateBody(data requestData) string {
+func validateData(data requestData) string {
 	message := ""
 	_, err := mail.ParseAddress(data.SenderEmail)
 	switch {
@@ -34,7 +34,7 @@ func validateBody(data requestData) string {
 
 func validateRecaptcha(secret string, token string, httpClient internal.HttpClient) bool {
 	url := fmt.Sprintf("https://www.google.com/recaptcha/api/siteverify?secret=%v&response=%v", secret, token)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodPost, url, nil)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
 		return false
