@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	unsplashKey = "Unsplash"
+	unsplashKey = "unsplash"
 )
 
 // Unsplash handles fetching and caching of data from Unsplash. And also returning the cached data
@@ -24,14 +24,13 @@ type Unsplash struct {
 // FetchAndCache fetches data from Unsplash and caches it
 func (u Unsplash) FetchAndCache() int {
 	images := u.FetchImage([]models.Image{}, 1)
-	buf, _ := json.Marshal(images)
-	u.CacheData(getCacheKey(unsplashKey), buf)
+	u.CacheData(internal.DbGalleryKey, unsplashKey, images)
 	return len(images)
 }
 
 // GetCached returns data that was cached in Cache
-func (u Unsplash) GetCached() ([]byte, error) {
-	return u.GetCachedData(getCacheKey(unsplashKey))
+func (u Unsplash) GetCached() ([]interface{}, error) {
+	return u.GetCachedData(internal.DbGalleryKey, unsplashKey)
 }
 
 // FetchImage fetches images via HTTP

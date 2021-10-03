@@ -9,30 +9,29 @@ import (
 )
 
 const (
-	wordpressKey = "Wordpress"
+	wordpressKey = "wordpress"
 )
 
-// Wordpress encapsulates fetching and caching of wordpress blog posts
-type Wordpress struct {
+// WordPress encapsulates fetching and caching of WordPress blog posts
+type WordPress struct {
 	URL string // WP V2 post URL URL e.g https://example.com/wp-json/wp/v2/posts
 	internal.Fetch
 }
 
-// FetchAndCache fetches and caches wordpress articles
-func (w Wordpress) FetchAndCache() int {
+// FetchAndCache fetches and caches WordPress articles
+func (w WordPress) FetchAndCache() int {
 	articles := w.fetchArticles()
-	buf, _ := json.Marshal(articles)
-	w.CacheData(getCacheKey(wordpressKey), buf)
+	w.CacheData(internal.DbArticlesKey, wordpressKey, articles)
 	return len(articles)
 }
 
-// GetCached returns cached Wordpress articles
-func (w Wordpress) GetCached() ([]byte, error) {
-	return w.GetCachedData(getCacheKey(wordpressKey))
+// GetCached returns cached WordPress articles
+func (w WordPress) GetCached() ([]interface{}, error) {
+	return w.GetCachedData(internal.DbArticlesKey, wordpressKey)
 }
 
-// fetchArticles gets articles from Wordpress via HTTP
-func (w Wordpress) fetchArticles() []models.Article {
+// fetchArticles gets articles from WordPress via HTTP
+func (w WordPress) fetchArticles() []models.Article {
 	req, err := http.NewRequest(http.MethodGet, w.URL, nil)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
@@ -54,4 +53,3 @@ func (w Wordpress) fetchArticles() []models.Article {
 	}
 	return posts.ToArticles()
 }
-

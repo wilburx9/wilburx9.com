@@ -7,7 +7,7 @@ import (
 )
 
 func TestWordPressFetchArticles(t *testing.T) {
-	var w = Wordpress{URL: "https://example.com/wp-json/wp/v2/posts", Fetch: internal.Fetch{
+	var w = WordPress{URL: "https://example.com/wp-json/wp/v2/posts", Fetch: internal.Fetch{
 		Db:         nil,
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/wordpress_response.json"},
 	}}

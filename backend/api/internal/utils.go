@@ -1,7 +1,9 @@
 package internal
 
 import (
+	"fmt"
 	log "github.com/sirupsen/logrus"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"time"
 )
 
@@ -19,11 +21,7 @@ func StringToTime(layout string, timeStr string) time.Time {
 	return t
 }
 
-// GetFirstNCodePoints Returns the first n code points of string. E.g FirstNCodePoints("世界 Hello", 1) == "世"
-func GetFirstNCodePoints(s string, n int) string {
-	r := []rune(s)
-	if len(r) > n {
-		return string(r[:n])
-	}
-	return s
+// GetDataCollection prepends the running environment passed string and returns it
+func GetDataCollection(coll string) string {
+	return fmt.Sprintf("%s_%s", configs.Config.Env, coll)
 }

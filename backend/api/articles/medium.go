@@ -1,7 +1,6 @@
 package articles
 
 import (
-	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -11,26 +10,25 @@ import (
 )
 
 const (
-	mediumKey = "Medium"
+	mediumKey = "medium"
 )
 
 // Medium encapsulates the fetching and caching of medium articles
 type Medium struct {
-	Name string // should be Medium username (e.g "@Wilburx9") or publication (e.g flutter-community)
+	Name string // should be Medium username (e.g "@Wilburx9") or publication (e.g. flutter-community)
 	internal.Fetch
 }
 
 // FetchAndCache fetches and caches all Medium Articles
 func (m Medium) FetchAndCache() int {
 	articles := m.fetchArticles()
-	buf, _ := json.Marshal(articles)
-	m.CacheData(getCacheKey(mediumKey), buf)
+	m.CacheData(internal.DbArticlesKey, mediumKey, articles)
 	return len(articles)
 }
 
 // GetCached returns cached Medium articles
-func (m Medium) GetCached() ([]byte, error) {
-	return m.GetCachedData(getCacheKey(mediumKey))
+func (m Medium) GetCached() ([]interface{}, error) {
+	return m.GetCachedData(internal.DbArticlesKey, mediumKey)
 }
 
 // fetchArticles fetches articles via HTTP

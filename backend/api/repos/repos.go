@@ -1,9 +1,9 @@
 package repos
 
 import (
-	"encoding/json"
-	"github.com/dgraph-io/badger/v3"
+	"cloud.google.com/go/firestore"
 	"github.com/gin-gonic/gin"
+	"github.com/mitchellh/mapstructure"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
@@ -14,7 +14,8 @@ import (
 // Handler retrieves a list of all git repos, sorted in descending stars and forks
 func Handler(c *gin.Context) {
 	fetch := internal.Fetch{
-		Db:         c.MustGet(internal.Db).(*badger.DB),
+		Db:         c.MustGet(internal.Db).(*firestore.Client),
+		Ctx:        c,
 		HttpClient: &http.Client{},
 	}
 
@@ -23,10 +24,8 @@ func Handler(c *gin.Context) {
 
 	var allRepos = make([]models.Repo, 0)
 	for _, f := range fetchers {
-		var repos []models.Repo
-		bytes, _ := f.GetCached()
-		json.Unmarshal(bytes, &repos)
-		allRepos = append(allRepos, repos...)
+		maps, _ := f.GetCached()
+		allRepos = append(allRepos, mapSliceTRepos(maps)...)
 	}
 
 	// Sort in descending order of scores
@@ -36,6 +35,14 @@ func Handler(c *gin.Context) {
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse(allRepos))
 }
 
-func getCacheKey(suffix string) string {
-	return internal.GetCacheKey(internal.DbReposKey, suffix)
+func mapSliceTRepos(maps []interface{}) []models.Repo {
+	var repos = make([]models.Repo, len(maps))
+	for i, v := range maps {
+		var repo models.Repo
+		err := mapstructure.Decode(v, &repo)
+		if err == nil {
+			repos[i] = repo
+		}
+	}
+	return repos
 }
