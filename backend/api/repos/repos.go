@@ -18,7 +18,7 @@ func Handler(c *gin.Context) {
 		HttpClient: &http.Client{},
 	}
 
-	github := Github{Auth: configs.Config.GithubToken, Username: configs.Config.GithubUsername, Fetch: fetch}
+	github := GitHub{Auth: configs.Config.GithubToken, Username: configs.Config.GithubUsername, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{github}
 
 	var allRepos = make([]models.Repo, 0)

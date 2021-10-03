@@ -7,37 +7,40 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos/internal/models"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
 
 const (
-	githubKey = "Github"
+	githubKey = "GitHub"
 )
 
-// Github handles fetching and caching of Github repositories
-type Github struct {
+// GitHub handles fetching and caching of GitHub repositories
+type GitHub struct {
 	Auth     string
 	Username string
 	internal.Fetch
 }
 
-// FetchAndCache fetches and saves Github repositories to DB
-func (g Github) FetchAndCache() int {
+// FetchAndCache fetches and saves GitHub repositories to DB
+func (g GitHub) FetchAndCache() int {
 	repos := g.fetchRepos()
 	bytes, _ := json.Marshal(repos)
 	g.CacheData(getCacheKey(githubKey), bytes)
 	return len(repos)
 }
 
-// GetCached retrieves saved Github repositories
-func (g Github) GetCached() ([]byte, error) {
+// GetCached retrieves saved GitHub repositories
+func (g GitHub) GetCached() ([]byte, error) {
 	return g.GetCachedData(getCacheKey(githubKey))
 }
 
-func (g Github) fetchRepos() []models.Repo {
+func (g GitHub) fetchRepos() []models.Repo {
 	url := "https://api.github.com/graphql"
 
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(getGraphQlQuery()))
@@ -67,10 +70,16 @@ func (g Github) fetchRepos() []models.Repo {
 }
 
 func getGraphQlQuery() string {
-	queryPath := "../api/repos/internal/files/github_query.graphql"
-	bytes, err := ioutil.ReadFile(queryPath)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Error("Could not load graphql query file")
+	queryPath := fmt.Sprintf("%v/api/repos/internal/files/github_query.graphql", configs.Config.AppHome)
+	bytes, err1 := ioutil.ReadFile(queryPath)
+	if err1 != nil {
+		root, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			log.Fatalf("Could not read root directory %s", err)
+			return ""
+		}
+		log.Println(fmt.Sprintf("Current directory is %v", root))
+		log.WithFields(log.Fields{"error": err1}).Error("Could not load graphql query file")
 		return ""
 	}
 
