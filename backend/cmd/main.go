@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/dgraph-io/badger/v3"
-	"github.com/getsentry/sentry-go"
+	"cloud.google.com/go/firestore"
+	"context"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api"
-	"time"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 )
 
 func main() {
@@ -16,22 +16,22 @@ func main() {
 		log.Fatalf("invalid application configuration: %s", err)
 	}
 
-	err := api.SetUpSentry()
-	if err != nil {
-		log.Fatalf("sentry.Init: failed %s", err)
-	}
-	defer sentry.Flush(2 * time.Second)
+	ctx := context.Background()
+	db := createFireStoreClient(ctx)
+	defer db.Close()
 
-	db, err := badger.Open(badger.DefaultOptions("/tmp/badger"))
-
-	if err != nil {
-		log.Fatalf("setting up badger failed %v", err)
-		return
-	}
-
-	api.ScheduleFetchAddCache(db)
+	api.ScheduleFetchAddCache(db, ctx)
 
 	// Setup and start Http server
 	s := api.SetUpServer(db)
 	s.ListenAndServe()
+}
+
+func createFireStoreClient(ctx context.Context) *firestore.Client {
+	projectId := configs.Config.GcpProjectId
+	client, err := firestore.NewClient(ctx, projectId)
+	if err != nil {
+		log.Fatalf("Failed to create Firestore cleint: %v", err)
+	}
+	return client
 }

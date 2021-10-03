@@ -2,7 +2,6 @@ package configs
 
 import (
 	"fmt"
-	"github.com/fatih/structs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
@@ -23,6 +22,7 @@ type appConfig struct {
 	GithubToken          string `mapstructure:"github_token"`
 	GithubUsername       string `mapstructure:"github_username"`
 	AppHome              string `mapstructure:"app_home"`
+	GcpProjectId         string `mapstructure:"gcp_project_id"`
 }
 
 // IsRelease returns true for release Env and false otherwise
@@ -53,6 +53,6 @@ func LoadConfig() error {
 	}
 
 	err := v.Unmarshal(&Config)
-	log.WithFields(structs.Map(Config)).Info("App started with these config")
+	log.Infof("App started with these config: %+v\n", Config)
 	return err
 }
