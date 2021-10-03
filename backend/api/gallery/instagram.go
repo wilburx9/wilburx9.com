@@ -76,15 +76,17 @@ func (i Instagram) getToken() string {
 	// Attempt to get token from Db
 	collection := internal.GetDataCollection(internal.DbKeys)
 	snapshot, err := i.Db.Collection(collection).Doc(instagramKey).Get(i.Ctx)
-
 	// If we haven't saved the token before, log an error and refresh the token we have now
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't fetch Instagram token")
 		return i.refreshToken(i.AccessToken)
 	}
 
-	dataAt, _ := snapshot.DataAt(tokenKey)
-	mapstructure.Decode(dataAt, tk)
+	err = mapstructure.Decode(snapshot.Data(), &tk)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't decode saved token object")
+		return ""
+	}
 
 	// Check for expired token.
 	if tk.Expired() {
