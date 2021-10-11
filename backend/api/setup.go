@@ -74,7 +74,7 @@ func apiMiddleware(db *firestore.Client) gin.HandlerFunc {
 // ScheduleFetchAddCache schedules fetching and caching of data from fetchers
 func ScheduleFetchAddCache(db *firestore.Client, ctx context.Context) {
 	s := gocron.NewScheduler(time.UTC)
-	s.Every(3).Days().Do(func(db *firestore.Client, ctx context.Context) {
+	s.Every(2).Weeks().Do(func(db *firestore.Client, ctx context.Context) {
 		fetchAndCache(db, ctx)
 	}, db, ctx)
 	s.StartAsync()
