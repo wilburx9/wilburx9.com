@@ -34,14 +34,14 @@ func (f Fetch) GetCachedData(coll string, doc string) ([]interface{}, error) {
 	collection := GetDataCollection(coll)
 	snapshot, err := f.Db.Collection(collection).Doc(doc).Get(f.Ctx)
 	if err != nil {
-		log.Errorf("Failed to read from %s.%s", collection, doc)
+		log.Errorf("Failed to read from %s.%s:: %s", collection, doc, err)
 		return nil, err
 	}
 
 	data, err := snapshot.DataAt("data")
 
 	if err != nil {
-		log.Errorf("Failed to read snapshot data at %s.%s", collection, doc)
+		log.Errorf("Failed to read snapshot data at %s.%s:: %s", collection, doc, err)
 		return nil, err
 	}
 	return data.([]interface{}), nil
