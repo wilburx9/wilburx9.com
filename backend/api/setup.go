@@ -5,6 +5,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"context"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-co-op/gocron"
 	log "github.com/sirupsen/logrus"
@@ -38,6 +39,14 @@ func SetUpServer(db *firestore.Client) *http.Server {
 
 	// Attach API middleware
 	router.Use(apiMiddleware(db))
+
+	if config.IsDebug() {
+		// Enable CORS support
+		corsConfig := cors.DefaultConfig()
+		corsConfig.AllowOrigins = []string{"http://localhost:3000"}
+		corsConfig.AddAllowMethods(http.MethodGet)
+		router.Use(cors.New(corsConfig))
+	}
 
 	// Setup API route
 	api := router.Group("/api")
