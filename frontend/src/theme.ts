@@ -2,8 +2,8 @@ import {extendTheme, theme as base} from "@chakra-ui/react";
 
 const theme = extendTheme({
   fonts: {
-    heading: `Montserrat, ${base.fonts?.heading}`,
-    body: `Montserrat, ${base.fonts?.body}`
+    heading: `'Roboto Mono', monospace, ${base.fonts?.heading}`,
+    body: `'Roboto Mono', monospace, ${base.fonts?.body}`
   }
 });
 
