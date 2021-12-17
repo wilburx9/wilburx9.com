@@ -12,8 +12,8 @@ export const App = () => (
       <Box textAlign="center" fontSize="xl">
         <Flex flexDir="column">
           <ColorModeSwitcher justifySelf="flex-end" alignSelf="end"/>
-          <Box flex="1">
-            <ArticleComponent/>
+          <Box  maxW="container.xl" alignSelf="center">
+            <ArticleComponent />
           </Box>
         </Flex>
       </Box>
