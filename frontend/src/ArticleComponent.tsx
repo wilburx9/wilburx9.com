@@ -1,4 +1,15 @@
-import {Box, Flex, Heading, Image, Stack, StackDivider, Text, useColorModeValue, VStack} from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Heading,
+  Image,
+  LinkBox, LinkOverlay,
+  Stack,
+  StackDivider,
+  Text,
+  VStack,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import React, {useContext, useEffect} from "react";
 import {DataContext} from "./DataProvider";
 import {Utils} from "./Utils";
@@ -41,16 +52,20 @@ export const ArticleComponent = () => {
 
 
 function Column(props: Article) {
-  return <Flex>
-    <Image
-      src={props.thumbnail}
-      alt={props.title}
-      objectFit="cover"
-      boxSize="100px"
-      borderRadius="md"/>
-    <VStack alignItems="flex-start" w="full" px={4} justifyContent="left">
-      <Heading mb={1} fontSize="20px" align="start" fontWeight="bold">{props.title}</Heading>
-      <Text noOfLines={3} fontSize="16px" align="start" fontWeight="regular">{props.excerpt}</Text>
-    </VStack>
-  </Flex>
+  return <LinkBox>
+    <LinkOverlay href={props.url} isExternal>
+      <Flex>
+        <Image
+          src={props.thumbnail}
+          alt={props.title}
+          objectFit="cover"
+          boxSize="100px"
+          borderRadius="md"/>
+        <VStack alignItems="flex-start" w="full" px={4} justifyContent="left">
+          <Heading mb={1} fontSize="20px" align="start" fontWeight="bold">{props.title}</Heading>
+          <Text noOfLines={3} fontSize="16px" align="start" fontWeight="regular">{props.excerpt}</Text>
+        </VStack>
+      </Flex>
+    </LinkOverlay>
+  </LinkBox>
 }

@@ -9,11 +9,18 @@ import DataProvider from "./DataProvider";
 export const App = () => (
   <ChakraProvider theme={theme}>
     <DataProvider>
-      <Box textAlign="center" fontSize="xl">
+      <Box
+        textAlign="center"
+        fontSize="xl">
         <Flex flexDir="column">
-          <ColorModeSwitcher justifySelf="flex-end" alignSelf="end"/>
-          <Box  maxW="container.xl" alignSelf="center">
-            <ArticleComponent />
+          <ColorModeSwitcher
+            justifySelf="flex-end"
+            alignSelf="end"/>
+          <Box
+            flex='1'
+            maxW="container.xl"
+            alignSelf="center">
+            <ArticleComponent/>
           </Box>
         </Flex>
       </Box>
