@@ -48,7 +48,8 @@ func SetUpServer(db *firestore.Client) *http.Server {
 		router.Use(cors.New(corsConfig))
 	}
 
-	// Setup API route
+	// Setup API route.
+	// TODO: Setup up caching headers?
 	api := router.Group("/api")
 	api.GET("/articles", articles.Handler)
 	api.GET("/gallery", gallery.Handler)

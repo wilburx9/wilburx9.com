@@ -11,11 +11,11 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import React, {useContext, useEffect} from "react";
-import {DataContext} from "./DataProvider";
-import {Utils} from "./Utils";
-import {Article} from "./models/Article";
+import {DataContext} from "../DataProvider";
+import {Utils} from "../Utils";
+import {ArticleModel} from "../models/ArticleModel";
 
-export const ArticleComponent = () => {
+export const ArticlesComponent = () => {
   const {fetchArticles, articles} = useContext(DataContext)
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export const ArticleComponent = () => {
 }
 
 
-function Column(props: Article) {
+function Column(props: ArticleModel) {
   return <LinkBox>
     <LinkOverlay href={props.url} isExternal>
       <Flex>
