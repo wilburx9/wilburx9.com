@@ -1,9 +1,9 @@
-export interface ArticleAPI {
-  data:    Article[];
+export interface ArticleResponse {
+  data:    ArticleModel[];
   success: boolean;
 }
 
-export interface Article {
+export interface ArticleModel {
   title:      string;
   thumbnail:  string;
   url:        string;

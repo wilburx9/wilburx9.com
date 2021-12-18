@@ -13,6 +13,7 @@ import (
 
 // Handler retrieves a list of all the articles sorted in descending creation date
 func Handler(c *gin.Context) {
+	// TODO: Use query params to for list size, and add special consideration for a repo
 	fetch := internal.Fetch{
 		Db:         c.MustGet(internal.Db).(*firestore.Client),
 		Ctx:        c,

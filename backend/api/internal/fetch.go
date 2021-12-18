@@ -17,6 +17,7 @@ type Fetch struct {
 type Fetcher interface {
 	FetchAndCache() int
 	GetCached() ([]interface{}, error)
+	// TODO: Stop using Firebase for debug environment. Use some for of local DB
 }
 
 // CacheData caches the data with key

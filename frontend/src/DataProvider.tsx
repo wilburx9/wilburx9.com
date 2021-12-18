@@ -1,10 +1,13 @@
 import React, {Component} from "react";
-import {Article, ArticleAPI} from "./models/Article";
+import {ArticleModel, ArticleResponse} from "./models/ArticleModel";
 import axios from "axios";
+import {RepoModel, RepoResponse} from "./models/RepoModel";
 
 export type DataValue = {
-  articles: Article[],
-  fetchArticles: () => void
+  articles: ArticleModel[],
+  repos: RepoModel[],
+  fetchArticles: () => void,
+  fetchRepos: () => void,
 }
 
 const DataContext = React.createContext<Partial<DataValue>>({});
@@ -15,23 +18,37 @@ const http = axios.create({
 })
 
 type DataState = {
-  articles: Article[]
+  articles: ArticleModel[],
+  repos: RepoModel[],
 }
 
 export class DataProvider extends Component<any, DataState> {
 
-  state: DataState = {articles: []}
+  state: DataState = {articles: [], repos: []}
 
   componentDidMount() {
     this.fetchArticles()
+    this.fetchRepos()
   }
 
   fetchArticles = () => {
     http
-      .get<ArticleAPI>("/articles")
+      .get<ArticleResponse>("/articles")
       .then(response => {
-        console.log("Success:: " + response.data)
+        console.log("Articles success:: " + response.data)
         this.setState({articles: response.data.data})
+      })
+      .catch(ex => {
+        console.log(ex)
+      })
+  }
+
+  fetchRepos = () => {
+    http
+      .get<RepoResponse>("/repos")
+      .then(response => {
+        console.log("Repos success:: " + response.data)
+        this.setState({repos: response.data.data})
       })
       .catch(ex => {
         console.log(ex)
@@ -43,7 +60,8 @@ export class DataProvider extends Component<any, DataState> {
       <DataContext.Provider
         value={{
           ...this.state,
-          fetchArticles: this.fetchArticles
+          fetchArticles: this.fetchArticles,
+          fetchRepos: this.fetchRepos
         }}>
         {this.props.children}
       </DataContext.Provider>
@@ -51,7 +69,6 @@ export class DataProvider extends Component<any, DataState> {
   }
 }
 
-const DataConsumer = DataContext.Consumer
 
-export {DataConsumer, DataContext}
+export {DataContext}
 export default DataProvider
