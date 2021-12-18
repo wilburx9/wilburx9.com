@@ -5,7 +5,7 @@ import {ArticlesComponent} from "./components/ArticlesComponent";
 import theme from "./theme";
 import "./style.css"
 import DataProvider from "./DataProvider";
-import {ReposComponents} from "./components/ReposComponents";
+import {ReposComponent} from "./components/ReposComponent";
 
 export const App = () => (
   <ChakraProvider theme={theme}>
@@ -14,15 +14,14 @@ export const App = () => (
         textAlign="center"
         fontSize="xl">
         <Flex flexDir="column">
-          <ColorModeSwitcher
-            justifySelf="flex-end"
-            alignSelf="end"/>
+          <ColorModeSwitcher ml='auto'/>
           <Box
             flex='1'
             maxW="container.xl"
+            px={[5, null, 10]}
             alignSelf="center">
             <ArticlesComponent/>
-            <ReposComponents/>
+            <ReposComponent/>
           </Box>
         </Flex>
       </Box>

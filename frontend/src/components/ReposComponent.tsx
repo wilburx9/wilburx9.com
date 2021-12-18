@@ -26,7 +26,7 @@ import {
 import {IconType} from "react-icons";
 
 
-export const ReposComponents = () => {
+export const ReposComponent = () => {
   const {fetchRepos, repos} = useContext(DataContext)
 
   useEffect(() => {
@@ -36,19 +36,19 @@ export const ReposComponents = () => {
   if (!repos) return <Box/>
 
   return (
-    <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} p={4}>
+    <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
       {repos.map((repo) =>
-        <Item {...repo} key={repo.name}/>
+        <RepoComponent {...repo} key={repo.name}/>
       )}
     </SimpleGrid>
   )
 }
 
-function Item(props: RepoModel) {
+function RepoComponent(props: RepoModel) {
   // Assign icons to the languages and filter out those with no icon afterwards
   let languages = props.languages.map(function (l) {
     let icon = lngIconMap.get(l.name.toLowerCase())
-    return new Lng(l, icon?.icon, icon?.size)
+    return new _Language(l, icon?.icon, icon?.size)
   }).filter((l) => l.icon != null)
 
   let borderColor = useColorModeValue('black', 'white');
@@ -67,13 +67,17 @@ function Item(props: RepoModel) {
               <Text fontSize='12px' fontWeight='medium' pr={4}>{props.stars}</Text>
             </HStack>
             <HStack>
-              {languages.map((l) => <Icon as={l.icon!} color={l.color} w={l.iconSize} h={l.iconSize}/>)}
+              {languages.map((l) => <LanguageComponent {...l} key={l.name}/>)}
             </HStack>
           </HStack>
         </VStack>
       </Box>
     </LinkOverlay>
   </LinkBox>
+}
+
+function LanguageComponent(props: _Language) {
+  return <Icon as={props.icon!} color={props.color} w={props.iconSize} h={props.iconSize}/>
 }
 
 let lngIconMap: Map<string, { icon: IconType, size: number }> = new Map([
@@ -87,7 +91,7 @@ let lngIconMap: Map<string, { icon: IconType, size: number }> = new Map([
   ["css", {icon: DiCss3, size: 4}],
 ])
 
-class Lng {
+class _Language {
   name: string;
   color: string;
   icon?: IconType;
