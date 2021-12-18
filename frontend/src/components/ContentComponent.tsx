@@ -4,6 +4,7 @@ import {Box, Center, Fade, Flex, Spinner} from "@chakra-ui/react";
 import {ColorModeSwitcher} from "./ColorModeSwitcher";
 import {ArticlesComponent} from "./ArticlesComponent";
 import {ReposComponent} from "./ReposComponent";
+import {AttributionComponent} from "./AttributionComponent";
 
 export const ContentComponent = () => {
   const {hasData} = useContext(DataContext)
@@ -31,6 +32,7 @@ export const ContentComponent = () => {
           alignSelf="center">
           <ArticlesComponent/>
           <ReposComponent/>
+          <AttributionComponent/>
         </Box>
       </Flex>
     </Fade>
