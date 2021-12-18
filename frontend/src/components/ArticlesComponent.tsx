@@ -1,19 +1,16 @@
 import {
   Box,
-  Flex,
   Heading,
   Image,
   LinkBox, LinkOverlay,
-  Stack,
-  StackDivider,
   Text,
   VStack,
-  useColorModeValue,
+  SimpleGrid, Icon, Circle, useColorModeValue, AspectRatio,
 } from "@chakra-ui/react";
 import React, {useContext, useEffect} from "react";
 import {DataContext} from "../DataProvider";
-import {Utils} from "../Utils";
 import {ArticleModel} from "../models/ArticleModel";
+import {HiArrowRight} from "react-icons/hi";
 
 export const ArticlesComponent = () => {
   const {fetchArticles, articles} = useContext(DataContext)
@@ -23,30 +20,12 @@ export const ArticlesComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchArticles])
 
-  let borderColor = useColorModeValue('gray.400', 'gray.600');
-
   if (!articles) return <Box/>
 
-  let groups = Utils.groupArray(articles, 2);
   return (
-    <Stack
-      direction={{base: 'column', md: 'row'}}
-      divider={<StackDivider
-        display={{base: 'none', md: 'inherit'}}
-        borderColor={borderColor}/>}>
-
-      {groups.map((group) => <Box
-        w={{base: 'full', md: '50%'}}>
-        <VStack key={group[0].title}>
-          {group.map(function (article, index) {
-            let isLast = index === (group.length - 1)
-            return <Box w="full" pb={isLast ? 0 : 4} px={4}>
-              <Column {...article} key={article.title}/>
-            </Box>;
-          })}
-        </VStack>
-      </Box>)}
-    </Stack>
+    <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} px={[5, null, 10]} py={4}>
+      {articles.map((article) => <Column {...article} key={article.title}/>)}
+    </SimpleGrid>
   )
 }
 
@@ -54,18 +33,25 @@ export const ArticlesComponent = () => {
 function Column(props: ArticleModel) {
   return <LinkBox>
     <LinkOverlay href={props.url} isExternal>
-      <Flex>
-        <Image
-          src={props.thumbnail}
-          alt={props.title}
-          objectFit="cover"
-          boxSize="100px"
-          borderRadius="md"/>
-        <VStack alignItems="flex-start" w="full" px={4} justifyContent="left">
-          <Heading mb={1} fontSize="20px" align="start" fontWeight="bold">{props.title}</Heading>
-          <Text noOfLines={3} fontSize="16px" align="start" fontWeight="regular">{props.excerpt}</Text>
+      <Box w='full' h='full' borderRadius='lg' borderWidth='1px' pb={5}>
+        <VStack align='start' justify='space-between' h='full' spacing={0}>
+          <AspectRatio w='full' ratio={3 / 2}>
+            <Image
+              src={props.thumbnail}
+              alt={props.title}
+              borderTopRadius='lg'
+              objectFit="cover"
+              w='full'/>
+          </AspectRatio>
+          <Heading px={6} pt={6} fontSize="20px" align="start" fontWeight="bold">{props.title}</Heading>
+          <Text px={6} pt={3} noOfLines={3} fontSize="16px" align="start" fontWeight="regular">{props.excerpt}</Text>
+          <Box placeSelf='end'>
+            <Circle bg={useColorModeValue('gray.200', 'gray.700')} boxSize={10} mt={4} mx={9}>
+              <Icon as={HiArrowRight} color={useColorModeValue('gray.800', 'gray.200')}/>
+            </Circle>
+          </Box>
         </VStack>
-      </Flex>
+      </Box>
     </LinkOverlay>
   </LinkBox>
 }
