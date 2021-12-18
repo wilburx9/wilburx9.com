@@ -36,11 +36,14 @@ export const ReposComponent = () => {
   if (!repos) return <Box/>
 
   return (
+  <VStack align='start'>
+    <Heading pt={16} size='xl' align="start" fontWeight="black">&#47;&#47;Open-source Projects</Heading>
     <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
       {repos.map((repo) =>
         <RepoComponent {...repo} key={repo.name}/>
       )}
     </SimpleGrid>
+  </VStack>
   )
 }
 
@@ -57,14 +60,14 @@ function RepoComponent(props: RepoModel) {
     <LinkOverlay href={props.url} isExternal role="group">
       <Box w='full' h='full' borderWidth='1px' borderRadius='lg' p={4} _groupHover={{borderColor: borderColor}}>
         <VStack w='full' h='full' alignItems='flex-start' justify='center'>
-          <Heading mb={1} fontSize="16px" align="start" fontWeight="bold">{props.name}</Heading>
-          <Text mb={3} fontSize="14px" align="start" fontWeight="regular">{props.description}</Text>
+          <Heading mb={1} size='sm' align="start">{props.name}</Heading>
+          <Text mb={3} fontSize='sm' align="start">{props.description}</Text>
           <HStack w='full' justify='space-between'>
             <HStack spacing={0}>
               <Icon as={CgGitFork}/>
-              <Text fontSize='12px' fontWeight='medium' pr={4}>{props.forks}</Text>
+              <Text fontSize='xs' fontWeight='bold' pr={4}>{props.forks}</Text>
               <Icon as={AiFillStar} pr={0.5}/>
-              <Text fontSize='12px' fontWeight='medium' pr={4}>{props.stars}</Text>
+              <Text fontSize='xs' fontWeight='bold' pr={4}>{props.stars}</Text>
             </HStack>
             <HStack>
               {languages.map((l) => <LanguageComponent {...l} key={l.name}/>)}
