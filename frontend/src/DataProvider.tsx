@@ -8,6 +8,7 @@ export type DataValue = {
   repos: RepoModel[],
   fetchArticles: () => void,
   fetchRepos: () => void,
+  hasData: () => boolean,
 }
 
 const DataContext = React.createContext<Partial<DataValue>>({});
@@ -55,13 +56,18 @@ export class DataProvider extends Component<any, DataState> {
       })
   }
 
+  hasData = (): boolean => {
+    return this.state.repos.length > 0 || this.state.repos.length > 0
+  }
+
   render() {
     return (
       <DataContext.Provider
         value={{
           ...this.state,
           fetchArticles: this.fetchArticles,
-          fetchRepos: this.fetchRepos
+          fetchRepos: this.fetchRepos,
+          hasData: this.hasData
         }}>
         {this.props.children}
       </DataContext.Provider>
