@@ -25,7 +25,7 @@ func Handler(c *gin.Context) {
 	var allRepos = make([]models.Repo, 0)
 	for _, f := range fetchers {
 		maps, _ := f.GetCached()
-		allRepos = append(allRepos, mapSliceTRepos(maps)...)
+		allRepos = append(allRepos, mapSliceToRepos(maps)...)
 	}
 
 	// Sort in descending order of scores
@@ -35,7 +35,7 @@ func Handler(c *gin.Context) {
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse(allRepos))
 }
 
-func mapSliceTRepos(maps []interface{}) []models.Repo {
+func mapSliceToRepos(maps []interface{}) []models.Repo {
 	var repos = make([]models.Repo, len(maps))
 	for i, v := range maps {
 		var repo models.Repo

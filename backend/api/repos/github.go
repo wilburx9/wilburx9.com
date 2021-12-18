@@ -58,7 +58,7 @@ func (g GitHub) fetchRepos() []models.Repo {
 	}
 	defer resp.Body.Close()
 
-	var data models.Github
+	var data models.GitHub
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
