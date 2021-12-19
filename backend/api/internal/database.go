@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/mitchellh/mapstructure"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"os"
@@ -14,7 +15,7 @@ import (
 // Database is the interface that wraps basic functions for saving anf retrieving data from concrete databases
 type Database interface {
 	Persist(parentKey string, key string, data interface{})
-	Retrieve(parentKey string, key string) ([]interface{}, error)
+	Retrieve(parentKey string, key string, result interface{}) error
 	Close()
 }
 
@@ -31,7 +32,6 @@ func (f FirebaseFirestore) Close() {
 
 // Persist saves the data to Firebase Firestore
 func (f FirebaseFirestore) Persist(parentKey string, key string, data interface{}) {
-	log.Infof("parent = %q :: key = %q", parentKey, key)
 	mapData := map[string]interface{}{"data": data}
 	_, err := f.Client.Collection(parentKey).Doc(key).Set(f.Ctx, mapData)
 	if err != nil {
@@ -40,21 +40,20 @@ func (f FirebaseFirestore) Persist(parentKey string, key string, data interface{
 }
 
 // Retrieve gets the data saved to Firebase Firestore
-func (f FirebaseFirestore) Retrieve(parentKey string, key string) ([]interface{}, error) {
-	log.Infof("parent = %q :: key = %q", parentKey, key)
+func (f FirebaseFirestore) Retrieve(parentKey string, key string, result interface{}) error {
 	snapshot, err := f.Client.Collection(parentKey).Doc(key).Get(f.Ctx)
 	if err != nil {
 		log.Errorf("Failed to read from %s.%s:: %s", parentKey, key, err)
-		return nil, err
+		return err
 	}
 
 	data, err := snapshot.DataAt("data")
 
 	if err != nil {
 		log.Errorf("Failed to read snapshot data at %s.%s:: %s", parentKey, key, err)
-		return nil, err
+		return err
 	}
-	return data.([]interface{}), nil
+	return decodeMap(data.([]interface{}), result)
 }
 
 // LocalDatabase gets and saves data to a local .json file
@@ -82,24 +81,41 @@ func (l LocalDatabase) Persist(parentKey string, key string, data interface{}) {
 }
 
 // Retrieve gets the data saved to a local .json file
-func (l LocalDatabase) Retrieve(parentKey string, key string) ([]interface{}, error) {
+func (l LocalDatabase) Retrieve(parentKey string, key string, result interface{}) error {
 	path := getFullPath(getDirectory(parentKey), key)
 
 	data, err := os.ReadFile(path)
 	if err != nil {
 		log.Errorf("error: %v :: failed to read file at %q", err, path)
-		return nil, err
+		return err
 	}
 
 	var dest []interface{}
 	err = json.Unmarshal(data, &dest)
 	if err != nil {
 		log.Errorf("error: %v :: failed to unmashal data", err)
-		return nil, err
+		return err
 	}
 
-	return dest, nil
+	return decodeMap(dest, result)
 }
+
+func decodeMap(maps []interface{}, result interface{}) error {
+	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		Metadata: nil,
+		DecodeHook: mapstructure.ComposeDecodeHookFunc(ToTimeHookFunc()),
+		Result: &result,
+	})
+	if err != nil {
+		return err
+	}
+
+	if err = decoder.Decode(maps); err != nil {
+		return err
+	}
+	return nil
+}
+
 
 func getDirectory(parentKey string) string {
 	return filepath.Join(configs.Config.AppHome, ".db", parentKey)

@@ -9,7 +9,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-co-op/gocron"
 	log "github.com/sirupsen/logrus"
+	"github.com/wilburt/wilburx9.dev/backend/api/articles"
 	"github.com/wilburt/wilburx9.dev/backend/api/contact"
+	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
@@ -49,8 +51,8 @@ func SetUpServer(db internal.Database) *http.Server {
 	// Setup API route.
 	// TODO: Setup up caching headers?
 	api := router.Group("/api")
-	// api.GET("/articles", articles.Handler)
-	// api.GET("/gallery", gallery.Handler)
+	api.GET("/articles", articles.Handler)
+	api.GET("/gallery", gallery.Handler)
 	api.GET("/repos", repos.Handler)
 	api.POST("/contact", contact.Handler)
 
@@ -121,14 +123,13 @@ func fetchAndCache(db internal.Database) {
 		HttpClient: &http.Client{},
 	}
 
-	// instagram := gallery.Instagram{AccessToken: config.InstagramAccessToken, Fetch: fetcher}
-	// unsplash := gallery.Unsplash{Username: config.UnsplashUsername, AccessKey: config.UnsplashAccessKey, Fetch: fetcher}
-	// medium := articles.Medium{Name: config.MediumUsername, Fetch: fetcher}
-	// wordpress := articles.WordPress{URL: config.WPUrl, Fetch: fetcher}
+	instagram := gallery.Instagram{AccessToken: config.InstagramAccessToken, Fetch: fetcher}
+	unsplash := gallery.Unsplash{Username: config.UnsplashUsername, AccessKey: config.UnsplashAccessKey, Fetch: fetcher}
+	medium := articles.Medium{Name: config.MediumUsername, Fetch: fetcher}
+	wordpress := articles.WordPress{URL: config.WPUrl, Fetch: fetcher}
 	github := repos.GitHub{Auth: config.GithubToken, Username: config.UnsplashUsername, Fetch: fetcher}
 
-	// fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress, github}
-	fetchers := [...]internal.Fetcher{github}
+	fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress, github}
 	var results []result
 
 	for _, f := range fetchers {

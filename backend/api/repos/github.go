@@ -35,8 +35,8 @@ func (g GitHub) FetchAndCache() int {
 }
 
 // GetCached retrieves saved GitHub repositories
-func (g GitHub) GetCached() ([]interface{}, error) {
-	return g.Db.Retrieve(internal.DbReposKey, githubKey)
+func (g GitHub) GetCached(result interface{}) error {
+	return g.Db.Retrieve(internal.DbReposKey, githubKey, result)
 }
 
 func (g GitHub) fetchRepos() []models.Repo {
