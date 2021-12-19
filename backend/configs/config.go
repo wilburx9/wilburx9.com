@@ -18,7 +18,6 @@ type appConfig struct {
 	UnsplashAccessKey    string `mapstructure:"unsplash_access_key"`
 	InstagramAccessToken string `mapstructure:"instagram_access_token"`
 	Env                  string `mapstructure:"env"`
-	SentryDsn            string `mapstructure:"sentry_dsn"`
 	GithubToken          string `mapstructure:"github_token"`
 	GithubUsername       string `mapstructure:"github_username"`
 	AppHome              string `mapstructure:"app_home"`
