@@ -32,14 +32,14 @@ export const ReposComponent = () => {
   if (!repos || repos.length === 0) return <Box/>
 
   return (
-  <VStack align='start'>
-    <Heading pt={16} size='xl' align="start" fontWeight="black">&#47;&#47;Open-source Projects</Heading>
-    <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
-      {repos.map((repo) =>
-        <RepoComponent {...repo} key={repo.name}/>
-      )}
-    </SimpleGrid>
-  </VStack>
+    <VStack align='start'>
+      <Heading pt={16} size='xl' align="start" fontWeight="black">&#47;&#47;Open-source Projects</Heading>
+      <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
+        {repos.map((repo) =>
+          <RepoComponent {...repo} key={repo.name}/>
+        )}
+      </SimpleGrid>
+    </VStack>
   )
 }
 
@@ -50,11 +50,19 @@ function RepoComponent(props: RepoModel) {
     return new _Language(l, icon?.icon, icon?.size)
   }).filter((l) => l.icon != null)
 
-  let borderColor = useColorModeValue('black', 'white');
+  let hoverBorderColor = useColorModeValue('black', 'white');
+  let bgColor = useColorModeValue('gray.100', 'gray.900');
 
   return <LinkBox>
     <LinkOverlay href={props.url} isExternal role="group">
-      <Box w='full' h='full' borderWidth='1px' borderRadius='lg' p={4} _groupHover={{borderColor: borderColor}}>
+      <Box
+        w='full'
+        h='full'
+        bg={bgColor}
+        borderWidth='1px'
+        borderRadius='lg'
+        p={4}
+        _groupHover={{borderColor: hoverBorderColor}}>
         <VStack w='full' h='full' alignItems='flex-start' justify='center'>
           <Heading mb={1} size='sm' align="start">{props.name}</Heading>
           <Text mb={3} fontSize='sm' align="start">{props.description}</Text>
