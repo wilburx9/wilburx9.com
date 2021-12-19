@@ -12,7 +12,7 @@ const (
 	DbArticlesKey = "articles"
 
 	// DbReposKey is the key to the collection of git repos response in Db
-	DbReposKey = "repositories"
+	DbReposKey = "repos"
 
 	// DbKeys is the key to the collection of gateway keys
 	DbKeys = "keys"
