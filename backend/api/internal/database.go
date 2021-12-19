@@ -53,7 +53,7 @@ func (f FirebaseFirestore) Retrieve(parentKey string, key string, result interfa
 		log.Errorf("Failed to read snapshot data at %s.%s:: %s", parentKey, key, err)
 		return err
 	}
-	return decodeMap(data.([]interface{}), result)
+	return decodeMap(data, result)
 }
 
 // LocalDatabase gets and saves data to a local .json file
@@ -100,7 +100,7 @@ func (l LocalDatabase) Retrieve(parentKey string, key string, result interface{}
 	return decodeMap(dest, result)
 }
 
-func decodeMap(maps []interface{}, result interface{}) error {
+func decodeMap(input interface{}, result interface{}) error {
 	decoder, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
 		Metadata: nil,
 		DecodeHook: mapstructure.ComposeDecodeHookFunc(ToTimeHookFunc()),
@@ -110,7 +110,7 @@ func decodeMap(maps []interface{}, result interface{}) error {
 		return err
 	}
 
-	if err = decoder.Decode(maps); err != nil {
+	if err = decoder.Decode(input); err != nil {
 		return err
 	}
 	return nil
