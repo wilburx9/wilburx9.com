@@ -30,13 +30,13 @@ type GitHub struct {
 // FetchAndCache fetches and saves GitHub repositories to DB
 func (g GitHub) FetchAndCache() int {
 	repos := g.fetchRepos()
-	g.CacheData(internal.DbReposKey, githubKey, repos)
+	g.Db.Persist(internal.DbReposKey, githubKey, repos)
 	return len(repos)
 }
 
 // GetCached retrieves saved GitHub repositories
 func (g GitHub) GetCached() ([]interface{}, error) {
-	return g.GetCachedData(internal.DbReposKey, githubKey)
+	return g.Db.Retrieve(internal.DbReposKey, githubKey)
 }
 
 func (g GitHub) fetchRepos() []models.Repo {
