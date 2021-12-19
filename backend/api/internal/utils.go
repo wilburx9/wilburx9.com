@@ -1,9 +1,7 @@
 package internal
 
 import (
-	"fmt"
 	log "github.com/sirupsen/logrus"
-	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"time"
 )
 
@@ -19,9 +17,4 @@ func StringToTime(layout string, timeStr string) time.Time {
 		return time.Now()
 	}
 	return t
-}
-
-// GetDataCollection prepends the running environment passed string and returns it
-func GetDataCollection(coll string) string {
-	return fmt.Sprintf("%s_%s", configs.Config.Env, coll)
 }

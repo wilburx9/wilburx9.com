@@ -9,9 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-co-op/gocron"
 	log "github.com/sirupsen/logrus"
-	"github.com/wilburt/wilburx9.dev/backend/api/articles"
 	"github.com/wilburt/wilburx9.dev/backend/api/contact"
-	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
@@ -28,7 +26,7 @@ func LoadConfig() error {
 }
 
 // SetUpServer sets the Http Server. Call SetUpLogrus before this.
-func SetUpServer(db *firestore.Client) *http.Server {
+func SetUpServer(db internal.Database) *http.Server {
 	gin.ForceConsoleColor()
 	gin.SetMode(config.Env)
 	router := gin.Default()
@@ -51,8 +49,8 @@ func SetUpServer(db *firestore.Client) *http.Server {
 	// Setup API route.
 	// TODO: Setup up caching headers?
 	api := router.Group("/api")
-	api.GET("/articles", articles.Handler)
-	api.GET("/gallery", gallery.Handler)
+	// api.GET("/articles", articles.Handler)
+	// api.GET("/gallery", gallery.Handler)
 	api.GET("/repos", repos.Handler)
 	api.POST("/contact", contact.Handler)
 
@@ -74,7 +72,7 @@ func SetUpLogrus() {
 }
 
 // ApiMiddleware adds custom params to request contexts
-func apiMiddleware(db *firestore.Client) gin.HandlerFunc {
+func apiMiddleware(db internal.Database) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(internal.Db, db)
 		c.Next()
@@ -82,12 +80,31 @@ func apiMiddleware(db *firestore.Client) gin.HandlerFunc {
 }
 
 // ScheduleFetchAddCache schedules fetching and caching of data from fetchers
-func ScheduleFetchAddCache(db *firestore.Client, ctx context.Context) {
+func ScheduleFetchAddCache(db internal.Database) {
+
 	s := gocron.NewScheduler(time.UTC)
-	s.Every(2).Weeks().Do(func(db *firestore.Client, ctx context.Context) {
-		fetchAndCache(db, ctx)
-	}, db, ctx)
+	s.Every(2).Weeks().Do(func(db internal.Database) {
+		fetchAndCache(db)
+	}, db)
 	s.StartAsync()
+}
+
+// SetUpDatabase sets up Firebase Firestore in release  and a local db in debug
+func SetUpDatabase() internal.Database {
+	if configs.Config.IsRelease() {
+		ctx := context.Background()
+		projectId := configs.Config.GcpProjectId
+		client, err := firestore.NewClient(ctx, projectId)
+		if err != nil {
+			log.Fatalf("Failed to create Firestore cleint: %v", err)
+		}
+		return &internal.FirebaseFirestore{
+			Client: client,
+			Ctx:    ctx,
+		}
+	} else {
+		return &internal.LocalDatabase{}
+	}
 }
 
 type result struct {
@@ -96,22 +113,22 @@ type result struct {
 }
 
 // fetchAndCache iteratively calls fetchAndCache all fetchers
-func fetchAndCache(db *firestore.Client, ctx context.Context) {
+func fetchAndCache(db internal.Database) {
 	var startTime = time.Now()
 	var config = &configs.Config
 	fetcher := internal.Fetch{
 		Db:         db,
-		Ctx:        ctx,
 		HttpClient: &http.Client{},
 	}
 
-	instagram := gallery.Instagram{AccessToken: config.InstagramAccessToken, Fetch: fetcher}
-	unsplash := gallery.Unsplash{Username: config.UnsplashUsername, AccessKey: config.UnsplashAccessKey, Fetch: fetcher}
-	medium := articles.Medium{Name: config.MediumUsername, Fetch: fetcher}
-	wordpress := articles.WordPress{URL: config.WPUrl, Fetch: fetcher}
+	// instagram := gallery.Instagram{AccessToken: config.InstagramAccessToken, Fetch: fetcher}
+	// unsplash := gallery.Unsplash{Username: config.UnsplashUsername, AccessKey: config.UnsplashAccessKey, Fetch: fetcher}
+	// medium := articles.Medium{Name: config.MediumUsername, Fetch: fetcher}
+	// wordpress := articles.WordPress{URL: config.WPUrl, Fetch: fetcher}
 	github := repos.GitHub{Auth: config.GithubToken, Username: config.UnsplashUsername, Fetch: fetcher}
 
-	fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress, github}
+	// fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress, github}
+	fetchers := [...]internal.Fetcher{github}
 	var results []result
 
 	for _, f := range fetchers {

@@ -1,7 +1,6 @@
 package repos
 
 import (
-	"cloud.google.com/go/firestore"
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
@@ -14,8 +13,7 @@ import (
 // Handler retrieves a list of all git repos, sorted in descending stars and forks
 func Handler(c *gin.Context) {
 	fetch := internal.Fetch{
-		Db:         c.MustGet(internal.Db).(*firestore.Client),
-		Ctx:        c,
+		Db:         c.MustGet(internal.Db).(internal.Database),
 		HttpClient: &http.Client{},
 	}
 
