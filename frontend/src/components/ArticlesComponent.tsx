@@ -6,19 +6,15 @@ import {
   Text,
   SimpleGrid, Icon, Circle, useColorModeValue, AspectRatio, Flex, VStack,
 } from "@chakra-ui/react";
-import React, {useContext, useEffect} from "react";
+import React, {useContext} from "react";
 import {DataContext} from "../DataProvider";
 import {ArticleModel} from "../models/ArticleModel";
 import {HiArrowRight} from "react-icons/hi";
 
 export const ArticlesComponent = () => {
-  const {fetchArticles, articles} = useContext(DataContext)
+  const {articles} = useContext(DataContext)
 
-  useEffect(() => {
-    fetchArticles?.()
-  }, [fetchArticles])
-
-  if (!articles) return <Box/>
+  if (!articles || articles.length === 0) return <Box/>
 
   return (
     <VStack align='start'>

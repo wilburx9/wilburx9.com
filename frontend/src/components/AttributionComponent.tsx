@@ -25,7 +25,7 @@ let attributions: Attr[] = [
 export const AttributionComponent = () => (
   <Flex flexDir='row' w='full' my={8} align='flex-end'>
     <HStack spacing={4} flexGrow={1} justify='center'>
-      {attributions.map(a => <LinkBox>
+      {attributions.map(a => <LinkBox key={a.url}>
         <LinkOverlay href={a.url} isExternal>
           <Icon as={a.icon!} boxSize={6}/>
         </LinkOverlay>

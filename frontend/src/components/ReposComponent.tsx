@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext} from "react";
 import {DataContext} from "../DataProvider";
 import {
   Box,
@@ -27,13 +27,9 @@ import {IconType} from "react-icons";
 
 
 export const ReposComponent = () => {
-  const {fetchRepos, repos} = useContext(DataContext)
+  const {repos} = useContext(DataContext)
 
-  useEffect(() => {
-    fetchRepos?.()
-  }, [fetchRepos])
-
-  if (!repos) return <Box/>
+  if (!repos || repos.length === 0) return <Box/>
 
   return (
   <VStack align='start'>
