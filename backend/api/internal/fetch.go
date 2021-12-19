@@ -9,5 +9,5 @@ type Fetch struct {
 // Fetcher is an interface implemented all data fetchers
 type Fetcher interface {
 	FetchAndCache() int
-	GetCached() ([]interface{}, error)
+	GetCached(result interface{}) error
 }

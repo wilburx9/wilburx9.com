@@ -1,7 +1,5 @@
 package internal
 
-import "fmt"
-
 const (
 
 	// Db is the key for the Db
@@ -19,8 +17,3 @@ const (
 	// DbKeys is the key to the collection of gateway keys
 	DbKeys = "keys"
 )
-
-// GetCacheKey returns the key of cache
-func GetCacheKey(group string, key string) string {
-	return fmt.Sprintf("%s_%s", group, key)
-}

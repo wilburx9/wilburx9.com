@@ -2,7 +2,7 @@ package repos
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/mitchellh/mapstructure"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
@@ -22,8 +22,17 @@ func Handler(c *gin.Context) {
 
 	var allRepos = make([]models.Repo, 0)
 	for _, f := range fetchers {
-		maps, _ := f.GetCached()
-		allRepos = append(allRepos, mapSliceToRepos(maps)...)
+		var result []models.Repo
+		if err := f.GetCached(&result); err != nil {
+			log.Errorf("Failed to get cached data:: %v", err)
+			continue
+		}
+		allRepos = append(allRepos, result...)
+	}
+
+	if len(allRepos) == 0 {
+		c.JSON(http.StatusInternalServerError, internal.MakeErrorResponse(allRepos))
+		return
 	}
 
 	// Sort in descending order of scores
@@ -31,16 +40,4 @@ func Handler(c *gin.Context) {
 		return allRepos[i].Score() > allRepos[j].Score()
 	})
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse(allRepos))
-}
-
-func mapSliceToRepos(maps []interface{}) []models.Repo {
-	var repos = make([]models.Repo, len(maps))
-	for i, v := range maps {
-		var repo models.Repo
-		err := mapstructure.Decode(v, &repo)
-		if err == nil {
-			repos[i] = repo
-		}
-	}
-	return repos
 }
