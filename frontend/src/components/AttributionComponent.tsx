@@ -23,15 +23,15 @@ let attributions: Attr[] = [
 ];
 
 export const AttributionComponent = () => (
-  <Flex flexDir='row' w='full' my={8} align='flex-end'>
+  <Flex flexDir={{base: 'column', md: 'row'}} w='full' mt={8} mb={5} align={{base: 'center', md: 'flex-end'}}>
     <HStack spacing={4} flexGrow={1} justify='center'>
       {attributions.map(a => <LinkBox key={a.url}>
         <LinkOverlay href={a.url} isExternal>
-          <Icon as={a.icon!} boxSize={6}/>
+          <Icon as={a.icon!} boxSize={8}/>
         </LinkOverlay>
       </LinkBox>)}
     </HStack>
-    <LinkBox>
+    <LinkBox mt={{base: 4, md: 0}}>
       <LinkOverlay href='https://github.com/wilburt/wilburx9.dev' isExternal>
         <HStack>
           <Text fontSize='xs'>Built with</Text>
