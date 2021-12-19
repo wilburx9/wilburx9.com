@@ -53,9 +53,11 @@ func Handler(c *gin.Context) {
 		} else if size < len(allRepos) {
 			index, err := getIndexOfExtra(strExtra, allRepos)
 			extra := allRepos[index]
-			allRepos = allRepos[:size]
-			if err == nil && index >= size {
+			if err == nil && index >= size { // Ensuring that the extra repo doesn't already exist in the list
+				allRepos = allRepos[:(size - 1)]
 				allRepos = append(allRepos, extra)
+			} else {
+				allRepos = allRepos[:size]
 			}
 		}
 	}

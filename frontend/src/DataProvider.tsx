@@ -36,28 +36,29 @@ export class DataProvider extends Component<any, DataState> {
     http
       .get<ArticleResponse>("/articles")
       .then(response => {
-        console.log("Articles success:: " + response.data)
+        console.log("Articles success:: " + JSON.stringify(response.data))
         this.setState({articles: response.data.data})
       })
       .catch(ex => {
-        console.log(ex)
+        console.error(ex)
       })
   }
 
   fetchRepos = () => {
+    let params = new URLSearchParams([["size", "6"], ["extra", "wilburx9.dev"]])
     http
-      .get<RepoResponse>("/repos")
+      .get<RepoResponse>("/repos", {params})
       .then(response => {
-        console.log("Repos success:: " + response.data)
+        console.log("Repos success:: " + JSON.stringify(response.data))
         this.setState({repos: response.data.data})
       })
       .catch(ex => {
-        console.log(ex)
+        console.error(ex)
       })
   }
 
   hasData = (): boolean => {
-    return this.state.repos.length > 0 || this.state.repos.length > 0
+    return this.state.repos.length > 0 || this.state.articles.length > 0
   }
 
   render() {
