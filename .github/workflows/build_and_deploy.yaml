@@ -1,4 +1,4 @@
-name: Build and Deploy backend Cloud Run
+name: Build and Deploy to Firebase and Cloud Run
 
 on:
   pull_request:
@@ -11,7 +11,8 @@ env:
 
 
 jobs:
-  build_and_deploy:
+  build_and_deploy_backend:
+    name: Build and Deploy the backend to Cloud Run
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,3 +41,17 @@ jobs:
 
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
+
+  build_and_deploy_frontend:
+    name: Build and Deploy the frontend to Firebase Hosting
+    needs: [ build_and_deploy_backend ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm ci && npm run build
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SA_KEY }}'
+          channelId: live
+          projectId: ${{ env.PROJECT_ID }}
