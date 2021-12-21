@@ -47,9 +47,15 @@ jobs:
     needs: [ build_and_deploy_backend ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: npm ci && npm run build
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build with npm
+        working-directory: /frontend
+        run: npm ci && npm run build
+
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SA_KEY }}'
