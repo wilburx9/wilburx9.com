@@ -50,8 +50,8 @@ func Handler(c *gin.Context) {
 	})
 
 	if strSize != "" {
-		if size, err := strconv.Atoi(strSize); err != nil {
-			data := internal.MakeErrorResponse(fmt.Sprintf("%v is not a valid size", strSize))
+		if size, err := strconv.Atoi(strSize); err != nil || size == 0 {
+			data := internal.MakeErrorResponse(fmt.Sprintf("%q is not a valid size", strSize))
 			c.JSON(http.StatusBadRequest, data)
 			return
 		} else if size < len(repos) {
