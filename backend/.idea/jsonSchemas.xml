@@ -12,7 +12,7 @@
               <option name="patterns">
                 <list>
                   <Item>
-                    <option name="path" value="file://$PROJECT_DIR$/../.github/workflows/deploy.yaml" />
+                    <option name="path" value="file://$PROJECT_DIR$/../.github/workflows/deploy_backend.yaml" />
                   </Item>
                 </list>
               </option>
