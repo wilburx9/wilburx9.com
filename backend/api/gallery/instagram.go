@@ -26,8 +26,13 @@ func (i Instagram) FetchAndCache() int {
 	accessToken := i.getToken()
 	fields := "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type"
 	u := fmt.Sprintf("https://graph.instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
+
 	images := i.fetchImage([]models.Image{}, u)
-	i.Db.Persist(internal.DbGalleryKey, instagramKey, images)
+	result := models.ImageResult{
+		Result: internal.Result{UpdatedAt: time.Now()},
+		Images: images,
+	}
+	i.Db.Persist(internal.DbGalleryKey, instagramKey, result)
 	return len(images)
 }
 

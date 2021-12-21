@@ -52,8 +52,8 @@ type licenseInfo struct {
 	Name string `json:"name"`
 }
 
-// ToRepos maps GitHub to a slice of Repo
-func (m GitHub) ToRepos() []Repo {
+// ToResult creates RepoResult by mapping GitHub to a slice of Repo
+func (m GitHub) ToResult() RepoResult {
 	nodes := m.Data.Viewer.Repositories.Nodes
 	var repos = make([]Repo, len(nodes))
 
@@ -91,5 +91,8 @@ func (m GitHub) ToRepos() []Repo {
 			Languages:   mapLanguages(node),
 		}
 	}
-	return repos
+	return RepoResult{
+		Result: internal.Result{UpdatedAt: time.Now()},
+		Repos:  repos,
+	}
 }

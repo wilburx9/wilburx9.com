@@ -29,9 +29,9 @@ type GitHub struct {
 
 // FetchAndCache fetches and saves GitHub repositories to DB
 func (g GitHub) FetchAndCache() int {
-	repos := g.fetchRepos()
-	g.Db.Persist(internal.DbReposKey, githubKey, repos)
-	return len(repos)
+	res := g.fetchRepos()
+	g.Db.Persist(internal.DbReposKey, githubKey, res)
+	return len(res.Repos)
 }
 
 // GetCached retrieves saved GitHub repositories
@@ -39,13 +39,13 @@ func (g GitHub) GetCached(result interface{}) error {
 	return g.Db.Retrieve(internal.DbReposKey, githubKey, result)
 }
 
-func (g GitHub) fetchRepos() []models.Repo {
+func (g GitHub) fetchRepos() models.RepoResult {
 	url := "https://api.github.com/graphql"
 
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(getGraphQlQuery()))
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return nil
+		return models.EmptyResponse()
 	}
 
 	auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v:%v", g.Username, g.Auth)))
@@ -54,7 +54,7 @@ func (g GitHub) fetchRepos() []models.Repo {
 	resp, err := g.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return nil
+		return models.EmptyResponse()
 	}
 	defer resp.Body.Close()
 
@@ -62,10 +62,10 @@ func (g GitHub) fetchRepos() []models.Repo {
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return nil
+		return models.EmptyResponse()
 	}
 
-	return data.ToRepos()
+	return data.ToResult()
 }
 
 func getGraphQlQuery() string {

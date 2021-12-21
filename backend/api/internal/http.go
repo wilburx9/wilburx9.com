@@ -19,7 +19,7 @@ type HttpClientMock struct {
 	Header           http.Header
 }
 
-// Do returns an is instance http.Response with body set to the file at cm.ResponseFilePath
+// Do return an instance of http.Response with body set to the file at cm.ResponseFilePath
 func (cm *HttpClientMock) Do(_ *http.Request) (*http.Response, error) {
 	file, err := os.Open(cm.ResponseFilePath)
 	if err != nil {
