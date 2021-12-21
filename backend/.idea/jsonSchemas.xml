@@ -14,6 +14,9 @@
                   <Item>
                     <option name="path" value="file://$PROJECT_DIR$/../.github/workflows/deploy_backend.yaml" />
                   </Item>
+                  <Item>
+                    <option name="path" value="file://$PROJECT_DIR$/../.github/workflows/deploy_frontend.yml" />
+                  </Item>
                 </list>
               </option>
             </SchemaInfo>
