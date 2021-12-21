@@ -12,7 +12,7 @@ const (
 
 // Result encapsulates the fields and methods needed for saving data from Fetcher(s) and writing to http requests
 type Result struct {
-	UpdatedAt time.Time   `json:"updated_at" firestore:"updated_at" mapstructure:"updated_at"`
+	UpdatedAt time.Time   `json:"updated_at" firestore:"updated_at"`
 }
 
 // AverageCacheControl returns Cache-Control instructions
