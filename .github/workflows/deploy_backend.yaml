@@ -1,9 +1,8 @@
 name: Build and Deploy backend Cloud Run
 
 on:
-  push:
-    branches:
-      - live
+  pull_request:
+    branches: [ live ]  #TODO: Change to live
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
