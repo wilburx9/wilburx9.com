@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"time"
 )
 
 // Handler retrieves a list of all git repos, sorted in descending stars and forks
@@ -25,24 +26,27 @@ func Handler(c *gin.Context) {
 	github := GitHub{Auth: configs.Config.GithubToken, Username: configs.Config.GithubUsername, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{github}
 
-	var allRepos = make([]models.Repo, 0)
+	var repos = make([]models.Repo, 0)
+	var updatedAts = make([]time.Time, 0)
+
 	for _, f := range fetchers {
-		var result []models.Repo
+		var result models.RepoResult
 		if err := f.GetCached(&result); err != nil {
 			log.Errorf("Failed to get cached data:: %v", err)
 			continue
 		}
-		allRepos = append(allRepos, result...)
+		repos = append(repos, result.Repos...)
+		updatedAts = append(updatedAts, result.UpdatedAt)
 	}
 
-	if len(allRepos) == 0 {
-		c.JSON(http.StatusInternalServerError, internal.MakeErrorResponse(allRepos))
+	if len(repos) == 0 {
+		c.JSON(http.StatusInternalServerError, internal.MakeErrorResponse(repos))
 		return
 	}
 
 	// Sort in descending order of scores
-	sort.Slice(allRepos, func(i, j int) bool {
-		return allRepos[i].Score() > allRepos[j].Score()
+	sort.Slice(repos, func(i, j int) bool {
+		return repos[i].Score() > repos[j].Score()
 	})
 
 	if strSize != "" {
@@ -50,19 +54,20 @@ func Handler(c *gin.Context) {
 			data := internal.MakeErrorResponse(fmt.Sprintf("%v is not a valid size", strSize))
 			c.JSON(http.StatusBadRequest, data)
 			return
-		} else if size < len(allRepos) {
-			index, err := getIndexOfExtra(strExtra, allRepos)
-			extra := allRepos[index]
+		} else if size < len(repos) {
+			index, err := getIndexOfExtra(strExtra, repos)
+			extra := repos[index]
 			if err == nil && index >= size { // Ensuring that the extra repo doesn't already exist in the list
-				allRepos = allRepos[:(size - 1)]
-				allRepos = append(allRepos, extra)
+				repos = repos[:(size - 1)]
+				repos = append(repos, extra)
 			} else {
-				allRepos = allRepos[:size]
+				repos = repos[:size]
 			}
 		}
 	}
 
-	c.JSON(http.StatusOK, internal.MakeSuccessResponse(allRepos))
+	c.Writer.Header().Set("Cache-Control", internal.AverageCacheControl(updatedAts))
+	c.JSON(http.StatusOK, internal.MakeSuccessResponse(repos))
 }
 
 func getIndexOfExtra(name string, repos []models.Repo) (int, error) {

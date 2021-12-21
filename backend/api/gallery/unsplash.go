@@ -8,6 +8,7 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 const (
@@ -24,7 +25,12 @@ type Unsplash struct {
 // FetchAndCache fetches data from Unsplash and caches it
 func (u Unsplash) FetchAndCache() int {
 	images := u.FetchImage([]models.Image{}, 1)
-	u.Db.Persist(internal.DbGalleryKey, unsplashKey, images)
+	result := models.ImageResult{
+		Result: internal.Result{UpdatedAt: time.Now()},
+		Images: images,
+	}
+
+	u.Db.Persist(internal.DbGalleryKey, unsplashKey, result)
 	return len(images)
 }
 

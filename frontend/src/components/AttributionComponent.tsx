@@ -27,7 +27,7 @@ export const AttributionComponent = () => (
     <HStack spacing={4} flexGrow={1} justify='center'>
       {attributions.map(a => <LinkBox key={a.url}>
         <LinkOverlay href={a.url} isExternal>
-          <Icon as={a.icon!} boxSize={8}/>
+          <Icon as={a.icon!} boxSize={6}/>
         </LinkOverlay>
       </LinkBox>)}
     </HStack>
