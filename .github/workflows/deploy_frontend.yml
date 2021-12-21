@@ -2,10 +2,9 @@ name: Deploy frontend to Firebase Hosting
 
 on:
   workflow_run:
-    workflows: ["Build and Deploy backend Cloud Run"]
+    workflows: [ "deploy_backend" ]
     branches: [ develop ] #TODO: Change to live
-    types:
-      - completed
+    types: [ completed ]
 
 jobs:
   build_and_deploy:
