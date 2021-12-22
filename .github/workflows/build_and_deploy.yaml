@@ -44,7 +44,7 @@ jobs:
 
   build_and_deploy_frontend:
     name: Build and Deploy the frontend to Firebase Hosting
-#    needs: [ build_and_deploy_backend ]
+    needs: [ build_and_deploy_backend ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
