@@ -8,10 +8,6 @@
     ],
     "rewrites": [
       {
-        "source": "**",
-        "destination": "/index.html"
-      },
-      {
         "source": "/api/**",
         "run": {
           "serviceId": "backend",
