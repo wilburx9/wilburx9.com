@@ -8,10 +8,11 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 const (
-	unsplashKey = "Unsplash"
+	unsplashKey = "unsplash"
 )
 
 // Unsplash handles fetching and caching of data from Unsplash. And also returning the cached data
@@ -24,14 +25,18 @@ type Unsplash struct {
 // FetchAndCache fetches data from Unsplash and caches it
 func (u Unsplash) FetchAndCache() int {
 	images := u.FetchImage([]models.Image{}, 1)
-	buf, _ := json.Marshal(images)
-	u.CacheData(getCacheKey(unsplashKey), buf)
+	result := models.ImageResult{
+		Result: internal.Result{UpdatedAt: time.Now()},
+		Images: images,
+	}
+
+	u.Db.Persist(internal.DbGalleryKey, unsplashKey, result)
 	return len(images)
 }
 
 // GetCached returns data that was cached in Cache
-func (u Unsplash) GetCached() ([]byte, error) {
-	return u.GetCachedData(getCacheKey(unsplashKey))
+func (u Unsplash) GetCached(result interface{}) error {
+	return u.Db.Retrieve(internal.DbGalleryKey, unsplashKey, result)
 }
 
 // FetchImage fetches images via HTTP

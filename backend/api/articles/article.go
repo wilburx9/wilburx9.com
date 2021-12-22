@@ -1,42 +1,49 @@
 package articles
 
 import (
-	"encoding/json"
-	"github.com/dgraph-io/badger/v3"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 	"sort"
+	"time"
 )
 
 // Handler retrieves a list of all the articles sorted in descending creation date
 func Handler(c *gin.Context) {
 	fetch := internal.Fetch{
-		Db:         c.MustGet(internal.Db).(*badger.DB),
+		Db:         c.MustGet(internal.Db).(internal.Database),
 		HttpClient: &http.Client{},
 	}
 
 	medium := Medium{Name: configs.Config.MediumUsername, Fetch: fetch}
-	wordpress := Wordpress{URL: configs.Config.WPUrl, Fetch: fetch}
+	wordpress := WordPress{URL: configs.Config.WPUrl, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{medium, wordpress}
 
-	var allArticles = make([]models.Article, 0)
+	var articles = make([]models.Article, 0)
+	var updatedAts = make([]time.Time, 0)
 	for _, f := range fetchers {
-		var articles []models.Article
-		bytes, _ := f.GetCached()
-		json.Unmarshal(bytes, &articles)
-		allArticles = append(allArticles, articles...)
+		var result models.ArticleResult
+		if err := f.GetCached(&result); err != nil {
+			log.Errorf("Failed to get cached data:: %v", err)
+			continue
+		}
+		articles = append(articles, result.Articles...)
+		updatedAts = append(updatedAts, result.UpdatedAt)
 	}
 
-	// Sort in descending date (i.e the most recent dates first)
-	sort.Slice(allArticles, func(i, j int) bool {
-		return allArticles[i].PostedAt.After(allArticles[j].PostedAt)
-	})
-	c.JSON(http.StatusOK, internal.MakeSuccessResponse(allArticles))
-}
+	if len(articles) == 0 {
+		c.JSON(http.StatusInternalServerError, internal.MakeErrorResponse(articles))
+		return
+	}
 
-func getCacheKey(suffix string) string {
-	return internal.GetCacheKey(internal.DbArticlesKey, suffix)
+	// Sort in descending date (i.e. the most recent dates first)
+	sort.Slice(articles, func(i, j int) bool {
+		return articles[i].PostedAt.After(articles[j].PostedAt)
+	})
+
+	c.Writer.Header().Set("Cache-Control", internal.AverageCacheControl(updatedAts))
+	c.JSON(http.StatusOK, internal.MakeSuccessResponse(articles))
 }

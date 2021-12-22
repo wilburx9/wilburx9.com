@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// Github is a container foe Github response data
-type Github struct {
+// GitHub is a container foe GitHub response data
+type GitHub struct {
 	Data data `json:"data"`
 }
 
@@ -52,8 +52,8 @@ type licenseInfo struct {
 	Name string `json:"name"`
 }
 
-// ToRepos maps Github to a slice of Repo
-func (m Github) ToRepos() []Repo {
+// ToResult creates RepoResult by mapping GitHub to a slice of Repo
+func (m GitHub) ToResult() RepoResult {
 	nodes := m.Data.Viewer.Repositories.Nodes
 	var repos = make([]Repo, len(nodes))
 
@@ -91,5 +91,8 @@ func (m Github) ToRepos() []Repo {
 			Languages:   mapLanguages(node),
 		}
 	}
-	return repos
+	return RepoResult{
+		Result: internal.Result{UpdatedAt: time.Now()},
+		Repos:  repos,
+	}
 }

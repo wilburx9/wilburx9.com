@@ -15,9 +15,9 @@ type InstaImg struct {
 
 // InstaToken is container for Instagram token data
 type InstaToken struct {
-	Value       string    `json:"access_token"`
-	ExpiresIn   int64     `json:"expires_in"`
-	RefreshedAt time.Time `json:"refreshed_at"`
+	Value       string    `json:"access_token" firestore:"value"`
+	ExpiresIn   int64     `json:"expires_in" firestore:"expires_in"`
+	RefreshedAt time.Time `json:"refreshed_at" firestore:"refreshed_at"`
 }
 
 type instaImgs []instaImg

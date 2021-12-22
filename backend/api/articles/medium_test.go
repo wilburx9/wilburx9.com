@@ -11,7 +11,7 @@ func TestMediumFetchArticles(t *testing.T) {
 		Db:         nil,
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/medium_response.xml"},
 	}}
-	var result = m.fetchArticles()
+	var result = m.fetchArticles().Articles
 
 	first := result[0]
 	second := result[1]

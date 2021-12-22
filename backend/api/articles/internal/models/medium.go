@@ -30,8 +30,8 @@ type Rss struct {
 	} `xml:"channel"`
 }
 
-// ToArticles maps this Rss to a slice of Article
-func (r Rss) ToArticles() []Article {
+// ToResult creates ArticleResult by mapping Rss to a slice of Article
+func (r Rss) ToResult() ArticleResult {
 	var articles = make([]Article, len(r.Channel.Item))
 	for i, e := range r.Channel.Item {
 		thumbnail, excerpt := getMediumThumbAndExcerpt(e.Encoded)
@@ -44,7 +44,10 @@ func (r Rss) ToArticles() []Article {
 			Excerpt:   fmt.Sprintf("%v..", excerpt),
 		}
 	}
-	return articles
+	return ArticleResult{
+		Result:   internal.Result{UpdatedAt: time.Now()},
+		Articles: articles,
+	}
 }
 
 func getMediumThumbAndExcerpt(content string) (thumbnail string, excerpt string) {

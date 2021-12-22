@@ -1,20 +1,16 @@
-import React from 'react';
-import './App.css';
+import * as React from "react"
+import {ChakraProvider} from "@chakra-ui/react"
+import theme from "./theme";
+import "./style.css"
+import DataProvider from "./DataProvider";
+import {ContentComponent} from "./components/ContentComponent";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-content">
-        <p>
-          Hi, I am Wilbur and I am a Software Developer.
-        </p>
-        <hr className="Hr"/>
-        <p>
-          Hallo, ich bin Wilbur und ich bin Softwareentwickler.
-        </p>
-      </header>
-    </div>
-  );
-}
+// TODO: Integrate analytics and performance reporting
+export const App = () => (
+  <ChakraProvider theme={theme}>
+    <DataProvider>
+      <ContentComponent/>
+    </DataProvider>
+  </ChakraProvider>
+)
 
-export default App;
