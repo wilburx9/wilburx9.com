@@ -49,7 +49,6 @@ func SetUpServer(db internal.Database) *http.Server {
 	}
 
 	// Setup API route.
-	// TODO: Setup up caching headers?
 	api := router.Group("/api")
 	api.GET("/articles", articles.Handler)
 	api.GET("/gallery", gallery.Handler)
