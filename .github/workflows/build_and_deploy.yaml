@@ -2,7 +2,7 @@ name: Build and Deploy to Firebase and Cloud Run
 
 on:
   pull_request:
-    branches: [ develop ]  #TODO: Change to live
+    branches: [ live ]
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT }}
@@ -38,9 +38,6 @@ jobs:
           service: ${{ env.SERVICE }}
           image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
           region: ${{ env.REGION }}
-
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
 
   build_and_deploy_frontend:
     name: Build and Deploy the frontend to Firebase Hosting
