@@ -3,7 +3,6 @@ package gallery
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dgraph-io/badger/v3"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
@@ -12,8 +11,8 @@ import (
 )
 
 const (
-	instagramKey          = "Instagram"
-	minTokenRemainingLife = 24 * time.Hour * 5  // 5 Days
+	instagramKey          = "instagram"
+	minTokenRemainingLife = 24 * time.Hour * 5 // 5 Days
 )
 
 // Instagram encapsulates the fetching of Instagram images and access token management
@@ -27,15 +26,19 @@ func (i Instagram) FetchAndCache() int {
 	accessToken := i.getToken()
 	fields := "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type"
 	u := fmt.Sprintf("https://graph.instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
-	allResults := i.fetchImage([]models.Image{}, u)
-	bytes, _ := json.Marshal(allResults)
-	i.CacheData(getCacheKey(instagramKey), bytes)
-	return len(allResults)
+
+	images := i.fetchImage([]models.Image{}, u)
+	result := models.ImageResult{
+		Result: internal.Result{UpdatedAt: time.Now()},
+		Images: images,
+	}
+	i.Db.Persist(internal.DbGalleryKey, instagramKey, result)
+	return len(images)
 }
 
 // GetCached fetches Instagram images from the db that was previously saved in Cache
-func (i Instagram) GetCached() ([]byte, error) {
-	return i.GetCachedData(getCacheKey(instagramKey))
+func (i Instagram) GetCached(result interface{}) error {
+	return i.Db.Retrieve(internal.DbGalleryKey, instagramKey, result)
 }
 
 // Recursively fetch all the images
@@ -74,20 +77,9 @@ func (i Instagram) fetchImage(fetched []models.Image, url string) []models.Image
 func (i Instagram) getToken() string {
 	var tk models.InstaToken
 	// Attempt to get token from Db
-	err := i.Db.View(func(txn *badger.Txn) error {
-		item, err := txn.Get([]byte(getInstagramToken()))
-		if err != nil {
-			return err
-		}
-
-		return item.Value(func(val []byte) error {
-			return json.Unmarshal(val, &tk)
-		})
-	})
-
+	err := i.Db.Retrieve(internal.DbKeys, instagramKey, &tk)
 	// If we haven't saved the token before, log an error and refresh the token we have now
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't fetch Instagram token")
 		return i.refreshToken(i.AccessToken)
 	}
 
@@ -128,26 +120,6 @@ func (i Instagram) refreshToken(oldToken string) string {
 		return newT.Value
 	}
 	newT.RefreshedAt = time.Now()
-	i.saveToken(newT)
+	i.Db.Persist(internal.DbKeys, instagramKey, newT)
 	return newT.Value
 }
-
-func (i Instagram) saveToken(t models.InstaToken) {
-	err := i.Db.Update(func(txn *badger.Txn) error {
-		buf, err := json.Marshal(t)
-		if err != nil {
-			return err
-		}
-		return txn.Set([]byte(getInstagramToken()), buf)
-	})
-	if err != nil {
-		log.Errorf("error while persisting Instagram access token to Db: %v", err)
-	}
-}
-
-
-func getInstagramToken() string {
-	return internal.GetCacheKey(internal.DbAccessKey, instagramKey)
-}
-
-

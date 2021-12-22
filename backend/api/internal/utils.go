@@ -18,12 +18,3 @@ func StringToTime(layout string, timeStr string) time.Time {
 	}
 	return t
 }
-
-// GetFirstNCodePoints Returns the first n code points of string. E.g FirstNCodePoints("世界 Hello", 1) == "世"
-func GetFirstNCodePoints(s string, n int) string {
-	r := []rune(s)
-	if len(r) > n {
-		return string(r[:n])
-	}
-	return s
-}

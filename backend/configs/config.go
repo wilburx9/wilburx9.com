@@ -2,9 +2,9 @@ package configs
 
 import (
 	"fmt"
-	"github.com/fatih/structs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"os"
 )
 
 // Config is global object that holds all application level variables.
@@ -18,15 +18,10 @@ type appConfig struct {
 	UnsplashAccessKey    string `mapstructure:"unsplash_access_key"`
 	InstagramAccessToken string `mapstructure:"instagram_access_token"`
 	Env                  string `mapstructure:"env"`
-	SentryDsn            string `mapstructure:"sentry_dsn"`
 	GithubToken          string `mapstructure:"github_token"`
 	GithubUsername       string `mapstructure:"github_username"`
-	SmtpHost             string `mapstructure:"smtp_host"`
-	SmtpPort             int    `mapstructure:"smtp_port"`
-	SmtpUsername         string `mapstructure:"smtp_username"`
-	SmtpPassword         string `mapstructure:"smtp_password"`
-	ContactEmail         string `mapstructure:"contact_email"`
-	RecaptchaSecret      string `mapstructure:"recaptcha_secret"`
+	AppHome              string `mapstructure:"app_home"`
+	GcpProjectId         string `mapstructure:"gcp_project_id"`
 }
 
 // IsRelease returns true for release Env and false otherwise
@@ -40,19 +35,23 @@ func (c appConfig) IsDebug() bool {
 }
 
 // LoadConfig loads config variables from a config file or environment variables
-func LoadConfig(path string) error {
+func LoadConfig() error {
 	v := viper.New()
 	v.SetConfigName("config")
 	v.SetConfigType("yaml")
 	v.SetEnvPrefix("WilburX9")
+	v.AddConfigPath(fmt.Sprintf("%vconfigs", os.Getenv("WILBURX9_APP_HOME")))
 	v.AutomaticEnv()
-	v.AddConfigPath(path)
+
+	if err := v.BindEnv("port", "PORT"); err != nil {
+		return fmt.Errorf("unable to read PORT from env: %s", err)
+	}
 
 	if err := v.ReadInConfig(); err != nil {
 		return fmt.Errorf("failed to read the configuration file: %s", err)
 	}
 
 	err := v.Unmarshal(&Config)
-	log.WithFields(structs.Map(Config)).Info("App started with these config")
+	log.Infof("App started with these config: %+v\n", Config)
 	return err
 }

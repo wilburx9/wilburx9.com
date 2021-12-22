@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"time"
+)
 
 // Repo represents a single git repository
 type Repo struct {
@@ -24,4 +27,18 @@ type language struct {
 // Score returns a sum of the stars and forks of this repo
 func (r Repo) Score() int {
 	return r.Stars + r.Forks
+}
+
+// RepoResult is data saved to the db and retrieved from it
+type RepoResult struct {
+	internal.Result
+	Repos []Repo `json:"repos" firestore:"repos"`
+}
+
+// EmptyResponse constructs an empty RepoResult
+func EmptyResponse() RepoResult {
+	return RepoResult{
+		Result: internal.Result{UpdatedAt: time.Now()},
+		Repos:  []Repo{},
+	}
 }
