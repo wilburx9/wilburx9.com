@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -32,7 +32,7 @@ func Handler(c *gin.Context, client internal.HttpClient) {
 	}
 
 	// if !validateRecaptcha(configs.Config.RecaptchaSecret, data.RecaptchaToken, &http.Client{}) {
-	// 	c.JSON(http.StatusForbidden, internal.MakeErrorResponse("Could not confirm humanness"))
+	// 	c.JSON(http.StatusForbidden, internal.MakeErrorResponse("Could not verify humanness"))
 	// 	return
 	// }
 
@@ -71,7 +71,7 @@ func send(data requestData, client internal.HttpClient) error {
 
 	defer res.Body.Close()
 
-	body, _ := ioutil.ReadAll(res.Body)
+	body, _ := io.ReadAll(res.Body)
 	fields := log.Fields{"data": data, "statusCode": res.StatusCode, "response": string(body)}
 	log.WithFields(fields).Info("Post email")
 
