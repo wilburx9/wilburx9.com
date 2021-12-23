@@ -14,14 +14,14 @@ import (
 )
 
 type requestData struct {
-	SenderEmail    string `json:"sender_email"`
-	SenderName     string `json:"sender_name"`
-	Subject        string `json:"subject"`
-	Message        string `json:"message"`
-	RecaptchaToken string `json:"recaptcha_token"`
+	SenderEmail     string `json:"sender_email"`
+	SenderName      string `json:"sender_name"`
+	Subject         string `json:"subject"`
+	Message         string `json:"message"`
+	CaptchaResponse string `json:"captcha_response"`
 }
 
-// Handler validates request body and reCAPTCHA and possibly sends an email
+// Handler validates both request body and captcha, and possibly sends an email
 func Handler(c *gin.Context, client internal.HttpClient) {
 	var data requestData
 	err := c.ShouldBindJSON(&data)
@@ -31,10 +31,10 @@ func Handler(c *gin.Context, client internal.HttpClient) {
 		return
 	}
 
-	// if !validateRecaptcha(configs.Config.RecaptchaSecret, data.RecaptchaToken, &http.Client{}) {
-	// 	c.JSON(http.StatusForbidden, internal.MakeErrorResponse("Could not verify humanness"))
-	// 	return
-	// }
+	if !validateRecaptcha(data.CaptchaResponse, client) {
+		c.JSON(http.StatusForbidden, internal.MakeErrorResponse("Could not verify humanness"))
+		return
+	}
 
 	err = send(data, client)
 	if err != nil {

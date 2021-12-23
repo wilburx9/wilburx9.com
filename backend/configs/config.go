@@ -25,6 +25,8 @@ type appConfig struct {
 	EmailDomain          string `mapstructure:"email_domain"`
 	EmailReceiver        string `mapstructure:"email_receiver"`
 	EmailAPIKey          string `mapstructure:"email_api_key"`
+	HCaptchaSecret       string `mapstructure:"h_captcha_secret"`
+	HCaptchaSiteKey      string `mapstructure:"h_captcha_site_key"`
 }
 
 // IsRelease returns true for release Env and false otherwise
