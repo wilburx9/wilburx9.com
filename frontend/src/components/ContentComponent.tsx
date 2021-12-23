@@ -5,6 +5,7 @@ import {ColorModeSwitcher} from "./ColorModeSwitcher";
 import {ArticlesComponent} from "./ArticlesComponent";
 import {ReposComponent} from "./ReposComponent";
 import {AttributionComponent} from "./AttributionComponent";
+import {ContactComponent} from "./ContactComponent";
 
 export const ContentComponent = () => {
   const {hasData} = useContext(DataContext)
@@ -33,6 +34,7 @@ export const ContentComponent = () => {
           alignSelf="center">
           <ArticlesComponent/>
           <ReposComponent/>
+          <ContactComponent/>
         </Box>
         <Box bg={footerColorBg}>
           <Box maxW="container.xl" mx='auto'>

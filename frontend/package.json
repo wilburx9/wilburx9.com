@@ -6,6 +6,7 @@
     "@chakra-ui/react": "^1.6.8",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
+    "@hcaptcha/react-hcaptcha": "^0.3.10",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^10.4.9",
     "@testing-library/user-event": "^12.8.3",
