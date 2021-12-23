@@ -26,8 +26,8 @@ func validateData(data requestData) string {
 		message = "Please, enter a subject"
 	case len(strings.TrimSpace(data.Message)) == 0:
 		message = "Please, enter a message"
-	case len(strings.TrimSpace(data.RecaptchaToken)) == 0:
-		message = "Cannot verify humanness"
+	// case len(strings.TrimSpace(data.RecaptchaToken)) == 0:
+	// 	message = "Cannot verify humanness"
 	}
 	return message
 }
