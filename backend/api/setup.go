@@ -48,12 +48,14 @@ func SetUpServer(db internal.Database) *http.Server {
 		router.Use(cors.New(corsConfig))
 	}
 
+	httpClient := &http.Client{}
+
 	// Setup API route.
 	api := router.Group("/api")
 	api.GET("/articles", articles.Handler)
 	api.GET("/gallery", gallery.Handler)
 	api.GET("/repos", repos.Handler)
-	api.POST("/contact", contact.Handler)
+	api.POST("/contact", func(c *gin.Context) { contact.Handler(c, httpClient) })
 
 	// Start Http server
 	s := &http.Server{Addr: fmt.Sprintf(":%s", config.Port), Handler: router}
@@ -82,6 +84,9 @@ func apiMiddleware(db internal.Database) gin.HandlerFunc {
 
 // ScheduleFetchAddCache schedules fetching and caching of data from fetchers
 func ScheduleFetchAddCache(db internal.Database) {
+	if config.IsDebug() {
+		return
+	}
 
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(2).Weeks().Do(func(db internal.Database) {
