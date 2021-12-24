@@ -1,15 +1,16 @@
 import React, {Component} from "react";
 import {ArticleModel, ArticleResponse} from "./models/ArticleModel";
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 import {RepoModel, RepoResponse} from "./models/RepoModel";
-import {EmailData, EmailResponse} from "./components/ContactComponent";
+import {ContactResponse, ContactData} from "./models/ContactModel";
+import {FormResponse} from "./components/ContactComponent";
 
 export type DataValue = {
   articles: ArticleModel[],
   repos: RepoModel[],
   fetchArticles: () => void,
   fetchRepos: () => void,
-  postEmail: (data: EmailData) => Promise<EmailResponse>,
+  postEmail: (data: ContactData) => Promise<FormResponse>,
   hasData: () => boolean,
 }
 
@@ -57,10 +58,27 @@ export class DataProvider extends Component<any, DataState> {
       })
   }
 
-  postEmail = async (data: EmailData): Promise<EmailResponse> => {
+  postEmail = async (data: ContactData): Promise<FormResponse> => {
     console.log(JSON.stringify(data))
-    await new Promise(resolve => setTimeout(() => resolve(), 3000))
-    return {success: true, message: "Email successfully sent"}
+    return http
+      .post<ContactData, AxiosResponse<ContactResponse>>("/contact", data)
+      .then(response => {
+        console.log("postEmail: success ", response.data)
+        return DataProvider.generateContactResponse(response.data, response.status)
+      })
+      .catch((e) => {
+        console.log("postEmail: error", e)
+        return DataProvider.generateContactResponse()
+      })
+  }
+
+  private static generateContactResponse(data?: ContactResponse, status?: number): FormResponse {
+    if (!data || !status || (status >= 400 && data <= 499)) return {
+      message: "Please, correct your input and try again",
+      success: false
+    }
+    if (data.success) return {message: "Your message has been received. I will reply as soon as I can.", success: true}
+    return {message: "Something went wrong. Please, try again", success: false}
   }
 
   hasData = (): boolean => {
