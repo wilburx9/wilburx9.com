@@ -13,6 +13,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import {Form, Formik, Field, FormikHelpers} from 'formik';
 import * as Yup from 'yup';
 import {DataContext} from "../DataProvider";
+import { ContactData } from "../models/ContactModel";
 
 export const ContactComponent = () => {
   const {postEmail} = useContext(DataContext)
@@ -21,8 +22,8 @@ export const ContactComponent = () => {
   const [token, setToken] = useState<string | null>('');
   const toast = useToast()
 
-  async function handleValidForm(values: FormValue, token: string, actions: FormikHelpers<FormValue>) {
-    let data: EmailData = {
+  async function handleValidForm(values: FormData, token: string, actions: FormikHelpers<FormData>) {
+    let data: ContactData = {
       sender_name: values.name.trim(),
       sender_email: values.email.trim(),
       subject: values.subject.trim(),
@@ -44,7 +45,7 @@ export const ContactComponent = () => {
     actions.resetForm()
   }
 
-  function onFormSubmit(values: FormValue, actions: FormikHelpers<FormValue>) {
+  function onFormSubmit(values: FormData, actions: FormikHelpers<FormData>) {
     if (token && token.length > 0) {
       handleValidForm(values, token, actions)
     } else {
@@ -55,8 +56,8 @@ export const ContactComponent = () => {
   }
 
   return <Box mt={4} my={6} py={6} px={20} borderRadius='xl' bg={isLightTheme ? 'gray.100' : 'gray.900'}>
-    <Heading mb={4} size='lg' align="start">&#47;&#47;Let's work together</Heading>
-    <Formik<FormValue>
+    <Heading mb={6} size='lg' align="start">&#47;&#47;Let's work together</Heading>
+    <Formik<FormData>
       initialValues={{name: '', email: '', subject: '', message: ''}}
       onSubmit={(values, actions) => onFormSubmit(values, actions)}
       validationSchema={Yup.object({
@@ -129,22 +130,14 @@ export const ContactComponent = () => {
   </Box>
 }
 
-type FormValue = {
+type FormData = {
   name: string,
   email: string,
   subject: string,
   message: string
 }
 
-export type EmailData = {
-  sender_name: string;
-  sender_email: string;
-  subject: string
-  message: string
-  captcha_response: string
-}
-
-export type EmailResponse = {
+export type FormResponse = {
   success: boolean;
   message: string
 }
