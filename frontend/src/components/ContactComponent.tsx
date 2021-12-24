@@ -4,8 +4,7 @@ import {
   Button, FormControl,
   FormErrorMessage,
   Heading,
-  HStack,
-  Input, Textarea, useColorMode, useToast,
+  Input, Stack, Textarea, useBreakpointValue, useColorMode, useToast,
   VStack
 } from "@chakra-ui/react";
 import {HiOutlineArrowRight} from "react-icons/all";
@@ -13,14 +12,17 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import {Form, Formik, Field, FormikHelpers} from 'formik';
 import * as Yup from 'yup';
 import {DataContext} from "../DataProvider";
-import { ContactData } from "../models/ContactModel";
+import {ContactData} from "../models/ContactModel";
 
 export const ContactComponent = () => {
   const {postEmail} = useContext(DataContext)
-  let isLightTheme = useColorMode().colorMode === 'light'
-  let captchaRef = useRef<HCaptcha>(null);
   const [token, setToken] = useState<string | null>('');
   const toast = useToast()
+  let isLightTheme = useColorMode().colorMode === 'light'
+  let captchaRef = useRef<HCaptcha>(null);
+  let isNormalCaptchaSize = useBreakpointValue({base: false, md: false, lg: true})
+  let isSmallButton = useBreakpointValue({base: false, lg: true})
+
 
   async function handleValidForm(values: FormData, token: string, actions: FormikHelpers<FormData>) {
     let data: ContactData = {
@@ -42,7 +44,11 @@ export const ContactComponent = () => {
 
     setToken(null)
     captchaRef.current?.resetCaptcha()
-    actions.resetForm()
+    if (response?.success === true) {
+      actions.resetForm()
+    } else  {
+      actions.setSubmitting(false)
+    }
   }
 
   function onFormSubmit(values: FormData, actions: FormikHelpers<FormData>) {
@@ -51,11 +57,14 @@ export const ContactComponent = () => {
     } else {
       captchaRef.current?.execute({async: true}).then(({response}) => {
         return handleValidForm(values, response, actions);
+      }).catch(() => {
+        actions.setSubmitting(false)
       })
     }
   }
 
-  return <Box mt={4} my={6} py={6} px={20} borderRadius='xl' bg={isLightTheme ? 'gray.100' : 'gray.900'}>
+  return <Box mt={4} my={6} py={6} px={{base: 5, md: 6, lg: 20}} borderRadius='xl'
+              bg={isLightTheme ? 'gray.100' : 'gray.900'}>
     <Heading mb={6} size='lg' align="start">&#47;&#47;Let's work together</Heading>
     <Formik<FormData>
       initialValues={{name: '', email: '', subject: '', message: ''}}
@@ -70,10 +79,9 @@ export const ContactComponent = () => {
       {(formik) => {
         return (
           <Form>
-            <HStack align='flex-end' spacing={10}>
-
+            <Stack direction={{base: 'column', md: 'row'}} align={{base: 'stretch', md: 'flex-end'}} spacing={10}>
               <VStack flexGrow={3} spacing={6}>
-                <HStack w='full' spacing={6} align='flex-start'>
+                <Stack direction={{base: 'column', md: 'row'}} w='full' spacing={6} align='flex-start'>
                   <Field name='name'>
                     {({field, form}: { field: any; form: any }) => (
                       <FormControl isInvalid={form.errors.name && form.touched.name}>
@@ -90,7 +98,7 @@ export const ContactComponent = () => {
                       </FormControl>
                     )}
                   </Field>
-                </HStack>
+                </Stack>
                 <Field name='subject'>
                   {({field, form}: { field: any; form: any }) => (
                     <FormControl isInvalid={form.errors.subject && form.touched.subject}>
@@ -109,20 +117,23 @@ export const ContactComponent = () => {
                 </Field>
               </VStack>
 
-              <VStack spacing={6}>
+              <Stack direction={{base: 'row-reverse', md: 'column'}} spacing={6} align={{base: 'flex-start', md: 'center'}}>
                 <HCaptcha sitekey={process.env.REACT_APP_H_CAPTCHA_SITE_KEY!}
                           theme={isLightTheme ? 'light' : 'dark'}
+                          size={isNormalCaptchaSize ? 'normal' : 'compact'}
                           ref={captchaRef}
                           onExpire={() => setToken(null)}
                           onVerify={setToken}/>
                 <Button color='white' isLoading={formik.isSubmitting} type='submit' borderRadius='lg'
                         loadingText='Sending'
                         spinnerPlacement='end'
+                        px={{base: 0, md: 20, lg: 0}}
+                        size={isSmallButton? 'md' : 'lg'}
                         rightIcon={<HiOutlineArrowRight size='20px'/>} w='full'>
                   Send
                 </Button>
-              </VStack>
-            </HStack>
+              </Stack>
+            </Stack>
           </Form>
         );
       }}

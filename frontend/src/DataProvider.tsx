@@ -63,21 +63,17 @@ export class DataProvider extends Component<any, DataState> {
     return http
       .post<ContactData, AxiosResponse<ContactResponse>>("/contact", data)
       .then(response => {
-        console.log("postEmail: success ", response.data)
-        return DataProvider.generateContactResponse(response.data, response.status)
+        return DataProvider.generateContactResponse(response.data.success)
       })
-      .catch((e) => {
-        console.log("postEmail: error", e)
+      .catch(() => {
         return DataProvider.generateContactResponse()
       })
   }
 
-  private static generateContactResponse(data?: ContactResponse, status?: number): FormResponse {
-    if (!data || !status || (status >= 400 && data <= 499)) return {
-      message: "Please, correct your input and try again",
-      success: false
+  private static generateContactResponse(success?: boolean): FormResponse {
+    if (success === true) {
+      return {message: "Your message has been received. I will reply as soon as I can.", success: true}
     }
-    if (data.success) return {message: "Your message has been received. I will reply as soon as I can.", success: true}
     return {message: "Something went wrong. Please, try again", success: false}
   }
 
