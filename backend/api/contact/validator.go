@@ -32,7 +32,7 @@ func validateData(data requestData) string {
 func validateRecaptcha(response string, httpClient internal.HttpClient) bool {
 	u := "https://hcaptcha.com/siteverify"
 	payload := url.Values{}
-	payload.Add("response", response)
+	payload.Add("response", strings.TrimSpace(response))
 	payload.Add("secret", configs.Config.HCaptchaSecret)
 	payload.Add("sitekey", configs.Config.HCaptchaSiteKey)
 

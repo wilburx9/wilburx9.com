@@ -48,7 +48,7 @@ func Handler(c *gin.Context, client internal.HttpClient) {
 func send(data requestData, client internal.HttpClient) error {
 	u := fmt.Sprintf("https://api.mailgun.net/v3/%v/messages", configs.Config.EmailDomain)
 	payload := url.Values{}
-	payload.Add("from", fmt.Sprintf("%v <%v>", data.SenderName, data.SenderEmail))
+	payload.Add("from", fmt.Sprintf("%v <%v>", data.SenderName, strings.TrimSpace(data.SenderEmail)))
 	payload.Add("to", configs.Config.EmailReceiver)
 	payload.Add("subject", data.Subject)
 	payload.Add("text", data.Message)
