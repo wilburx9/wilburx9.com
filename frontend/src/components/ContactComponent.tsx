@@ -1,43 +1,69 @@
-import React from "react";
+import React, {useContext, useRef, useState} from "react";
 import {
   Box,
   Button, FormControl,
   FormErrorMessage,
   Heading,
   HStack,
-  Input,
-  Textarea, useColorMode,
+  Input, Textarea, useColorMode, useToast,
   VStack
 } from "@chakra-ui/react";
 import {HiOutlineArrowRight} from "react-icons/all";
 import HCaptcha from '@hcaptcha/react-hcaptcha';
-import {Form, Formik, Field} from 'formik';
+import {Form, Formik, Field, FormikHelpers} from 'formik';
 import * as Yup from 'yup';
+import {DataContext} from "../DataProvider";
 
 export const ContactComponent = () => {
-  const {colorMode} = useColorMode()
+  const {postEmail} = useContext(DataContext)
+  let isLightTheme = useColorMode().colorMode === 'light'
+  let captchaRef = useRef<HCaptcha>(null);
+  const [token, setToken] = useState<string | null>('');
+  const toast = useToast()
 
-  function handleCaptchaSuccess(token: string) {
-    console.log("HCaptcha token  = " + token)
+  async function handleValidForm(values: FormValue, token: string, actions: FormikHelpers<FormValue>) {
+    let data: EmailData = {
+      sender_name: values.name.trim(),
+      sender_email: values.email.trim(),
+      subject: values.subject.trim(),
+      message: values.message.trim(),
+      captcha_response: token
+    }
+    let response = await postEmail?.(data)
+
+    toast({
+      status: response?.success ? 'success' : 'error',
+      title: response?.success ? 'Success' : 'Error',
+      description: response?.message,
+      duration: 5000,
+      isClosable: true
+    })
+
+    setToken(null)
+    captchaRef.current?.resetCaptcha()
+    actions.resetForm()
   }
 
-  let isLightTheme = colorMode === 'light'
+  function onFormSubmit(values: FormValue, actions: FormikHelpers<FormValue>) {
+    if (token && token.length > 0) {
+      handleValidForm(values, token, actions)
+    } else {
+      captchaRef.current?.execute({async: true}).then(({response}) => {
+        return handleValidForm(values, response, actions);
+      })
+    }
+  }
 
   return <Box mt={4} my={6} py={6} px={20} borderRadius='xl' bg={isLightTheme ? 'gray.100' : 'gray.900'}>
     <Heading mb={4} size='lg' align="start">&#47;&#47;Let's work together</Heading>
-    <Formik
+    <Formik<FormValue>
       initialValues={{name: '', email: '', subject: '', message: ''}}
-      onSubmit={(values, actions) => {
-        setTimeout(() => {
-          alert(JSON.stringify(values, null, 2))
-          actions.setSubmitting(false)
-        }, 1000)
-      }}
+      onSubmit={(values, actions) => onFormSubmit(values, actions)}
       validationSchema={Yup.object({
-        name: Yup.string().required('Required'),
-        email: Yup.string().email('Invalid email address').required('Required'),
-        subject: Yup.string().required('Required'),
-        message: Yup.string().required('Required'),
+        name: Yup.string().trim().required('Required'),
+        email: Yup.string().trim().email('Invalid email address').required('Required'),
+        subject: Yup.string().trim().required('Required'),
+        message: Yup.string().trim().required('Required'),
       })}
     >
       {(formik) => {
@@ -50,7 +76,7 @@ export const ContactComponent = () => {
                   <Field name='name'>
                     {({field, form}: { field: any; form: any }) => (
                       <FormControl isInvalid={form.errors.name && form.touched.name}>
-                        <Input {...field}  id='name' autoComplete='name' type='text' placeholder='Name' />
+                        <Input {...field} id='name' autoComplete='name' type='text' placeholder='Name'/>
                         <FormErrorMessage>{form.errors.name}</FormErrorMessage>
                       </FormControl>
                     )}
@@ -58,7 +84,7 @@ export const ContactComponent = () => {
                   <Field name='email'>
                     {({field, form}: { field: any; form: any }) => (
                       <FormControl isInvalid={form.errors.email && form.touched.email}>
-                        <Input {...field}  id='email' autoComplete='email' type='email' placeholder='Email' />
+                        <Input {...field} id='email' autoComplete='email' type='email' placeholder='Email'/>
                         <FormErrorMessage>{form.errors.email}</FormErrorMessage>
                       </FormControl>
                     )}
@@ -67,7 +93,7 @@ export const ContactComponent = () => {
                 <Field name='subject'>
                   {({field, form}: { field: any; form: any }) => (
                     <FormControl isInvalid={form.errors.subject && form.touched.subject}>
-                      <Input {...field}  id='subject' type='text' placeholder='Subject' />
+                      <Input {...field} id='subject' type='text' placeholder='Subject'/>
                       <FormErrorMessage>{form.errors.subject}</FormErrorMessage>
                     </FormControl>
                   )}
@@ -75,7 +101,7 @@ export const ContactComponent = () => {
                 <Field name='message'>
                   {({field, form}: { field: any; form: any }) => (
                     <FormControl isInvalid={form.errors.message && form.touched.message}>
-                      <Textarea {...field}  id='message' resize='vertical' placeholder='Message'  />
+                      <Textarea {...field} id='message' resize='vertical' placeholder='Message'/>
                       <FormErrorMessage>{form.errors.message}</FormErrorMessage>
                     </FormControl>
                   )}
@@ -85,7 +111,9 @@ export const ContactComponent = () => {
               <VStack spacing={6}>
                 <HCaptcha sitekey={process.env.REACT_APP_H_CAPTCHA_SITE_KEY!}
                           theme={isLightTheme ? 'light' : 'dark'}
-                          onVerify={(token) => handleCaptchaSuccess(token)}/>
+                          ref={captchaRef}
+                          onExpire={() => setToken(null)}
+                          onVerify={setToken}/>
                 <Button color='white' isLoading={formik.isSubmitting} type='submit' borderRadius='lg'
                         loadingText='Sending'
                         spinnerPlacement='end'
@@ -99,4 +127,24 @@ export const ContactComponent = () => {
       }}
     </Formik>
   </Box>
+}
+
+type FormValue = {
+  name: string,
+  email: string,
+  subject: string,
+  message: string
+}
+
+export type EmailData = {
+  sender_name: string;
+  sender_email: string;
+  subject: string
+  message: string
+  captcha_response: string
+}
+
+export type EmailResponse = {
+  success: boolean;
+  message: string
 }

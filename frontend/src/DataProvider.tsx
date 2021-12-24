@@ -2,12 +2,14 @@ import React, {Component} from "react";
 import {ArticleModel, ArticleResponse} from "./models/ArticleModel";
 import axios from "axios";
 import {RepoModel, RepoResponse} from "./models/RepoModel";
+import {EmailData, EmailResponse} from "./components/ContactComponent";
 
 export type DataValue = {
   articles: ArticleModel[],
   repos: RepoModel[],
   fetchArticles: () => void,
   fetchRepos: () => void,
+  postEmail: (data: EmailData) => Promise<EmailResponse>,
   hasData: () => boolean,
 }
 
@@ -55,6 +57,12 @@ export class DataProvider extends Component<any, DataState> {
       })
   }
 
+  postEmail = async (data: EmailData): Promise<EmailResponse> => {
+    console.log(JSON.stringify(data))
+    await new Promise(resolve => setTimeout(() => resolve(), 3000))
+    return {success: true, message: "Email successfully sent"}
+  }
+
   hasData = (): boolean => {
     return this.state.repos.length > 0 || this.state.articles.length > 0
   }
@@ -66,6 +74,7 @@ export class DataProvider extends Component<any, DataState> {
           ...this.state,
           fetchArticles: this.fetchArticles,
           fetchRepos: this.fetchRepos,
+          postEmail: this.postEmail,
           hasData: this.hasData
         }}>
         {this.props.children}
