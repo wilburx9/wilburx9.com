@@ -36,7 +36,6 @@ export class DataProvider extends Component<any, DataState> {
     http
       .get<ArticleResponse>("/articles")
       .then(response => {
-        console.log("Articles success:: " + JSON.stringify(response.data))
         this.setState({articles: response.data.data})
       })
       .catch(ex => {
@@ -45,11 +44,10 @@ export class DataProvider extends Component<any, DataState> {
   }
 
   fetchRepos = () => {
-    let params = new URLSearchParams([["size", "6"], ["extra", "wilburx9.dev"]])
+    let params = new URLSearchParams([["size", "6"]])
     http
       .get<RepoResponse>("/repos", {params})
       .then(response => {
-        console.log("Repos success:: " + JSON.stringify(response.data))
         this.setState({repos: response.data.data})
       })
       .catch(ex => {
