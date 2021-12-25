@@ -13,6 +13,9 @@ import {Form, Formik, Field, FormikHelpers} from 'formik';
 import * as Yup from 'yup';
 import {DataContext} from "../DataProvider";
 import {ContactData} from "../models/ContactModel";
+import {logAnalyticsEvent} from "../analytics/firebase";
+import {AnalyticsEvent} from "../analytics/events";
+import {AnalyticsKey} from "../analytics/keys";
 
 export const ContactComponent = () => {
   const {postEmail} = useContext(DataContext)
@@ -46,7 +49,7 @@ export const ContactComponent = () => {
     captchaRef.current?.resetCaptcha()
     if (response?.success === true) {
       actions.resetForm()
-    } else  {
+    } else {
       actions.setSubmitting(false)
     }
   }
@@ -57,8 +60,9 @@ export const ContactComponent = () => {
     } else {
       captchaRef.current?.execute({async: true}).then(({response}) => {
         return handleValidForm(values, response, actions);
-      }).catch(() => {
+      }).catch((reason) => {
         actions.setSubmitting(false)
+        logAnalyticsEvent(AnalyticsEvent.captchaFailure, new Map([AnalyticsKey.reason, reason]))
       })
     }
   }
@@ -117,7 +121,8 @@ export const ContactComponent = () => {
                 </Field>
               </VStack>
 
-              <Stack direction={{base: 'row-reverse', md: 'column'}} spacing={6} align={{base: 'flex-start', md: 'center'}}>
+              <Stack direction={{base: 'row-reverse', md: 'column'}} spacing={6}
+                     align={{base: 'flex-start', md: 'center'}}>
                 <HCaptcha sitekey={process.env.REACT_APP_H_CAPTCHA_SITE_KEY!}
                           theme={isLightTheme ? 'light' : 'dark'}
                           size={isNormalCaptchaSize ? 'normal' : 'compact'}
@@ -128,7 +133,7 @@ export const ContactComponent = () => {
                         loadingText='Sending'
                         spinnerPlacement='end'
                         px={{base: 0, md: 20, lg: 0}}
-                        size={isSmallButton? 'md' : 'lg'}
+                        size={isSmallButton ? 'md' : 'lg'}
                         rightIcon={<HiOutlineArrowRight size='20px'/>} w='full'>
                   Send
                 </Button>

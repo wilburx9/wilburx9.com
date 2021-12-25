@@ -6,7 +6,7 @@ const config: ThemeConfig = {
   useSystemColorMode: true,
 }
 
-const inputSelectStyles = {
+const inputStyles = {
   variants: {
     filled: (props: ThemeComponentProps) => ({
       field: {
@@ -30,8 +30,8 @@ const theme = extendTheme({
       body: `'Roboto Mono', monospace, ${base.fonts?.body}`,
     },
     components: {
-      Textarea: {...inputSelectStyles},
-      Input: {...inputSelectStyles},
+      Textarea: {...inputStyles},
+      Input: {...inputStyles},
     }
   },
   withDefaultVariant({
