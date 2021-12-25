@@ -2,6 +2,7 @@ import { ColorModeScript } from "@chakra-ui/react"
 import * as React from "react"
 import ReactDOM from "react-dom"
 import { App } from "./App"
+import {initializeFirebase} from "./analytics/firebase";
 
 // Disable logs in production
 if (process.env.NODE_ENV === 'production') {
@@ -9,6 +10,8 @@ if (process.env.NODE_ENV === 'production') {
   console.error = () => {}
   console.debug = () => {}
 }
+
+initializeFirebase()
 
 ReactDOM.render(
   <React.StrictMode>
