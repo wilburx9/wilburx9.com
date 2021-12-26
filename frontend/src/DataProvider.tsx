@@ -62,7 +62,6 @@ export class DataProvider extends Component<any, DataState> {
   }
 
   postEmail = async (data: ContactData): Promise<FormResponse> => {
-    console.log(JSON.stringify(data))
     return http
       .post<ContactData, AxiosResponse<ContactResponse>>("/contact", data)
       .then(response => {
@@ -102,26 +101,16 @@ export class DataProvider extends Component<any, DataState> {
 }
 
 function logNetworkError(e: AxiosError) {
-  let statusCode;
-  let rawResponse;
-  let url;
-  const message = e.message;
+  let params = getAnalyticsParams()
+  params.set(AnalyticsKey.url, `${e.config.baseURL}${e.config.url}`)
+  params.set(AnalyticsKey.method, e.config.method)
+  params.set(AnalyticsKey.message, e.message)
+  params.set(AnalyticsKey.data, e.config.data)
 
   if (e.response) {
-    statusCode = e.response.status
-    rawResponse = JSON.stringify(e.response.data)
-    url = e.response.config.url
-  } else if (e.request) {
-    let request = e.request as XMLHttpRequest
-    rawResponse = request.responseText
-    url = request.responseURL
+    params.set(AnalyticsKey.statusCode,  e.response.status)
+    params.set(AnalyticsKey.rawResponse, JSON.stringify(e.response.data))
   }
-
-  let params = getAnalyticsParams()
-  params.set(AnalyticsKey.url, url)
-  params.set(AnalyticsKey.statusCode, statusCode)
-  params.set(AnalyticsKey.rawResponse, rawResponse)
-  params.set(AnalyticsKey.message, message)
 
   logAnalyticsEvent(AnalyticsEvent.apiFailure, params)
 }
