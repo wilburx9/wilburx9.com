@@ -68,14 +68,14 @@ export class DataProvider extends Component<any, DataState> {
         return DataProvider.generateContactResponse(response.data.success)
       })
       .catch((e) => {
-        logNetworkError(e)
+        logNetworkError(e, JSON.stringify(data.redact()))
         return DataProvider.generateContactResponse()
       })
   }
 
   private static generateContactResponse(success?: boolean): FormResponse {
     if (success === true) {
-      return {message: "Your message has been received. I will reply as soon as I can.", success: true}
+      return {message: "Your message has been received. I should revert within 24 hours.", success: true}
     }
     return {message: "Something went wrong. Please, try again", success: false}
   }
@@ -100,15 +100,15 @@ export class DataProvider extends Component<any, DataState> {
   }
 }
 
-function logNetworkError(e: AxiosError) {
+function logNetworkError(e: AxiosError, data?: string) {
   let params = getAnalyticsParams()
   params.set(AnalyticsKey.url, `${e.config.baseURL}${e.config.url}`)
   params.set(AnalyticsKey.method, e.config.method)
   params.set(AnalyticsKey.message, e.message)
-  params.set(AnalyticsKey.data, e.config.data)
 
+  if (data) params.set(AnalyticsKey.data, data)
   if (e.response) {
-    params.set(AnalyticsKey.statusCode,  e.response.status)
+    params.set(AnalyticsKey.statusCode, e.response.status)
     params.set(AnalyticsKey.rawResponse, JSON.stringify(e.response.data))
   }
 

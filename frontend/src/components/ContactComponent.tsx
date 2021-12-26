@@ -29,13 +29,13 @@ export const ContactComponent = () => {
 
 
   async function handleValidForm(values: FormData, token: string, actions: FormikHelpers<FormData>) {
-    let data: ContactData = {
-      sender_name: values.name.trim(),
-      sender_email: values.email.trim(),
-      subject: values.subject.trim(),
-      message: values.message.trim(),
-      captcha_response: token
-    }
+    let data = new ContactData(
+      values.name.trim(),
+      values.email.trim(),
+      values.subject.trim(),
+      values.message.trim(),
+      token
+    )
     let response = await postEmail?.(data)
 
     toast({
@@ -90,7 +90,8 @@ export const ContactComponent = () => {
                   <Field name='name'>
                     {({field, form}: { field: any; form: any }) => (
                       <FormControl isInvalid={form.errors.name && form.touched.name}>
-                        <Input {...field} id='name' autoComplete='name' type='text' placeholder='Name' colorScheme='blackAlpha'/>
+                        <Input {...field} id='name' autoComplete='name' type='text' placeholder='Name'
+                               colorScheme='blackAlpha'/>
                         <FormErrorMessage>{form.errors.name}</FormErrorMessage>
                       </FormControl>
                     )}
@@ -116,7 +117,8 @@ export const ContactComponent = () => {
                   {({field, form}: { field: any; form: any }) => (
                     <FormControl isInvalid={form.errors.message && form.touched.message}>
                       {/*For some reason, the input style applied in the custom theme for Textarea doesn't work. So I'm applying ut here manually*/}
-                      <Textarea {...field} {...getInputFilledStyle(isLightMode)} id='message' resize='vertical' placeholder='Message'/>
+                      <Textarea {...field} {...getInputFilledStyle(isLightMode)} id='message' resize='vertical'
+                                placeholder='Message'/>
                       <FormErrorMessage>{form.errors.message}</FormErrorMessage>
                     </FormControl>
                   )}
@@ -128,6 +130,7 @@ export const ContactComponent = () => {
                 <HCaptcha sitekey={process.env.REACT_APP_H_CAPTCHA_SITE_KEY!}
                           theme={isLightMode ? 'light' : 'dark'}
                           size={isNormalCaptchaSize ? 'normal' : 'compact'}
+                          onError={logCaptchaError}
                           ref={captchaRef}
                           onExpire={() => setToken(null)}
                           onVerify={setToken}/>
@@ -136,11 +139,11 @@ export const ContactComponent = () => {
                         spinnerPlacement='end'
                         px={{base: 0, md: 20, lg: 0}}
                         size={isSmallButton ? 'md' : 'lg'}
-                        bg={isLightMode? 'blackAlpha.600': 'whiteAlpha.100'}
+                        bg={isLightMode ? 'blackAlpha.600' : 'whiteAlpha.100'}
                         rightIcon={<HiOutlineArrowRight size='20px'/>}
                         w='full'
-                        _hover={{background: isLightMode? 'blackAlpha.800': 'whiteAlpha.200'}}
-                        _active={{background: isLightMode? 'blackAlpha.900': 'whiteAlpha.300'}}
+                        _hover={{background: isLightMode ? 'blackAlpha.800' : 'whiteAlpha.200'}}
+                        _active={{background: isLightMode ? 'blackAlpha.900' : 'whiteAlpha.300'}}
                 >
                   Send
                 </Button>
