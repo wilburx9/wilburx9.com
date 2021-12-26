@@ -3,5 +3,7 @@ export const AnalyticsKey = {
   statusCode: 'status_code',
   url: 'url',
   message: 'message',
-  rawResponse: 'raw_response'
+  rawResponse: 'raw_response',
+  method: 'method',
+  data: 'data',
 }
