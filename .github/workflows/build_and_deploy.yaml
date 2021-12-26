@@ -5,15 +5,15 @@ on:
     branches: [ live ]
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-  SERVICE: backend
-  REGION: us-central1
-
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
 
 jobs:
   build_and_deploy_backend:
     name: Build and Deploy the backend to Cloud Run
     runs-on: ubuntu-latest
+    env:
+      SERVICE: backend
+      REGION: us-central1
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -28,21 +28,27 @@ jobs:
 
       - name: Build and Push Container
         run: |-
-          docker build -t gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} backend/
-          docker push gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} backend/
+          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
 
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
         with:
           service: ${{ env.SERVICE }}
-          image: gcr.io/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
           region: ${{ env.REGION }}
 
   build_and_deploy_frontend:
     name: Build and Deploy the frontend to Firebase Hosting
     needs: [ build_and_deploy_backend ]
     runs-on: ubuntu-latest
+    env:
+      REACT_APP_DOMAIN: ${{ secrets.REACT_APP_DOMAIN }}
+      REACT_APP_H_CAPTCHA_SITE_KEY: ${{ secrets.REACT_APP_HCAPTCHA_SITE_KEY }}
+      REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+      REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
+      REACT_APP_GCP_PROJECT_ID: ${{ env.GCP_PROJECT_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -58,4 +64,4 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SA_KEY }}'
           channelId: live
-          projectId: ${{ env.PROJECT_ID }}
+          projectId: ${{ env.GCP_PROJECT_ID }}
