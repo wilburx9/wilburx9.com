@@ -2,16 +2,13 @@ package contact
 
 import (
 	"encoding/json"
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 	"net/mail"
+	"net/url"
 	"strings"
-)
-
-const (
-	minRecaptchaThresh = 0.5
 )
 
 func validateData(data requestData) string {
@@ -26,19 +23,25 @@ func validateData(data requestData) string {
 		message = "Please, enter a subject"
 	case len(strings.TrimSpace(data.Message)) == 0:
 		message = "Please, enter a message"
-	case len(strings.TrimSpace(data.RecaptchaToken)) == 0:
+	case len(strings.TrimSpace(data.CaptchaResponse)) == 0:
 		message = "Cannot verify humanness"
 	}
 	return message
 }
 
-func validateRecaptcha(secret string, token string, httpClient internal.HttpClient) bool {
-	url := fmt.Sprintf("https://www.google.com/recaptcha/api/siteverify?secret=%v&response=%v", secret, token)
-	req, err := http.NewRequest(http.MethodPost, url, nil)
+func validateRecaptcha(response string, httpClient internal.HttpClient) bool {
+	u := "https://hcaptcha.com/siteverify"
+	payload := url.Values{}
+	payload.Add("response", strings.TrimSpace(response))
+	payload.Add("secret", configs.Config.HCaptchaSecret)
+	payload.Add("sitekey", configs.Config.HCaptchaSiteKey)
+
+	req, err := http.NewRequest(http.MethodPost, u, strings.NewReader(payload.Encode()))
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
 		return false
 	}
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
 	res, err := httpClient.Do(req)
 	if err != nil {
@@ -48,14 +51,11 @@ func validateRecaptcha(secret string, token string, httpClient internal.HttpClie
 	defer res.Body.Close()
 
 	resp := struct {
-		Success bool    `json:"success"`
-		Score   float64 `json:"score"`
+		Success bool `json:"success"`
 	}{}
-	err = json.NewDecoder(res.Body).Decode(&resp)
-	if err != nil {
+	if err = json.NewDecoder(res.Body).Decode(&resp); err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
 		return false
 	}
-
-	return resp.Success && resp.Score >= minRecaptchaThresh
+	return resp.Success
 }

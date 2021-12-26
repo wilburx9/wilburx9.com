@@ -5,7 +5,6 @@ import "./style.css"
 import DataProvider from "./DataProvider";
 import {ContentComponent} from "./components/ContentComponent";
 
-// TODO: Integrate analytics and performance reporting
 export const App = () => (
   <ChakraProvider theme={theme}>
     <DataProvider>
