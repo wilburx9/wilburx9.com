@@ -16,12 +16,13 @@ import {ContactData} from "../models/ContactModel";
 import {getAnalyticsParams, logAnalyticsEvent} from "../analytics/firebase";
 import {AnalyticsEvent} from "../analytics/events";
 import {AnalyticsKey} from "../analytics/keys";
+import {getInputFilledStyle} from "../theme";
 
 export const ContactComponent = () => {
   const {postEmail} = useContext(DataContext)
   const [token, setToken] = useState<string | null>('');
   const toast = useToast()
-  let isLightTheme = useColorMode().colorMode === 'light'
+  let isLightMode = useColorMode().colorMode === 'light'
   let captchaRef = useRef<HCaptcha>(null);
   let isNormalCaptchaSize = useBreakpointValue({base: false, md: false, lg: true})
   let isSmallButton = useBreakpointValue({base: false, lg: true})
@@ -68,7 +69,7 @@ export const ContactComponent = () => {
   }
 
   return <Box mt={4} my={6} py={6} px={{base: 5, md: 6, lg: 20}} borderRadius='xl'
-              bg={isLightTheme ? 'gray.100' : 'gray.900'}>
+              bg={isLightMode ? 'gray.50' : 'gray.900'}>
     <Heading mb={6} size='lg' align="start">&#47;&#47;Let's work together</Heading>
     <Formik<FormData>
       initialValues={{name: '', email: '', subject: '', message: ''}}
@@ -89,7 +90,7 @@ export const ContactComponent = () => {
                   <Field name='name'>
                     {({field, form}: { field: any; form: any }) => (
                       <FormControl isInvalid={form.errors.name && form.touched.name}>
-                        <Input {...field} id='name' autoComplete='name' type='text' placeholder='Name'/>
+                        <Input {...field} id='name' autoComplete='name' type='text' placeholder='Name' colorScheme='blackAlpha'/>
                         <FormErrorMessage>{form.errors.name}</FormErrorMessage>
                       </FormControl>
                     )}
@@ -114,7 +115,8 @@ export const ContactComponent = () => {
                 <Field name='message'>
                   {({field, form}: { field: any; form: any }) => (
                     <FormControl isInvalid={form.errors.message && form.touched.message}>
-                      <Textarea {...field} id='message' resize='vertical' placeholder='Message'/>
+                      {/*For some reason, the input style applied in the custom theme for Textarea doesn't work. So I'm applying ut here manually*/}
+                      <Textarea {...field} {...getInputFilledStyle(isLightMode)} id='message' resize='vertical' placeholder='Message'/>
                       <FormErrorMessage>{form.errors.message}</FormErrorMessage>
                     </FormControl>
                   )}
@@ -124,7 +126,7 @@ export const ContactComponent = () => {
               <Stack direction={{base: 'row-reverse', md: 'column'}} spacing={6}
                      align={{base: 'flex-start', md: 'center'}}>
                 <HCaptcha sitekey={process.env.REACT_APP_H_CAPTCHA_SITE_KEY!}
-                          theme={isLightTheme ? 'light' : 'dark'}
+                          theme={isLightMode ? 'light' : 'dark'}
                           size={isNormalCaptchaSize ? 'normal' : 'compact'}
                           ref={captchaRef}
                           onExpire={() => setToken(null)}
@@ -134,7 +136,12 @@ export const ContactComponent = () => {
                         spinnerPlacement='end'
                         px={{base: 0, md: 20, lg: 0}}
                         size={isSmallButton ? 'md' : 'lg'}
-                        rightIcon={<HiOutlineArrowRight size='20px'/>} w='full'>
+                        bg={isLightMode? 'blackAlpha.600': 'whiteAlpha.100'}
+                        rightIcon={<HiOutlineArrowRight size='20px'/>}
+                        w='full'
+                        _hover={{background: isLightMode? 'blackAlpha.800': 'whiteAlpha.200'}}
+                        _active={{background: isLightMode? 'blackAlpha.900': 'whiteAlpha.300'}}
+                >
                   Send
                 </Button>
               </Stack>
