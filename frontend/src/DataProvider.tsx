@@ -1,13 +1,19 @@
 import React, {Component} from "react";
 import {ArticleModel, ArticleResponse} from "./models/ArticleModel";
-import axios from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
 import {RepoModel, RepoResponse} from "./models/RepoModel";
+import {ContactResponse, ContactData} from "./models/ContactModel";
+import {FormResponse} from "./components/ContactComponent";
+import {getAnalyticsParams, logAnalyticsEvent} from "./analytics/firebase";
+import {AnalyticsEvent} from "./analytics/events";
+import {AnalyticsKey} from "./analytics/keys";
 
 export type DataValue = {
   articles: ArticleModel[],
   repos: RepoModel[],
   fetchArticles: () => void,
   fetchRepos: () => void,
+  postEmail: (data: ContactData) => Promise<FormResponse>,
   hasData: () => boolean,
 }
 
@@ -36,25 +42,42 @@ export class DataProvider extends Component<any, DataState> {
     http
       .get<ArticleResponse>("/articles")
       .then(response => {
-        console.log("Articles success:: " + JSON.stringify(response.data))
         this.setState({articles: response.data.data})
       })
-      .catch(ex => {
-        console.error(ex)
+      .catch(e => {
+        logNetworkError(e)
       })
   }
 
   fetchRepos = () => {
-    let params = new URLSearchParams([["size", "6"], ["extra", "wilburx9.dev"]])
+    let params = new URLSearchParams([["size", "6"]])
     http
       .get<RepoResponse>("/repos", {params})
       .then(response => {
-        console.log("Repos success:: " + JSON.stringify(response.data))
         this.setState({repos: response.data.data})
       })
-      .catch(ex => {
-        console.error(ex)
+      .catch(e => {
+        logNetworkError(e)
       })
+  }
+
+  postEmail = async (data: ContactData): Promise<FormResponse> => {
+    return http
+      .post<ContactData, AxiosResponse<ContactResponse>>("/contact", data)
+      .then(response => {
+        return DataProvider.generateContactResponse(response.data.success)
+      })
+      .catch((e) => {
+        logNetworkError(e, JSON.stringify(data.redact()))
+        return DataProvider.generateContactResponse()
+      })
+  }
+
+  private static generateContactResponse(success?: boolean): FormResponse {
+    if (success === true) {
+      return {message: "Your message has been received. I should revert within 24 hours.", success: true}
+    }
+    return {message: "Something went wrong. Please, try again", success: false}
   }
 
   hasData = (): boolean => {
@@ -68,12 +91,28 @@ export class DataProvider extends Component<any, DataState> {
           ...this.state,
           fetchArticles: this.fetchArticles,
           fetchRepos: this.fetchRepos,
+          postEmail: this.postEmail,
           hasData: this.hasData
         }}>
         {this.props.children}
       </DataContext.Provider>
     )
   }
+}
+
+function logNetworkError(e: AxiosError, data?: string) {
+  let params = getAnalyticsParams()
+  params.set(AnalyticsKey.url, `${e.config.baseURL}${e.config.url}`)
+  params.set(AnalyticsKey.method, e.config.method)
+  params.set(AnalyticsKey.message, e.message)
+
+  if (data) params.set(AnalyticsKey.data, data)
+  if (e.response) {
+    params.set(AnalyticsKey.statusCode, e.response.status)
+    params.set(AnalyticsKey.rawResponse, JSON.stringify(e.response.data))
+  }
+
+  logAnalyticsEvent(AnalyticsEvent.apiFailure, params)
 }
 
 

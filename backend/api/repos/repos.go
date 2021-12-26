@@ -21,7 +21,6 @@ func Handler(c *gin.Context) {
 	}
 
 	strSize := c.Query("size")   // The number of repos to return.
-	strExtra := c.Query("extra") // An extra repo to add to the repos to return if strSize is less than the total repos.
 
 	github := GitHub{Auth: configs.Config.GithubToken, Username: configs.Config.GithubUsername, Fetch: fetch}
 	fetchers := [...]internal.Fetcher{github}
@@ -55,29 +54,10 @@ func Handler(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, data)
 			return
 		} else if size < len(repos) {
-			index, err := getIndexOfExtra(strExtra, repos)
-			extra := repos[index]
-			if err == nil && index >= size { // Ensuring that the extra repo doesn't already exist in the list
-				repos = repos[:(size - 1)]
-				repos = append(repos, extra)
-			} else {
-				repos = repos[:size]
-			}
+			repos = repos[:size]
 		}
 	}
 
 	c.Writer.Header().Set("Cache-Control", internal.AverageCacheControl(updatedAts))
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse(repos))
-}
-
-func getIndexOfExtra(name string, repos []models.Repo) (int, error) {
-	if name == "" {
-		return 0, fmt.Errorf("name not valid")
-	}
-	for i := range repos {
-		if repos[i].Name == name {
-			return i, nil
-		}
-	}
-	return 0, fmt.Errorf("%v not found", name)
 }
