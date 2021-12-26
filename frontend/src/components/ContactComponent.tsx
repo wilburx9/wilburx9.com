@@ -13,7 +13,7 @@ import {Form, Formik, Field, FormikHelpers} from 'formik';
 import * as Yup from 'yup';
 import {DataContext} from "../DataProvider";
 import {ContactData} from "../models/ContactModel";
-import {logAnalyticsEvent} from "../analytics/firebase";
+import {getAnalyticsParams, logAnalyticsEvent} from "../analytics/firebase";
 import {AnalyticsEvent} from "../analytics/events";
 import {AnalyticsKey} from "../analytics/keys";
 
@@ -62,7 +62,7 @@ export const ContactComponent = () => {
         return handleValidForm(values, response, actions);
       }).catch((reason) => {
         actions.setSubmitting(false)
-        logAnalyticsEvent(AnalyticsEvent.captchaFailure, new Map([AnalyticsKey.reason, reason]))
+        logCaptchaError(reason)
       })
     }
   }
@@ -144,6 +144,12 @@ export const ContactComponent = () => {
       }}
     </Formik>
   </Box>
+}
+
+function logCaptchaError(reason: any) {
+  let params = getAnalyticsParams()
+  params.set(AnalyticsKey.reason, reason)
+  logAnalyticsEvent(AnalyticsEvent.captchaFailure, params)
 }
 
 type FormData = {

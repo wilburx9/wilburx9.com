@@ -15,3 +15,7 @@ export function initializeFirebase() {
 export function logAnalyticsEvent(name: string, params?: Map<string, any>) {
   logEvent(getAnalytics(), name, params)
 }
+
+export function getAnalyticsParams(): Map<string, any> {
+  return new Map<string, any>()
+}

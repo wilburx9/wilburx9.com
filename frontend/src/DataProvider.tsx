@@ -1,9 +1,12 @@
 import React, {Component} from "react";
 import {ArticleModel, ArticleResponse} from "./models/ArticleModel";
-import axios, {AxiosResponse} from "axios";
+import axios, {AxiosError, AxiosResponse} from "axios";
 import {RepoModel, RepoResponse} from "./models/RepoModel";
 import {ContactResponse, ContactData} from "./models/ContactModel";
 import {FormResponse} from "./components/ContactComponent";
+import {getAnalyticsParams, logAnalyticsEvent} from "./analytics/firebase";
+import {AnalyticsEvent} from "./analytics/events";
+import {AnalyticsKey} from "./analytics/keys";
 
 export type DataValue = {
   articles: ArticleModel[],
@@ -41,8 +44,8 @@ export class DataProvider extends Component<any, DataState> {
       .then(response => {
         this.setState({articles: response.data.data})
       })
-      .catch(ex => {
-        console.error(ex)
+      .catch(e => {
+        logNetworkError(e)
       })
   }
 
@@ -53,8 +56,8 @@ export class DataProvider extends Component<any, DataState> {
       .then(response => {
         this.setState({repos: response.data.data})
       })
-      .catch(ex => {
-        console.error(ex)
+      .catch(e => {
+        logNetworkError(e)
       })
   }
 
@@ -65,7 +68,8 @@ export class DataProvider extends Component<any, DataState> {
       .then(response => {
         return DataProvider.generateContactResponse(response.data.success)
       })
-      .catch(() => {
+      .catch((e) => {
+        logNetworkError(e)
         return DataProvider.generateContactResponse()
       })
   }
@@ -95,6 +99,31 @@ export class DataProvider extends Component<any, DataState> {
       </DataContext.Provider>
     )
   }
+}
+
+function logNetworkError(e: AxiosError) {
+  let statusCode;
+  let rawResponse;
+  let url;
+  const message = e.message;
+
+  if (e.response) {
+    statusCode = e.response.status
+    rawResponse = JSON.stringify(e.response.data)
+    url = e.response.config.url
+  } else if (e.request) {
+    let request = e.request as XMLHttpRequest
+    rawResponse = request.responseText
+    url = request.responseURL
+  }
+
+  let params = getAnalyticsParams()
+  params.set(AnalyticsKey.url, url)
+  params.set(AnalyticsKey.statusCode, statusCode)
+  params.set(AnalyticsKey.rawResponse, rawResponse)
+  params.set(AnalyticsKey.message, message)
+
+  logAnalyticsEvent(AnalyticsEvent.apiFailure, params)
 }
 
 
