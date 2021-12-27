@@ -1,0 +1,27 @@
+query {
+  viewer {
+    repositories(first: 10, isFork: false, privacy: PUBLIC, orderBy: {field: STARGAZERS, direction: DESC}, ownerAffiliations: OWNER) {
+      nodes {
+        createdAt
+        description
+        forkCount
+        id
+        licenseInfo {
+          name
+        }
+        name
+        stargazerCount
+        url
+        updatedAt
+        languages(first: 5, orderBy: {field: SIZE, direction: DESC}) {
+          edges {
+            node {
+              name
+              color
+            }
+          }
+        }
+      }
+    }
+  }
+}
