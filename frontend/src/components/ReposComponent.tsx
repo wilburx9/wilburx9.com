@@ -33,7 +33,7 @@ export const ReposComponent = () => {
 
   return (
     <VStack align='start'>
-      <Heading pt={16} size='xl' align="start" fontWeight="black">&#47;&#47;Open-source Projects</Heading>
+      <Heading pt={16} size='xl' align="start" fontWeight="black">&#47;&#47; Open-source Projects</Heading>
       <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
         {repos.map((repo) =>
           <RepoComponent {...repo} key={repo.name}/>

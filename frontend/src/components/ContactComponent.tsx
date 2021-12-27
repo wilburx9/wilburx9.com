@@ -68,9 +68,9 @@ export const ContactComponent = () => {
     }
   }
 
-  return <Box mt={4} my={6} py={6} px={{base: 5, md: 6, lg: 20}} borderRadius='xl'
+  return <Box mt={16} mb={6} py={6} px={{base: 5, md: 6, lg: 20}} borderRadius='xl'
               bg={isLightMode ? 'gray.50' : 'gray.900'}>
-    <Heading mb={6} size='lg' align="start">&#47;&#47;Let's work together</Heading>
+    <Heading mb={6} size='lg' align="start">&#47;&#47; Let's work together</Heading>
     <Formik<FormData>
       initialValues={{name: '', email: '', subject: '', message: ''}}
       onSubmit={(values, actions) => onFormSubmit(values, actions)}
