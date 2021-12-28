@@ -16,9 +16,14 @@ type InstaImg struct {
 // InstaToken is container for Instagram token data
 type InstaToken struct {
 	ID          string    `json:"id" firestore:"id"`
-	Value       string    `json:"access_token" firestore:"value"`
+	Value       string    `json:"access_token" firestore:"access_token"`
 	ExpiresIn   int64     `json:"expires_in" firestore:"expires_in"`
 	RefreshedAt time.Time `json:"refreshed_at" firestore:"refreshed_at"`
+}
+
+// NewInstaToken returns a pointer to an InstaToken that's empty except for the id
+func NewInstaToken(id string) *InstaToken {
+	return &InstaToken{ID: id}
 }
 
 // Id returns the if this token
@@ -29,12 +34,20 @@ func (t InstaToken) Id() string {
 type instaImgs []instaImg
 
 type instaImg struct {
-	Caption   string `json:"caption"`
-	MediaType string `json:"media_type"`
-	ID        string `json:"id"`
-	MediaURL  string `json:"media_url"`
-	Timestamp string `json:"timestamp"`
-	Permalink string `json:"permalink"`
+	Caption      string `json:"caption"`
+	MediaType    string `json:"media_type"`
+	ID           string `json:"id"`
+	MediaURL     string `json:"media_url"`
+	Timestamp    string `json:"timestamp"`
+	Permalink    string `json:"permalink"`
+	ThumbnailUrl string `json:"thumbnail_url"`
+}
+
+func (i instaImg) thumbnail() string {
+	if i.ThumbnailUrl == "" {
+		return i.MediaURL
+	}
+	return i.ThumbnailUrl
 }
 
 // ToImages maps this slice of instaImg to slice of Image
@@ -43,9 +56,10 @@ func (s instaImgs) ToImages(source string) []internal.DbModel {
 	var images = make([]internal.DbModel, len(s))
 
 	for i, e := range s {
+
 		images[i] = Image{
 			ID:         internal.MakeId(source, e.ID),
-			Thumbnail:  e.MediaURL,
+			Thumbnail:  e.thumbnail(),
 			Page:       e.Permalink,
 			Url:        e.MediaURL,
 			Caption:    e.Caption,
@@ -63,10 +77,10 @@ func (t InstaToken) Expired() bool {
 	return now.Equal(expireTime) || now.After(expireTime)
 }
 
-// ShouldRefresh returns true if the remaining life of the access token is less than rDuration
-func (t InstaToken) ShouldRefresh(rDuration time.Duration) bool {
+// ShouldRefresh returns true if the remaining life of the access token is less than r
+func (t InstaToken) ShouldRefresh(r time.Duration) bool {
 	var now = time.Now()
 	var expireTime = t.RefreshedAt.Add(time.Second * time.Duration(t.ExpiresIn))
 	diff := expireTime.Sub(now)
-	return diff <= rDuration
+	return diff <= r
 }

@@ -2,6 +2,7 @@ package gallery
 
 import (
 	"encoding/json"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
@@ -36,10 +37,18 @@ func (i Instagram) Cache() int {
 
 // Recursively fetch all the images
 func (i Instagram) fetchImages() []internal.DbModel {
+	token, err := i.getToken()
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't get token")
+		return nil
+	}
+
 	u, _ := url.Parse("https://graph.instagram.com/me/media")
-	u.Query().Set("fields", "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type")
-	u.Query().Set("access_token", i.getToken())
-	u.Query().Set("limit", instagramLimit)
+	q := u.Query()
+	q.Set("fields", "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type")
+	q.Set("access_token", token)
+	q.Set("limit", instagramLimit)
+	u.RawQuery = q.Encode()
 
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
@@ -64,69 +73,70 @@ func (i Instagram) fetchImages() []internal.DbModel {
 	return data.Data.ToImages(instagramKey)
 }
 
-func (i Instagram) getToken() string {
+func (i Instagram) getToken() (string, error) {
 
 	// Attempt to get token from Db
 	keys, _, err := i.Db.Retrieve(internal.DbKeys, "", math.MaxInt)
 	// If we haven't saved the token before, log an error and refresh the token we have now
-	if err != nil {
+	if err != nil || len(keys) == 0 {
+		log.Warningf("Couldn't get Keys from the db. Possible error: %v", err)
 		return i.refreshToken(i.AccessToken)
 	}
 
 	var tk models.InstaToken
 	// Get token map from keys
 	for _, m := range keys {
-		if val, ok := m[instagramKey]; ok {
-			if bytes, err := json.Marshal(val); err != nil {
+		if _, ok := m["id"]; ok && m["id"] == instagramKey {
+			if bytes, err := json.Marshal(m); err == nil {
 				json.Unmarshal(bytes, &tk)
 			}
 			break
 		}
 	}
 
+	if tk.ID == "" || tk.Value == "" {
+		return i.refreshToken(i.AccessToken)
+	}
+
 	// Check for expired token.
 	if tk.Expired() {
 		// Token has expired and it can't be refreshed. This should never happen.
-		log.Error("Instagram access token has expired")
-		return ""
+		return "", fmt.Errorf("instagram access token has expired")
 	}
 
 	// Refresh the token if need be
 	if tk.ShouldRefresh(minTokenRemainingLife) {
 		return i.refreshToken(tk.Value)
 	}
-	return tk.Value
+	return tk.Value, nil
 }
 
-func (i Instagram) refreshToken(oldToken string) string {
-
+func (i Instagram) refreshToken(oldToken string) (string, error) {
 	u, _ := url.Parse("https://graph.instagram.com/refresh_access_token")
-	u.Query().Set("grant_type", "ig_refresh_token")
-	u.Query().Set("access_token", oldToken)
+	q := u.Query()
+	q.Set("grant_type", "ig_refresh_token")
+	q.Set("access_token", oldToken)
+	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
 
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return oldToken
-	}
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return oldToken
+		return "", err
 	}
 	defer res.Body.Close()
 
-	var newT models.InstaToken
+	var newT = models.NewInstaToken(instagramKey)
 	err = json.NewDecoder(res.Body).Decode(&newT)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall refresh token response")
-		return newT.Value
+		return "", err
 	}
+
 	newT.RefreshedAt = time.Now()
 	err = i.Db.Persist(internal.DbKeys, newT)
 	if err != nil {
-		log.Errorf("Couldn't save Instagram token. Reason :: %v", err)
+		return "", err
 	}
-	return newT.Value
+
+	return newT.Value, nil
 }
