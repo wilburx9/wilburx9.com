@@ -22,7 +22,7 @@ type Medium struct {
 // Cache fetches and caches all Medium Articles
 func (m Medium) Cache() int {
 	result := m.fetchArticles()
-	err := m.Db.Persist(internal.DbArticlesKey, result)
+	err := m.Db.Persist(internal.DbArticlesKey, result...)
 	if err != nil {
 		log.Errorf("Couldn't cache Medium articles. Reason :: %v", err)
 		return 0
