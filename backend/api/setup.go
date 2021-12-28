@@ -17,6 +17,7 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 	"reflect"
+	"sync"
 	"time"
 )
 
@@ -87,15 +88,15 @@ func apiMiddleware(db internal.Database) gin.HandlerFunc {
 	}
 }
 
-// ScheduleFetchAddCache schedules fetching and caching of data from fetchers
-func ScheduleFetchAddCache(db internal.Database) {
+// ScheduleCache schedules caching of data from cachers
+func ScheduleCache(db internal.Database) {
 	if config.IsDebug() {
 		return
 	}
 
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(2).Weeks().Do(func(db internal.Database) {
-		fetchAndCache(db)
+		cacheData(db)
 	}, db)
 	s.StartAsync()
 }
@@ -118,13 +119,7 @@ func SetUpDatabase() internal.Database {
 	}
 }
 
-type result struct {
-	fetcher string
-	size    int
-}
-
-// fetchAndCache iteratively calls fetchAndCache all fetchers
-func fetchAndCache(db internal.Database) {
+func cacheData(db internal.Database) {
 	var startTime = time.Now()
 	var config = &configs.Config
 	fetcher := internal.Fetch{
@@ -139,16 +134,20 @@ func fetchAndCache(db internal.Database) {
 	github := repos.GitHub{Auth: config.GithubToken, Username: config.UnsplashUsername, Fetch: fetcher}
 
 	fetchers := [...]internal.Cacher{instagram, unsplash, medium, wordpress, github}
-	var results []result
+
+	results := make(chan result, len(fetchers))
+	var wg sync.WaitGroup
 
 	for _, f := range fetchers {
-		var result = cacheWith(f)
-		results = append(results, result)
+		wg.Add(1)
+		go cacheWith(&wg, f, results)
 	}
+	wg.Wait()
+	close(results)
 
 	buffer := &bytes.Buffer{}
-	for _, r := range results {
-		buffer.WriteString(fmt.Sprintf("	%v: %d\n", r.fetcher, r.size))
+	for  r := range results {
+		buffer.WriteString(fmt.Sprintf("	%v: %d\n", r.cacher, r.size))
 	}
 	var message = `
 	==================== Cache Result ====================
@@ -158,7 +157,14 @@ func fetchAndCache(db internal.Database) {
 	log.Tracef(message, buffer.String(), time.Since(startTime))
 }
 
-func cacheWith(cacher internal.Cacher) result {
+func cacheWith(wg *sync.WaitGroup, cacher internal.Cacher, out chan<- result) {
+	defer wg.Done()
 	size := cacher.Cache()
-	return result{fetcher: reflect.TypeOf(cacher).Name(), size: size}
+	out <- result{cacher: reflect.TypeOf(cacher).Name(), size: size}
+}
+
+
+type result struct {
+	cacher string
+	size   int
 }
