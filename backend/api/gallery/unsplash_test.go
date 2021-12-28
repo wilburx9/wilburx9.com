@@ -18,7 +18,7 @@ func TestUnsplashFetchImages(t *testing.T) {
 	var u = Unsplash{Username: "x", AccessKey: "xa", Fetch: internal.Fetch{
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header},
 	}}
-	var images = u.FetchImage([]models.Image{}, 0)
+	var images = u.FetchImages([]models.Image{}, 0)
 
 	assert.Equal(t, len(images), expectedResults)
 

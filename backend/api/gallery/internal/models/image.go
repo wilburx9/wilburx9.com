@@ -1,31 +1,23 @@
 package models
 
 import (
-	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"time"
 )
 
 // Image is a container for each object returned by Handler
 type Image struct {
-	SrcThumbnail string                 `json:"src_thumbnail"`
-	Url          string                 `json:"url"`
-	Src          string                 `json:"src"`
-	Caption      string                 `json:"caption"`
-	UploadedAt   time.Time              `json:"uploaded_at"`
-	Source       string                 `json:"source"`
-	Meta         map[string]interface{} `json:"meta"`
+	ID         string                 `json:"id" firestore:"id"`
+	Thumbnail  string                 `json:"thumbnail" firestore:"thumbnail"`
+	Page       string                 `json:"page" firestore:"page"`
+	Url        string                 `json:"url" firestore:"url"`
+	Caption    string                 `json:"caption" firestore:"caption"`
+	UploadedOn time.Time              `json:"uploaded_on" firestore:"uploaded_on"`
+	Source     string                 `json:"source" firestore:"source"`
+	Meta       map[string]interface{} `json:"meta" firestore:"meta"`
+	UpdatedAt  time.Time              `json:"updated_at" firestore:"updated_at,serverTimestamp"`
 }
 
-// ImageResult is data saved to the db and retrieved from it
-type ImageResult struct {
-	internal.Result
-	Images []Image `json:"images" firestore:"images"`
-}
-
-// EmptyResponse constructs an empty ImageResult
-func EmptyResponse() ImageResult {
-	return ImageResult{
-		Result: internal.Result{UpdatedAt: time.Now()},
-		Images: []Image{},
-	}
+// Id returns the if this Image
+func (i Image) Id() string {
+	return i.ID
 }

@@ -18,6 +18,7 @@ type Repo struct {
 	Languages   []language `json:"languages" firestore:"languages"`
 	Score       int        `json:"score" firestore:"score"`
 	UpdatedAt   time.Time  `json:"updated_at" firestore:"updated_at,serverTimestamp"`
+	Source      string     `json:"source" firestore:"source"`
 }
 
 // Id returns the if this Repo
