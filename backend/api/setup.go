@@ -40,6 +40,11 @@ func SetUpServer(db internal.Database) *http.Server {
 	// Attach API middleware
 	router.Use(apiMiddleware(db))
 
+	// Attach recovery middleware
+	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, internal.MakeErrorResponse("Something went wrong"))
+	}))
+
 	if config.IsDebug() {
 		// Enable CORS support
 		corsConfig := cors.DefaultConfig()
@@ -82,15 +87,15 @@ func apiMiddleware(db internal.Database) gin.HandlerFunc {
 	}
 }
 
-// ScheduleFetchAddCache schedules fetching and caching of data from fetchers
-func ScheduleFetchAddCache(db internal.Database) {
+// ScheduleCache schedules caching of data from cachers
+func ScheduleCache(db internal.Database) {
 	if config.IsDebug() {
 		return
 	}
 
 	s := gocron.NewScheduler(time.UTC)
 	s.Every(2).Weeks().Do(func(db internal.Database) {
-		fetchAndCache(db)
+		cacheData(db)
 	}, db)
 	s.StartAsync()
 }
@@ -113,13 +118,7 @@ func SetUpDatabase() internal.Database {
 	}
 }
 
-type result struct {
-	fetcher string
-	size    int
-}
-
-// fetchAndCache iteratively calls fetchAndCache all fetchers
-func fetchAndCache(db internal.Database) {
+func cacheData(db internal.Database) {
 	var startTime = time.Now()
 	var config = &configs.Config
 	fetcher := internal.Fetch{
@@ -133,11 +132,11 @@ func fetchAndCache(db internal.Database) {
 	wordpress := articles.WordPress{URL: config.WPUrl, Fetch: fetcher}
 	github := repos.GitHub{Auth: config.GithubToken, Username: config.UnsplashUsername, Fetch: fetcher}
 
-	fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress, github}
+	fetchers := [...]internal.Cacher{instagram, unsplash, medium, wordpress, github}
 	var results []result
 
 	for _, f := range fetchers {
-		var result = fetchAndCacheFetcher(f)
+		var result = cacheWith(f)
 		results = append(results, result)
 	}
 
@@ -153,7 +152,12 @@ func fetchAndCache(db internal.Database) {
 	log.Tracef(message, buffer.String(), time.Since(startTime))
 }
 
-func fetchAndCacheFetcher(fetcher internal.Fetcher) result {
-	size := fetcher.FetchAndCache()
-	return result{fetcher: reflect.TypeOf(fetcher).Name(), size: size}
+func cacheWith(cacher internal.Cacher) result {
+	size := cacher.Cache()
+	return result{fetcher: reflect.TypeOf(cacher).Name(), size: size}
+}
+
+type result struct {
+	fetcher string
+	size    int
 }

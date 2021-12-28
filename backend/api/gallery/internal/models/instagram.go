@@ -15,35 +15,56 @@ type InstaImg struct {
 
 // InstaToken is container for Instagram token data
 type InstaToken struct {
-	Value       string    `json:"access_token" firestore:"value"`
+	ID          string    `json:"id" firestore:"id"`
+	Value       string    `json:"access_token" firestore:"access_token"`
 	ExpiresIn   int64     `json:"expires_in" firestore:"expires_in"`
 	RefreshedAt time.Time `json:"refreshed_at" firestore:"refreshed_at"`
+}
+
+// NewInstaToken returns a pointer to an InstaToken that's empty except for the id
+func NewInstaToken(id string) *InstaToken {
+	return &InstaToken{ID: id}
+}
+
+// Id returns the if this token
+func (t InstaToken) Id() string {
+	return t.ID
 }
 
 type instaImgs []instaImg
 
 type instaImg struct {
-	Caption   string `json:"caption"`
-	MediaType string `json:"media_type"`
-	ID        string `json:"id"`
-	MediaURL  string `json:"media_url"`
-	Timestamp string `json:"timestamp"`
-	Permalink string `json:"permalink"`
+	Caption      string `json:"caption"`
+	MediaType    string `json:"media_type"`
+	ID           string `json:"id"`
+	MediaURL     string `json:"media_url"`
+	Timestamp    string `json:"timestamp"`
+	Permalink    string `json:"permalink"`
+	ThumbnailUrl string `json:"thumbnail_url"`
+}
+
+func (i instaImg) thumbnail() string {
+	if i.ThumbnailUrl == "" {
+		return i.MediaURL
+	}
+	return i.ThumbnailUrl
 }
 
 // ToImages maps this slice of instaImg to slice of Image
-func (s instaImgs) ToImages() []Image {
+func (s instaImgs) ToImages(source string) []internal.DbModel {
 	var timeLayout = "2006-01-02T15:04:05-0700"
-	var images = make([]Image, len(s))
+	var images = make([]internal.DbModel, len(s))
 
 	for i, e := range s {
+
 		images[i] = Image{
-			SrcThumbnail: e.MediaURL,
-			Src:          e.MediaURL,
-			Url:          e.Permalink,
-			Caption:      e.Caption,
-			UploadedAt:   internal.StringToTime(timeLayout, e.Timestamp),
-			Source:       "Instagram",
+			ID:         internal.MakeId(source, e.ID),
+			Thumbnail:  e.thumbnail(),
+			Page:       e.Permalink,
+			Url:        e.MediaURL,
+			Caption:    e.Caption,
+			UploadedOn: internal.StringToTime(timeLayout, e.Timestamp),
+			Source:     source,
 		}
 	}
 	return images
@@ -56,10 +77,10 @@ func (t InstaToken) Expired() bool {
 	return now.Equal(expireTime) || now.After(expireTime)
 }
 
-// ShouldRefresh returns true if the remaining life of the access token is less than rDuration
-func (t InstaToken) ShouldRefresh(rDuration time.Duration) bool {
+// IsAboutToExpire returns true if the remaining life of the access token is less than r
+func (t InstaToken) IsAboutToExpire(r time.Duration) bool {
 	var now = time.Now()
 	var expireTime = t.RefreshedAt.Add(time.Second * time.Duration(t.ExpiresIn))
 	diff := expireTime.Sub(now)
-	return diff <= rDuration
+	return diff <= r
 }

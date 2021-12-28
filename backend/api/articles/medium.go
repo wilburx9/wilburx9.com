@@ -19,31 +19,30 @@ type Medium struct {
 	internal.Fetch
 }
 
-// FetchAndCache fetches and caches all Medium Articles
-func (m Medium) FetchAndCache() int {
+// Cache fetches and caches all Medium Articles
+func (m Medium) Cache() int {
 	result := m.fetchArticles()
-	m.Db.Persist(internal.DbArticlesKey, mediumKey, result)
-	return len(result.Articles)
-}
-
-// GetCached returns cached Medium articles
-func (m Medium) GetCached(result interface{}) error {
-	return m.Db.Retrieve(internal.DbArticlesKey, mediumKey, result)
+	err := m.Db.Persist(internal.DbArticlesKey, result...)
+	if err != nil {
+		log.Errorf("Couldn't cache Medium articles. Reason :: %v", err)
+		return 0
+	}
+	return len(result)
 }
 
 // fetchArticles fetches articles via HTTP
-func (m Medium) fetchArticles() models.ArticleResult {
+func (m Medium) fetchArticles() []internal.DbModel {
 	url := fmt.Sprintf("https://medium.com/feed/%s", m.Name)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return models.EmptyResponse()
+		return nil
 	}
 
 	res, err := m.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return models.EmptyResponse()
+		return nil
 	}
 	defer res.Body.Close()
 
@@ -51,7 +50,7 @@ func (m Medium) fetchArticles() models.ArticleResult {
 	err = xml.NewDecoder(res.Body).Decode(&rss)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return models.EmptyResponse()
+		return nil
 	}
-	return rss.ToResult()
+	return rss.ToResult(mediumKey)
 }
