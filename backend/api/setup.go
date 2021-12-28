@@ -17,7 +17,6 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
 	"reflect"
-	"sync"
 	"time"
 )
 
@@ -134,20 +133,16 @@ func cacheData(db internal.Database) {
 	github := repos.GitHub{Auth: config.GithubToken, Username: config.UnsplashUsername, Fetch: fetcher}
 
 	fetchers := [...]internal.Cacher{instagram, unsplash, medium, wordpress, github}
-
-	results := make(chan result, len(fetchers))
-	var wg sync.WaitGroup
+	var results []result
 
 	for _, f := range fetchers {
-		wg.Add(1)
-		go cacheWith(&wg, f, results)
+		var result = cacheWith(f)
+		results = append(results, result)
 	}
-	wg.Wait()
-	close(results)
 
 	buffer := &bytes.Buffer{}
-	for  r := range results {
-		buffer.WriteString(fmt.Sprintf("	%v: %d\n", r.cacher, r.size))
+	for _, r := range results {
+		buffer.WriteString(fmt.Sprintf("	%v: %d\n", r.fetcher, r.size))
 	}
 	var message = `
 	==================== Cache Result ====================
@@ -157,14 +152,12 @@ func cacheData(db internal.Database) {
 	log.Tracef(message, buffer.String(), time.Since(startTime))
 }
 
-func cacheWith(wg *sync.WaitGroup, cacher internal.Cacher, out chan<- result) {
-	defer wg.Done()
+func cacheWith(cacher internal.Cacher) result {
 	size := cacher.Cache()
-	out <- result{cacher: reflect.TypeOf(cacher).Name(), size: size}
+	return result{fetcher: reflect.TypeOf(cacher).Name(), size: size}
 }
 
-
 type result struct {
-	cacher string
-	size   int
+	fetcher string
+	size    int
 }
