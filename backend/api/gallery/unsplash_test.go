@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/update"
 	"net/http"
 	"strconv"
 	"testing"
@@ -15,7 +16,7 @@ func TestUnsplashFetchImages(t *testing.T) {
 	var header = http.Header{}
 	header.Add("X-Total", strconv.Itoa(expectedResults))
 
-	var u = Unsplash{Username: "x", AccessKey: "xa", Fetch: internal.Fetch{
+	var u = Unsplash{Username: "x", AccessKey: "xa", BaseCache: update.BaseCache{
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header},
 	}}
 	var images = u.FetchImages()
