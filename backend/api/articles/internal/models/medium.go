@@ -7,6 +7,7 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
+	h "html"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -31,23 +32,22 @@ type Rss struct {
 }
 
 // ToResult creates ArticleResult by mapping Rss to a slice of Article
-func (r Rss) ToResult() ArticleResult {
-	var articles = make([]Article, len(r.Channel.Item))
+func (r Rss) ToResult(source string) []internal.DbModel {
+	var articles = make([]internal.DbModel, len(r.Channel.Item))
 	for i, e := range r.Channel.Item {
 		thumbnail, excerpt := getMediumThumbAndExcerpt(e.Encoded)
 		articles[i] = Article{
-			Title:     e.Title,
-			Url:       e.Link,
+			ID:        internal.MakeId(source, e.PubDate),
+			Title:     h.UnescapeString(e.Title),
 			Thumbnail: thumbnail,
-			PostedAt:  internal.StringToTime(time.RFC1123, e.PubDate),
-			UpdatedAt: internal.StringToTime(time.RFC3339, e.Updated),
-			Excerpt:   fmt.Sprintf("%v..", excerpt),
+			Url:       e.Link,
+			PostedOn:  internal.StringToTime(time.RFC1123, e.PubDate),
+			UpdatedOn: internal.StringToTime(time.RFC3339, e.Updated),
+			Excerpt:   fmt.Sprintf("%v..", h.UnescapeString(excerpt)),
+			Source:    source,
 		}
 	}
-	return ArticleResult{
-		Result:   internal.Result{UpdatedAt: time.Now()},
-		Articles: articles,
-	}
+	return articles
 }
 
 func getMediumThumbAndExcerpt(content string) (thumbnail string, excerpt string) {
