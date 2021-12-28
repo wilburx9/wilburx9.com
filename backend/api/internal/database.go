@@ -28,7 +28,7 @@ type UpdatedAt struct {
 
 // Database is the interface that wraps basic functions for saving anf retrieving data from concrete databases
 type Database interface {
-	Persist(source string, data []DbModel) error
+	Persist(source string, data ...DbModel) error
 	Retrieve(source, orderBy string, limit int) ([]map[string]interface{}, UpdatedAt, error)
 	Close()
 }
@@ -51,7 +51,7 @@ func (f FirebaseFirestore) Close() {
 }
 
 // Persist saves the data to Firebase Firestore
-func (f FirebaseFirestore) Persist(source string, data []DbModel) error {
+func (f FirebaseFirestore) Persist(source string, data ...DbModel) error {
 	if len(data) == 0 {
 		return fmt.Errorf("data is empty")
 	}
@@ -74,7 +74,15 @@ func (f FirebaseFirestore) Persist(source string, data []DbModel) error {
 // Retrieve gets the data saved to Firebase Firestore
 func (f FirebaseFirestore) Retrieve(source, orderBy string, limit int) ([]map[string]interface{}, UpdatedAt, error) {
 	var data []map[string]interface{}
-	iter := f.Client.Collection(source).OrderBy(orderBy, firestore.Desc).Limit(limit).Documents(f.Ctx)
+	q := f.Client.Collection(source).Query
+	if orderBy != "" {
+		q = q.OrderBy(orderBy, firestore.Desc)
+	}
+	if limit != 0 {
+		q = q.Limit(limit)
+	}
+
+	iter := q.Documents(f.Ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -96,7 +104,7 @@ func (f FirebaseFirestore) Retrieve(source, orderBy string, limit int) ([]map[st
 }
 
 // Persist saves the data to a local .json file
-func (l LocalDatabase) Persist(source string, data []DbModel) error {
+func (l LocalDatabase) Persist(source string, data ...DbModel) error {
 	currentData, path, _ := l.retrieve(source)
 
 	for _, model := range data {

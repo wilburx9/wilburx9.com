@@ -21,7 +21,7 @@ type WordPress struct {
 // Cache fetches and caches WordPress articles
 func (w WordPress) Cache() int {
 	result := w.fetchArticles()
-	err := w.Db.Persist(internal.DbArticlesKey, result)
+	err := w.Db.Persist(internal.DbArticlesKey, result...)
 	if err != nil {
 		log.Errorf("Couldn't cache Wordpress articles. Reason :: %v", err)
 		return 0

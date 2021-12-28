@@ -15,9 +15,15 @@ type InstaImg struct {
 
 // InstaToken is container for Instagram token data
 type InstaToken struct {
+	ID          string    `json:"id" firestore:"id"`
 	Value       string    `json:"access_token" firestore:"value"`
 	ExpiresIn   int64     `json:"expires_in" firestore:"expires_in"`
 	RefreshedAt time.Time `json:"refreshed_at" firestore:"refreshed_at"`
+}
+
+// Id returns the if this token
+func (t InstaToken) Id() string {
+	return t.ID
 }
 
 type instaImgs []instaImg
@@ -32,18 +38,19 @@ type instaImg struct {
 }
 
 // ToImages maps this slice of instaImg to slice of Image
-func (s instaImgs) ToImages() []Image {
+func (s instaImgs) ToImages(source string) []internal.DbModel {
 	var timeLayout = "2006-01-02T15:04:05-0700"
-	var images = make([]Image, len(s))
+	var images = make([]internal.DbModel, len(s))
 
 	for i, e := range s {
 		images[i] = Image{
+			ID:         internal.MakeId(source, e.ID),
 			Thumbnail:  e.MediaURL,
-			Url:        e.MediaURL,
 			Page:       e.Permalink,
+			Url:        e.MediaURL,
 			Caption:    e.Caption,
 			UploadedOn: internal.StringToTime(timeLayout, e.Timestamp),
-			Source:     "Instagram",
+			Source:     source,
 		}
 	}
 	return images

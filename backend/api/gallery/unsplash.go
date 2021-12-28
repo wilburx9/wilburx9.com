@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	unsplashKey = "unsplash"
-	limit       = 20
+	unsplashKey   = "unsplash"
+	unsplashLimit = 20
 )
 
 // Unsplash handles fetching and caching of data from Unsplash. And also returning the cached data
@@ -24,7 +24,7 @@ type Unsplash struct {
 // Cache fetches and caches Unsplash images to db
 func (u Unsplash) Cache() int {
 	result := u.FetchImages()
-	err := u.Db.Persist(internal.DbGalleryKey, result)
+	err := u.Db.Persist(internal.DbGalleryKey, result...)
 	if err != nil {
 		log.Errorf("Couldn't cache Unsplash images. Reason :: %v", err)
 		return 0
@@ -34,7 +34,7 @@ func (u Unsplash) Cache() int {
 
 // FetchImages fetches images via HTTP
 func (u Unsplash) FetchImages() []internal.DbModel {
-	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?per_page=%v", u.Username, limit)
+	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?per_page=%v", u.Username, unsplashLimit)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")

@@ -30,7 +30,7 @@ type GitHub struct {
 // Cache fetches and saves GitHub repositories to DB
 func (g GitHub) Cache() int {
 	result := g.fetchRepos()
-	err := g.Db.Persist(internal.DbReposKey, result)
+	err := g.Db.Persist(internal.DbReposKey, result...)
 	if err != nil {
 		log.Errorf("Couldn't cache Github repos. Reason :: %v", err)
 		return 0
