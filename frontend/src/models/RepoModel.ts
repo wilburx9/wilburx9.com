@@ -4,6 +4,7 @@ export interface RepoResponse {
 }
 
 export interface RepoModel {
+  id: string;
   name: string;
   stars: number;
   forks: number;
@@ -13,6 +14,7 @@ export interface RepoModel {
   updatedAt: Date;
   license?: null | string;
   languages: Language[];
+  source: string;
 }
 
 export interface Language {
