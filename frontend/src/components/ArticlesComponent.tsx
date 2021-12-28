@@ -20,7 +20,7 @@ export const ArticlesComponent = () => {
     <VStack align='start'>
       <Heading pt={2} size='xl' align="start" fontWeight="black">&#47;&#47; Articles</Heading>
       <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
-        {articles.map((article) => <ArticleComponent {...article} key={article.title}/>)}
+        {articles.map((article) => <ArticleComponent {...article} key={article.id}/>)}
       </SimpleGrid>
     </VStack>
   )
