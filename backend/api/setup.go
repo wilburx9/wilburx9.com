@@ -40,6 +40,11 @@ func SetUpServer(db internal.Database) *http.Server {
 	// Attach API middleware
 	router.Use(apiMiddleware(db))
 
+	// Attach recovery middleware
+	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, internal.MakeErrorResponse("Something went wrong"))
+	}))
+
 	if config.IsDebug() {
 		// Enable CORS support
 		corsConfig := cors.DefaultConfig()
