@@ -26,11 +26,10 @@ type UpdatedAt struct {
 	T time.Time `firestore:"updated_at,serverTimestamp"`
 }
 
-
 // Database is the interface that wraps basic functions for saving anf retrieving data from concrete databases
 type Database interface {
 	Persist(source string, data []DbModel) error
-	Retrieve(source string, orderBy string) ([]map[string]interface{}, UpdatedAt, error)
+	Retrieve(source, orderBy string, limit int) ([]map[string]interface{}, UpdatedAt, error)
 	Close()
 }
 
@@ -73,9 +72,9 @@ func (f FirebaseFirestore) Persist(source string, data []DbModel) error {
 }
 
 // Retrieve gets the data saved to Firebase Firestore
-func (f FirebaseFirestore) Retrieve(source string, orderBy string) ([]map[string]interface{}, UpdatedAt, error) {
+func (f FirebaseFirestore) Retrieve(source, orderBy string, limit int) ([]map[string]interface{}, UpdatedAt, error) {
 	var data []map[string]interface{}
-	iter := f.Client.Collection(source).OrderBy(orderBy, firestore.Desc).Documents(f.Ctx)
+	iter := f.Client.Collection(source).OrderBy(orderBy, firestore.Desc).Limit(limit).Documents(f.Ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -124,7 +123,7 @@ func (l LocalDatabase) Persist(source string, data []DbModel) error {
 }
 
 // Retrieve gets the data saved to a local .json file. The results are  not ordered
-func (l LocalDatabase) Retrieve(source string, _ string) ([]map[string]interface{}, UpdatedAt, error) {
+func (l LocalDatabase) Retrieve(source, _ string, limit int) ([]map[string]interface{}, UpdatedAt, error) {
 	result, _, err := l.retrieve(source)
 	if err != nil {
 		return nil, UpdatedAt{}, err
@@ -133,6 +132,10 @@ func (l LocalDatabase) Retrieve(source string, _ string) ([]map[string]interface
 	var data []map[string]interface{}
 	for _, m := range result {
 		data = append(data, m)
+	}
+
+	if limit < len(data) {
+		data = data[:limit]
 	}
 
 	updatedAt, err := l.retrieveUpdatedTime(source)
