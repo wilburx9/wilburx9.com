@@ -18,15 +18,15 @@ func TestUnsplashFetchImages(t *testing.T) {
 	var u = Unsplash{Username: "x", AccessKey: "xa", Fetch: internal.Fetch{
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header},
 	}}
-	var images = u.FetchImages([]models.Image{}, 0)
+	var images = u.FetchImages()
 
 	assert.Equal(t, len(images), expectedResults)
 
-	first := images[0]
-	assert.Equal(t, first.Src, "https://images.unsplash.com/photo-56789-098yhj?crop=entropy&cs=srgb&fm=jpg&ixid=OIFGHJIUGGH=rb-1.2.1&q=85")
-	assert.Equal(t, first.Url, "https://unsplash.com/photos/blah_blah")
+	first := images[0].(models.Image)
+	assert.Equal(t, first.Url, "https://images.unsplash.com/photo-56789-098yhj?crop=entropy&cs=srgb&fm=jpg&ixid=OIFGHJIUGGH=rb-1.2.1&q=85")
+	assert.Equal(t, first.Page, "https://unsplash.com/photos/blah_blah")
 	assert.Equal(t, first.Caption, "ABC")
-	assert.NotEqual(t, first.UploadedAt.Year(), time.Now().Year())
+	assert.NotEqual(t, first.UploadedOn.Year(), time.Now().Year())
 
 	user, ok := first.Meta["user"].(models.User)
 	if assert.True(t, ok) {

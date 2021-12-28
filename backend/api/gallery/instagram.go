@@ -105,7 +105,7 @@ func (i Instagram) getToken() (string, error) {
 	}
 
 	// Refresh the token if need be
-	if tk.ShouldRefresh(minTokenRemainingLife) {
+	if tk.IsAboutToExpire(minTokenRemainingLife) {
 		return i.refreshToken(tk.Value)
 	}
 	return tk.Value, nil

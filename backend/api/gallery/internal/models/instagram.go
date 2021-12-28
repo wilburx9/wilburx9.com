@@ -77,8 +77,8 @@ func (t InstaToken) Expired() bool {
 	return now.Equal(expireTime) || now.After(expireTime)
 }
 
-// ShouldRefresh returns true if the remaining life of the access token is less than r
-func (t InstaToken) ShouldRefresh(r time.Duration) bool {
+// IsAboutToExpire returns true if the remaining life of the access token is less than r
+func (t InstaToken) IsAboutToExpire(r time.Duration) bool {
 	var now = time.Now()
 	var expireTime = t.RefreshedAt.Add(time.Second * time.Duration(t.ExpiresIn))
 	diff := expireTime.Sub(now)
