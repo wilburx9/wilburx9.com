@@ -133,11 +133,11 @@ func fetchAndCache(db internal.Database) {
 	wordpress := articles.WordPress{URL: config.WPUrl, Fetch: fetcher}
 	github := repos.GitHub{Auth: config.GithubToken, Username: config.UnsplashUsername, Fetch: fetcher}
 
-	fetchers := [...]internal.Fetcher{instagram, unsplash, medium, wordpress, github}
+	fetchers := [...]internal.Cacher{instagram, unsplash, medium, wordpress, github}
 	var results []result
 
 	for _, f := range fetchers {
-		var result = fetchAndCacheFetcher(f)
+		var result = cacheWith(f)
 		results = append(results, result)
 	}
 
@@ -153,7 +153,7 @@ func fetchAndCache(db internal.Database) {
 	log.Tracef(message, buffer.String(), time.Since(startTime))
 }
 
-func fetchAndCacheFetcher(fetcher internal.Fetcher) result {
-	size := fetcher.FetchAndCache()
-	return result{fetcher: reflect.TypeOf(fetcher).Name(), size: size}
+func cacheWith(cacher internal.Cacher) result {
+	size := cacher.Cache()
+	return result{fetcher: reflect.TypeOf(cacher).Name(), size: size}
 }
