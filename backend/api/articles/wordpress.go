@@ -18,30 +18,29 @@ type WordPress struct {
 	internal.Fetch
 }
 
-// FetchAndCache fetches and caches WordPress articles
-func (w WordPress) FetchAndCache() int {
+// Cache fetches and caches WordPress articles
+func (w WordPress) Cache() int {
 	result := w.fetchArticles()
-	w.Db.Persist(internal.DbArticlesKey, wordpressKey, result)
-	return len(result.Articles)
-}
-
-// GetCached returns cached WordPress articles
-func (w WordPress) GetCached(result interface{}) error {
-	return w.Db.Retrieve(internal.DbArticlesKey, wordpressKey, result)
+	err := w.Db.Persist(internal.DbArticlesKey, result...)
+	if err != nil {
+		log.Errorf("Couldn't cache Wordpress articles. Reason :: %v", err)
+		return 0
+	}
+	return len(result)
 }
 
 // fetchArticles gets articles from WordPress via HTTP
-func (w WordPress) fetchArticles() models.ArticleResult {
+func (w WordPress) fetchArticles() []internal.DbModel {
 	req, err := http.NewRequest(http.MethodGet, w.URL, nil)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return models.EmptyResponse()
+		return nil
 	}
 
 	res, err := w.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return models.EmptyResponse()
+		return nil
 	}
 	defer res.Body.Close()
 
@@ -49,7 +48,7 @@ func (w WordPress) fetchArticles() models.ArticleResult {
 	err = json.NewDecoder(res.Body).Decode(&posts)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return models.EmptyResponse()
+		return nil
 	}
-	return posts.ToResult()
+	return posts.ToResult(wordpressKey)
 }

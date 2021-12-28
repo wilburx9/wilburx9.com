@@ -6,8 +6,7 @@ type Fetch struct {
 	HttpClient HttpClient
 }
 
-// Fetcher is an interface implemented all data fetchers
-type Fetcher interface {
-	FetchAndCache() int
-	GetCached(result interface{}) error
+// Cacher is an interface that wraps functions for saving data to the db
+type Cacher interface {
+	Cache() int
 }

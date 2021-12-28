@@ -12,11 +12,11 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import {Form, Formik, Field, FormikHelpers} from 'formik';
 import * as Yup from 'yup';
 import {DataContext} from "../DataProvider";
-import {ContactData} from "../models/ContactModel";
+import {ContactData} from "./ContactModel";
 import {getAnalyticsParams, logAnalyticsEvent} from "../analytics/firebase";
 import {AnalyticsEvent} from "../analytics/events";
 import {AnalyticsKey} from "../analytics/keys";
-import {getInputFilledStyle} from "../theme";
+import {getInputFilledStyle} from "../theme/theme";
 
 export const ContactComponent = () => {
   const {postEmail} = useContext(DataContext)
@@ -68,9 +68,9 @@ export const ContactComponent = () => {
     }
   }
 
-  return <Box mt={4} my={6} py={6} px={{base: 5, md: 6, lg: 20}} borderRadius='xl'
+  return <Box mt={16} mb={6} py={6} px={{base: 5, md: 6, lg: 20}} borderRadius='xl'
               bg={isLightMode ? 'gray.50' : 'gray.900'}>
-    <Heading mb={6} size='lg' align="start">&#47;&#47;Let's work together</Heading>
+    <Heading mb={6} size='lg' align="start">&#47;&#47; Let's work together</Heading>
     <Formik<FormData>
       initialValues={{name: '', email: '', subject: '', message: ''}}
       onSubmit={(values, actions) => onFormSubmit(values, actions)}
