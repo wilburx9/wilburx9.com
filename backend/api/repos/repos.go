@@ -16,13 +16,12 @@ func Handler(c *gin.Context) {
 	db := c.MustGet(internal.Db).(internal.Database)
 
 	limit, err := getLimit(c.DefaultQuery("size", strconv.FormatInt(defaultLimit, 10)))
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, internal.MakeErrorResponse(err))
 		return
 	}
 
-	repos, updatedAt, err := db.Retrieve(internal.DbReposKey, "score", limit)
+	repos, at, err := db.Retrieve(internal.DbReposKey, "score", limit)
 
 	if err != nil && len(repos) == 0 {
 		c.JSON(http.StatusInternalServerError, internal.MakeErrorResponse(repos))
@@ -30,7 +29,7 @@ func Handler(c *gin.Context) {
 		return
 	}
 
-	c.Writer.Header().Set("Cache-Control", internal.GetCacheControl(updatedAt.T))
+	c.Writer.Header().Set("Cache-Control", internal.GetCacheControl(at.T))
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse(repos))
 }
 
