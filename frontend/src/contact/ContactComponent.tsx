@@ -12,11 +12,11 @@ import HCaptcha from '@hcaptcha/react-hcaptcha';
 import {Form, Formik, Field, FormikHelpers} from 'formik';
 import * as Yup from 'yup';
 import {DataContext} from "../DataProvider";
-import {ContactData} from "../models/ContactModel";
+import {ContactData} from "./ContactModel";
 import {getAnalyticsParams, logAnalyticsEvent} from "../analytics/firebase";
 import {AnalyticsEvent} from "../analytics/events";
 import {AnalyticsKey} from "../analytics/keys";
-import {getInputFilledStyle} from "../theme";
+import {getInputFilledStyle} from "../theme/theme";
 
 export const ContactComponent = () => {
   const {postEmail} = useContext(DataContext)

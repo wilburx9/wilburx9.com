@@ -12,7 +12,7 @@ import {
   useColorModeValue,
   VStack
 } from "@chakra-ui/react";
-import {Language, RepoModel} from "../models/RepoModel";
+import {Language, RepoModel} from "./RepoModel";
 import {
   AiFillStar,
   CgGitFork, DiCss3,

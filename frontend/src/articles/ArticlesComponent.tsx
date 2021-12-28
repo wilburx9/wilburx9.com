@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import React, {useContext} from "react";
 import {DataContext} from "../DataProvider";
-import {ArticleModel} from "../models/ArticleModel";
+import {ArticleModel} from "./ArticleModel";
 import {HiArrowRight} from "react-icons/hi";
 
 export const ArticlesComponent = () => {
