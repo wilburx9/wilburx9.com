@@ -38,12 +38,12 @@ func (s instaImgs) ToImages() []Image {
 
 	for i, e := range s {
 		images[i] = Image{
-			SrcThumbnail: e.MediaURL,
-			Src:          e.MediaURL,
-			Url:          e.Permalink,
-			Caption:      e.Caption,
-			UploadedAt:   internal.StringToTime(timeLayout, e.Timestamp),
-			Source:       "Instagram",
+			Thumbnail:  e.MediaURL,
+			Url:        e.MediaURL,
+			Page:       e.Permalink,
+			Caption:    e.Caption,
+			UploadedOn: internal.StringToTime(timeLayout, e.Timestamp),
+			Source:     "Instagram",
 		}
 	}
 	return images

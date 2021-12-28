@@ -91,6 +91,7 @@ func (m GitHub) ToResult(source string) []internal.DbModel {
 			License:     getLicense(node),
 			Languages:   mapLanguages(node),
 			Score:       node.StargazerCount + node.ForkCount,
+			Source:      source,
 		}
 	}
 	return repos

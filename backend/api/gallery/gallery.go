@@ -42,7 +42,7 @@ func Handler(c *gin.Context) {
 
 	// Sort in descending date (i.e. the most recent dates first)
 	sort.Slice(images, func(i, j int) bool {
-		return images[i].UploadedAt.After(images[j].UploadedAt)
+		return images[i].UploadedOn.After(images[j].UploadedOn)
 	})
 
 	c.Writer.Header().Set("Cache-Control", internal.AverageCacheControl(updatedAts))
