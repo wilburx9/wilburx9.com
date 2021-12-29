@@ -1,9 +1,11 @@
 package update
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles"
+	"github.com/wilburt/wilburx9.dev/backend/api/email"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
@@ -36,11 +38,41 @@ func Handler(c *gin.Context, h internal.HttpClient) {
 	if cap(cachers) == 0 {
 		SetUp(h, db)
 	}
-	result := updateCache()
-	c.JSON(http.StatusOK, internal.MakeSuccessResponse(result))
+	results, duration := updateCache()
+
+	err := email.Send(generateEmail(results, duration), h)
+
+	data := map[string]interface{}{
+		"results":              results,
+		"duration":             duration,
+		"email_report_success": err == nil,
+	}
+	c.JSON(http.StatusOK, internal.MakeSuccessResponse(data))
 }
 
-func updateCache() map[string]interface{} {
+func generateEmail(results []result, duration string) email.Data {
+	buffer := &bytes.Buffer{}
+	for _, r := range results {
+		buffer.WriteString(fmt.Sprintln("\n", "-----------------"))
+		buffer.WriteString(r.Cacher)
+		buffer.WriteString(fmt.Sprintln("\n", "-----------------"))
+
+		buffer.WriteString(fmt.Sprintln("Size:", r.Size))
+		if r.Error != nil {
+			buffer.WriteString(fmt.Sprintln("Error:", r.Error.Message))
+		}
+	}
+	buffer.WriteString(fmt.Sprintln("\n", "Total duration:", duration))
+
+	return email.Data{
+		SenderEmail: configs.Config.EmailReceiver,
+		SenderName:  "Jesse Bruce Pinkman",
+		Subject:     "Batch cache update report!",
+		Message:     buffer.String(),
+	}
+}
+
+func updateCache() ([]result, string) {
 	var startTime = time.Now()
 
 	rc := make(chan result, len(cachers))
@@ -76,8 +108,5 @@ func updateCache() map[string]interface{} {
 		rs = append(rs, r)
 	}
 
-	return map[string]interface{}{
-		"results":  rs,
-		"duration": fmt.Sprintf("%v milliseconds", time.Since(startTime).Milliseconds()),
-	}
+	return rs, fmt.Sprintf("%v milliseconds", time.Since(startTime).Milliseconds())
 }

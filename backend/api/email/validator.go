@@ -1,4 +1,4 @@
-package contact
+package email
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func validateData(data requestData) string {
+func validateData(data Data) string {
 	message := ""
 	_, err := mail.ParseAddress(data.SenderEmail)
 	switch {

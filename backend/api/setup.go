@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles"
-	"github.com/wilburt/wilburx9.dev/backend/api/contact"
+	"github.com/wilburt/wilburx9.dev/backend/api/email"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
@@ -59,7 +59,7 @@ func SetUpServer(db database.ReadWrite) *http.Server {
 	api.GET("/gallery", gallery.Handler)
 	api.GET("/repos", repos.Handler)
 	api.POST("/cache", func(c *gin.Context) { update.Handler(c, httpClient) })
-	api.POST("/contact", func(c *gin.Context) { contact.Handler(c, httpClient) })
+	api.POST("/contact", func(c *gin.Context) { email.Handler(c, httpClient) })
 
 	// Start Http server
 	s := &http.Server{Addr: fmt.Sprintf(":%s", configs.Config.Port), Handler: router}
