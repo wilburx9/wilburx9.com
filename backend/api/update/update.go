@@ -67,7 +67,7 @@ func generateEmail(results []result, duration string) email.Data {
 	return email.Data{
 		SenderEmail: configs.Config.EmailReceiver,
 		SenderName:  "Jesse Bruce Pinkman",
-		Subject:     "Batch cache update report!",
+		Subject:     "Yo! Batch cache update report!",
 		Message:     buffer.String(),
 	}
 }
