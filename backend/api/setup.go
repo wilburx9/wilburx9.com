@@ -58,8 +58,11 @@ func SetUpServer(db database.ReadWrite) *http.Server {
 	api.GET("/articles", articles.Handler)
 	api.GET("/gallery", gallery.Handler)
 	api.GET("/repos", repos.Handler)
-	api.POST("/cache", func(c *gin.Context) { update.Handler(c, httpClient) })
 	api.POST("/contact", func(c *gin.Context) { email.Handler(c, httpClient) })
+
+	auth := api.Group("/protected")
+	auth.Use(internal.AuthMiddleware())
+	auth.POST("/cache", func(c *gin.Context) { update.Handler(c, httpClient) })
 
 	// Start Http server
 	s := &http.Server{Addr: fmt.Sprintf(":%s", configs.Config.Port), Handler: router}
