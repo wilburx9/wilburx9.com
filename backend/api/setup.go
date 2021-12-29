@@ -11,6 +11,7 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/api/contact"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos"
 	"github.com/wilburt/wilburx9.dev/backend/api/update"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
@@ -23,7 +24,7 @@ func LoadConfig() error {
 }
 
 // SetUpServer sets the Http Server. Call SetUpLogrus before this.
-func SetUpServer(db internal.Database) *http.Server {
+func SetUpServer(db database.ReadWrite) *http.Server {
 	gin.ForceConsoleColor()
 	gin.SetMode(configs.Config.Env)
 	router := gin.Default()
@@ -78,7 +79,7 @@ func SetUpLogrus() {
 }
 
 // ApiMiddleware adds custom params to request contexts
-func apiMiddleware(db internal.Database) gin.HandlerFunc {
+func apiMiddleware(db database.ReadWrite) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set(internal.Db, db)
 		c.Next()
@@ -86,7 +87,7 @@ func apiMiddleware(db internal.Database) gin.HandlerFunc {
 }
 
 // SetUpDatabase sets up Firebase Firestore in release  and a local db in debug
-func SetUpDatabase() internal.Database {
+func SetUpDatabase() database.ReadWrite {
 	if configs.Config.IsRelease() {
 		ctx := context.Background()
 		projectId := configs.Config.GcpProjectId
@@ -94,11 +95,11 @@ func SetUpDatabase() internal.Database {
 		if err != nil {
 			log.Fatalf("Failed to create Firestore cleint: %v", err)
 		}
-		return &internal.FirebaseFirestore{
+		return &database.FirebaseFirestore{
 			Client: client,
 			Ctx:    ctx,
 		}
 	} else {
-		return &internal.LocalDatabase{}
+		return &database.LocalDatabase{}
 	}
 }

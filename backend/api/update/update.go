@@ -6,6 +6,7 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/api/articles"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"net/http"
@@ -14,27 +15,24 @@ import (
 	"time"
 )
 
-var cachers []internal.Cacher
+var cachers []database.Cacher
 
 // SetUp initializes the cachers slice
-func SetUp(http internal.HttpClient, db internal.Database) {
+func SetUp(http internal.HttpClient, db database.ReadWrite) {
 	var c = &configs.Config
-	cache := internal.BaseCache{
-		Db:         db,
-		HttpClient: http,
-	}
-	instagram := gallery.Instagram{AccessToken: c.InstagramAccessToken, BaseCache: cache}
-	unsplash := gallery.Unsplash{Username: c.UnsplashUsername, AccessKey: c.UnsplashAccessKey, BaseCache: cache}
-	medium := articles.Medium{Name: c.MediumUsername, BaseCache: cache}
-	wordpress := articles.WordPress{URL: c.WPUrl, BaseCache: cache}
-	github := repos.GitHub{Auth: c.GithubToken, Username: c.UnsplashUsername, BaseCache: cache}
 
-	cachers = []internal.Cacher{instagram, unsplash, medium, wordpress, github}
+	instagram := gallery.Instagram{AccessToken: c.InstagramAccessToken, Db: db, HttpClient: http}
+	unsplash := gallery.Unsplash{Username: c.UnsplashUsername, AccessKey: c.UnsplashAccessKey, Db: db, HttpClient: http}
+	medium := articles.Medium{Name: c.MediumUsername, Db: db, HttpClient: http}
+	wordpress := articles.WordPress{URL: c.WPUrl, Db: db, HttpClient: http}
+	github := repos.GitHub{Auth: c.GithubToken, Username: c.UnsplashUsername, Db: db, HttpClient: http}
+
+	cachers = []database.Cacher{instagram, unsplash, medium, wordpress, github}
 }
 
 // Handler fetches data from sources and cache the results
 func Handler(c *gin.Context, h internal.HttpClient) {
-	db := c.MustGet(internal.Db).(internal.Database)
+	db := c.MustGet(internal.Db).(database.ReadWrite)
 	if cap(cachers) == 0 {
 		SetUp(h, db)
 	}
@@ -50,7 +48,7 @@ func updateCache() map[string]interface{} {
 
 	for _, c := range cachers {
 		wg.Add(1)
-		go func(cacher internal.Cacher) {
+		go func(cacher database.Cacher) {
 			defer wg.Done()
 
 			size, err := cacher.Cache()

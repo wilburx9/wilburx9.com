@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"time"
 )
 
@@ -51,9 +52,9 @@ func (i instaImg) thumbnail() string {
 }
 
 // ToImages maps this slice of instaImg to slice of Image
-func (s instaImgs) ToImages(source string) []internal.DbModel {
+func (s instaImgs) ToImages(source string) []database.Model {
 	var timeLayout = "2006-01-02T15:04:05-0700"
-	var images = make([]internal.DbModel, len(s))
+	var images = make([]database.Model, len(s))
 
 	for i, e := range s {
 

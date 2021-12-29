@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 )
 
 // UnsplashImgs represents a slice of unsplashImg
@@ -29,9 +30,9 @@ type User struct {
 }
 
 // ToImages maps this slice of unsplashImg to slice of Image
-func (m UnsplashImgs) ToImages(source string) []internal.DbModel {
+func (m UnsplashImgs) ToImages(source string) []database.Model {
 	var timeLayout = "2006-01-02T03:04:05-07:00"
-	var images = make([]internal.DbModel, len(m))
+	var images = make([]database.Model, len(m))
 
 	for i, e := range m {
 		images[i] = Image{

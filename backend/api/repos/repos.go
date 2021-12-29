@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"net/http"
 	"strconv"
 )
@@ -13,7 +14,7 @@ const defaultLimit = 6
 
 // Handler retrieves a list of all git repos, sorted in descending stars and forks
 func Handler(c *gin.Context) {
-	db := c.MustGet(internal.Db).(internal.Database)
+	db := c.MustGet(internal.Db).(database.ReadWrite)
 
 	limit, err := getLimit(c.DefaultQuery("size", strconv.FormatInt(defaultLimit, 10)))
 	if err != nil {
@@ -21,7 +22,7 @@ func Handler(c *gin.Context) {
 		return
 	}
 
-	repos, at, err := db.Retrieve(internal.DbReposKey, "score", limit)
+	repos, at, err := db.Read(internal.DbReposKey, "score", limit)
 
 	if err != nil && len(repos) == 0 {
 		c.JSON(http.StatusInternalServerError, internal.MakeErrorResponse(repos))

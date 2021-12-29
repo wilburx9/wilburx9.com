@@ -4,13 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"net/http"
 )
 
 // Handler retrieves a list of all the images sorted in descending creation date
 func Handler(c *gin.Context) {
-	db := c.MustGet(internal.Db).(internal.Database)
-	images, at, err := db.Retrieve(internal.DbGalleryKey, "uploaded_on", 30)
+	db := c.MustGet(internal.Db).(database.ReadWrite)
+	images, at, err := db.Read(internal.DbGalleryKey, "uploaded_on", 30)
 
 
 	if err != nil && len(images) == 0 {

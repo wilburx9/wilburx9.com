@@ -4,13 +4,14 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"net/http"
 )
 
 // Handler retrieves a list of all the articles sorted in descending creation date
 func Handler(c *gin.Context) {
-	db := c.MustGet(internal.Db).(internal.Database)
-	articles, at, err := db.Retrieve(internal.DbArticlesKey, "updated_on", 20)
+	db := c.MustGet(internal.Db).(database.ReadWrite)
+	articles, at, err := db.Read(internal.DbArticlesKey, "updated_on", 20)
 
 	if err != nil || len(articles) == 0 {
 		c.JSON(http.StatusInternalServerError, internal.MakeErrorResponse(articles))
