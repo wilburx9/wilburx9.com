@@ -3,6 +3,7 @@ package models
 import (
 	"fmt"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"html"
 	"regexp"
 	"strconv"
@@ -31,9 +32,9 @@ type content struct {
 type WpPosts []WpPost
 
 // ToResult creates ArticleResult by mapping WpPosts to a slice of Article
-func (p WpPosts) ToResult(source string) []internal.DbModel {
+func (p WpPosts) ToResult(source string) []database.Model {
 	var timeLayout = "2006-01-02T15:04:05"
-	var articles = make([]internal.DbModel, len(p))
+	var articles = make([]database.Model, len(p))
 
 	for i, e := range p {
 		articles[i] = Article{

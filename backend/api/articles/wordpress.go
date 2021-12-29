@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"net/http"
 )
 
@@ -15,7 +16,8 @@ const (
 // WordPress encapsulates fetching and caching of WordPress blog posts
 type WordPress struct {
 	URL string // WP V2 post URL URL e.g https://example.com/wp-json/wp/v2/posts
-	internal.BaseCache
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
 // Cache fetches and caches WordPress articles
@@ -25,11 +27,11 @@ func (w WordPress) Cache() (int, error) {
 		return 0, err
 	}
 
-	return len(result), w.Db.Persist(internal.DbArticlesKey, result...)
+	return len(result), w.Db.Write(internal.DbArticlesKey, result...)
 }
 
 // fetchArticles gets articles from WordPress via HTTP
-func (w WordPress) fetchArticles() ([]internal.DbModel, error) {
+func (w WordPress) fetchArticles() ([]database.Model, error) {
 	req, _ := http.NewRequest(http.MethodGet, w.URL, nil)
 	res, err := w.HttpClient.Do(req)
 	if err != nil {

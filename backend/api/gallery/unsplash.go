@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"net/http"
 )
 
@@ -18,7 +19,8 @@ const (
 type Unsplash struct {
 	Username  string
 	AccessKey string
-	internal.BaseCache
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
 // Cache fetches and caches Unsplash images to db
@@ -28,11 +30,11 @@ func (u Unsplash) Cache() (int, error) {
 		return 0, err
 	}
 
-	return len(result), u.Db.Persist(internal.DbGalleryKey, result...)
+	return len(result), u.Db.Write(internal.DbGalleryKey, result...)
 }
 
 // FetchImages fetches images via HTTP
-func (u Unsplash) FetchImages() ([]internal.DbModel, error) {
+func (u Unsplash) FetchImages() ([]database.Model, error) {
 	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?per_page=%v", u.Username, unsplashLimit)
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 	req.Header.Add("Accept-Version", "v1")

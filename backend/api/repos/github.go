@@ -6,6 +6,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"io/ioutil"
@@ -22,7 +23,8 @@ const (
 type GitHub struct {
 	Auth     string
 	Username string
-	internal.BaseCache
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
 // Cache fetches and saves GitHub repositories to DB
@@ -32,10 +34,10 @@ func (g GitHub) Cache() (int, error) {
 		return 0, err
 	}
 
-	return len(result), g.Db.Persist(internal.DbReposKey, result...)
+	return len(result), g.Db.Write(internal.DbReposKey, result...)
 }
 
-func (g GitHub) fetchRepos() ([]internal.DbModel, error) {
+func (g GitHub) fetchRepos() ([]database.Model, error) {
 	url := "https://api.github.com/graphql"
 
 	query, err := getGraphQlQuery()
