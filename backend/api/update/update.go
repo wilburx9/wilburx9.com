@@ -1,6 +1,7 @@
 package update
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
@@ -51,11 +52,21 @@ func updateCache() map[string]interface{} {
 		wg.Add(1)
 		go func(cacher internal.Cacher) {
 			defer wg.Done()
+
 			size, err := cacher.Cache()
+
+			var errV *errorV
+			if err != nil {
+				errV = &errorV{
+					Message: err.Error(),
+					Details: err,
+				}
+			}
+
 			rc <- result{
 				Cacher: reflect.TypeOf(cacher).Name(),
 				Size:   size,
-				Error:  err,
+				Error:  errV,
 			}
 		}(c)
 	}
@@ -69,6 +80,6 @@ func updateCache() map[string]interface{} {
 
 	return map[string]interface{}{
 		"results":  rs,
-		"duration": time.Since(startTime),
+		"duration": fmt.Sprintf("%v milliseconds", time.Since(startTime).Milliseconds()),
 	}
 }
