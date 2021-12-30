@@ -36,13 +36,14 @@ func MakeId(source string, currentId string) string {
 
 
 // GetCacheControl returns Cache-Control instructions
-func GetCacheControl(updatedAt time.Time) string {
+func GetCacheControl(dataUpdatedAt time.Time) string {
 	maxAge := oneDay.Seconds()
 	now := time.Now()
-	diff := now.Sub(updatedAt)
-
-	if twoWeeks > diff { // Confirm that the data is less than two weeks old
-		expiresIn := updatedAt.Add(twoWeeks).Sub(now)
+	diff := now.Sub(dataUpdatedAt)
+	
+	// Check if the data is upto two weeks old yet
+	if twoWeeks > diff {
+		expiresIn := dataUpdatedAt.Add(twoWeeks).Sub(now) // Get how long until the data is two weeks old.
 		maxAge =  expiresIn.Seconds()
 	}
 

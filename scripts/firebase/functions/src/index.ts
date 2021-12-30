@@ -2,8 +2,6 @@ import * as functions from "firebase-functions";
 import admin from "firebase-admin";
 import * as https from "https";
 
-require("firebase-functions/lib/logger/compat");
-
 admin.initializeApp();
 
 export const cacheUpdateViaHttps = functions
@@ -14,7 +12,7 @@ export const cacheUpdateViaHttps = functions
         // Just confirm that the request has an authorization,
         // the backend will validate the key
         if (auth && auth?.length > 0) {
-          const result = await makeRequest("HTTP", auth);
+          const result = await makeRequest( auth);
           res.status(200).send(result);
           return;
         }
@@ -27,13 +25,13 @@ export const cacheUpdateViaHttps = functions
     });
 
 export const cacheUpdateViaPubSub = functions
-    .pubsub.schedule("every 5 minutes")
+    .pubsub.schedule("every saturday 03:00")
     .timeZone("Africa/Lagos")
     .onRun(() => {
-      return makeRequest("PubSub", functions.config().cacheupdate.key);
+      return makeRequest(functions.config().cacheupdate.key);
     });
 
-const makeRequest = (trigger: string, auth: string): Promise<string> => {
+const makeRequest = (auth: string): Promise<string> => {
   const options = {
     hostname: functions.config().cacheupdate.domain,
     path: "/api/protected/cache",
