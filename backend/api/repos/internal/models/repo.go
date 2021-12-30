@@ -28,6 +28,6 @@ func (r Repo) Id() string {
 
 // language represent a repo's language and color code
 type language struct {
-	Name  string `json:"name"`
-	Color string `json:"color"`
+	Name  string `json:"name" firestore:"name"`
+	Color string `json:"color" firestore:"color"`
 }

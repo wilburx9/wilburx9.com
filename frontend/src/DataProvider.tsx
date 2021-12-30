@@ -102,8 +102,8 @@ export class DataProvider extends Component<any, DataState> {
 
 function logNetworkError(e: AxiosError, data?: string) {
   let params = getAnalyticsParams()
-  params.set(AnalyticsKey.url, `${e.config.baseURL}${e.config.url}`)
-  params.set(AnalyticsKey.method, e.config.method)
+  params.set(AnalyticsKey.url, `${e.config?.baseURL}${e.config?.url}`)
+  params.set(AnalyticsKey.method, e.config?.method)
   params.set(AnalyticsKey.message, e.message)
 
   if (data) params.set(AnalyticsKey.data, data)
