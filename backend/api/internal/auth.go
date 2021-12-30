@@ -2,6 +2,8 @@ package internal
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/wilburt/wilburx9.dev/backend/configs"
+	scripts "github.com/wilburt/wilburx9.dev/scripts/tools"
 	"net/http"
 )
 
@@ -17,27 +19,11 @@ func AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-func valid(a string) bool {
-	if (len(a)) == 0 {
-		return false
+func valid(pass string) bool {
+	// Since we are using UUIDs, the expected length is 36 runes.
+	// Bounding it with >= 1 and <=49 just in case.
+	if len(pass) > 0 && len(pass) < 50 {
+		return configs.Config.APIHash == scripts.GenerateHash(pass, configs.Config.APISalt)
 	}
-
-	// v := gen()
-	// vs := strings.Split(v, ":")
-	//
-	// // key := []byte(vs[0])
-	// auth := pbkdf2.Key([]byte(vs[0]), []byte(vs[1]), 200000, 50, sha512.New)
-	// return hex.EncodeToString(auth) == vs[2]
-	return true
+	return false
 }
-
-// func gen() string {
-// 	key := uuid.NewString()
-// 	salt := uuid.NewString()
-// 	hash := pbkdf2.Key([]byte(key), []byte(salt), 200000, 50, sha512.New)
-// 	hashStr := hex.EncodeToString(hash)
-// 	return fmt.Sprintf("%v:%v:%v", key, salt, hashStr)
-// }
-
-// Key:: 8E4FA332-5894-41FA-A88F-DD76881144F9
-// Salt:: E9E36CE6-CF24-4D5F-8567-848F999C4C7A
