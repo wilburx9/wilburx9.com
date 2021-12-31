@@ -30,9 +30,9 @@ jobs:
         working-directory: ./scripts/go
         run: | # Generate the keys with main.go, parse the json output and output them
           read hash salt pass < <(echo $(go run main.go | jq -r '.hash, .salt, .pass'))
-          echo "::set-output hash=::add-mask::$hash"
-          echo "::set-output salt=::add-mask::$salt"
-          echo "::set-output pass=::add-mask::$pass"
+          echo "::set-output hash=$hash"
+          echo "::set-output salt=$salt"
+          echo "::set-output pass=$pass"
 
 
 
