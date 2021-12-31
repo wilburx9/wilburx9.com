@@ -13,9 +13,9 @@ jobs:
     name: Generate API Key
     runs-on: ubuntu-latest
     outputs:
-      hash: ${{ steps.generate-keys.outputs.api_hash }}
-      salt: ${{ steps.generate-keys.outputs.api_salt }}
-      pass: ${{ steps.generate-keys.outputs.api_pass }}
+      api_hash: ${{ steps.generate-keys.outputs.api_hash }}
+      api_salt: ${{ steps.generate-keys.outputs.api_salt }}
+      api_pass: ${{ steps.generate-keys.outputs.api_pass }}
 
     steps:
       - name: Checkout
