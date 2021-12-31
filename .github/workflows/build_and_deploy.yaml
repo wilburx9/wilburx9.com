@@ -2,21 +2,56 @@ name: Build and Deploy to Firebase and Cloud Run
 
 on:
   pull_request:
-    branches: [ live ]
+    branches: [ develop ]  #TODO: Change to live
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
 
 jobs:
+  generate_keys:
+    name: Generate API Key
+    runs-on: ubuntu-latest
+    outputs:
+      pass: ${{ steps.generate-keys.outputs.pass }}
+      salt: ${{ steps.generate-keys.outputs.salt }}
+      hash: ${{ steps.generate-keys.outputs.hash }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.17.5'
+
+      - name: Generate keys
+        id: generate-keys
+        working-directory: ./scripts/go
+        run: | # Generate the keys with main.go, parse the json output and output them
+          read hash salt pass < <(echo $(go run main.go | jq -r '.hash, .salt, .pass'))
+          echo "::set-output hash=::add-mask::$hash"
+          echo "::set-output salt=::add-mask::$salt"
+          echo "::set-output pass=::add-mask::$pass"
+
+
+
   build_and_deploy_backend:
     name: Build and Deploy the backend to Cloud Run
+    needs: [ generate_keys ]
     runs-on: ubuntu-latest
     env:
       SERVICE: backend
       REGION: us-central1
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Download api keys
+        uses: actions/download-artifact@v2
+        with:
+          name: api_keys
 
       - name: Setup Cloud SDK
         uses: google-github-actions/auth@v0
@@ -32,12 +67,13 @@ jobs:
           docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
 
       - name: Deploy to Cloud Run
-        id: deploy
+        id: Deploy
         uses: google-github-actions/deploy-cloudrun@v0
         with:
           service: ${{ env.SERVICE }}
           image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
           region: ${{ env.REGION }}
+          env_vars: 'WILBURX9_API_HASH=${{ needs.generate_keys.outputs.hash }},WILBURX9_API_SALT="${{ needs.generate_keys.outputs.salt }}"'
 
   build_and_deploy_frontend:
     name: Build and Deploy the frontend to Firebase Hosting
@@ -65,3 +101,30 @@ jobs:
           firebaseServiceAccount: '${{ secrets.FIREBASE_SA_KEY }}'
           channelId: live
           projectId: ${{ env.GCP_PROJECT_ID }}
+
+  deploy_cloud_functions:
+    name: Deploy Cloud Functions for Firebase
+    needs: [ build_and_deploy_frontend ]
+    runs-on: ubuntu-latest
+    env:
+      working_directory: ./scripts/firebase
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Firebase CI
+        run: sudo npm install -g firebase-tools
+
+      - name: Set environement variables
+        working-directory: ${{ env.working_directory }}
+        run: firebase functions:config:set cacheupdate.domain="${{ secrets.REACT_APP_DOMAIN }}" cacheupdate.key="${{ needs.generate_keys.outputs.pass }}" --token '${{ secrets.FIREBASE_TOKEN }}'
+
+      - name: Deploy
+        working-directory: ${{ env.working_directory }}
+        run: firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'
+
+      - name: Trigger HTTP function
+        run: |
+         curl --request POST --header "Authorization: ${{ needs.generate_keys.outputs.pass }}" --url "https://us-central1-wilburx9-336700.cloudfunctions.net/cacheUpdateViaHttps"
+
