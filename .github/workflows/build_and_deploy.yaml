@@ -62,7 +62,7 @@ jobs:
           docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
 
       - name: Echo Keys
-        run: echo "${{ needs.generate_keys.outputs.hash }} :: ${{ needs.generate_keys.outputs.salt }} :: ${{ needs.generate_keys.outputs.pass }}"
+        run: echo ${{ needs.generate_keys.outputs.hash }} / ${{ needs.generate_keys.outputs.salt }} / ${{ needs.generate_keys.outputs.pass }}
 
       - name: Deploy to Cloud Run
         id: Deploy
