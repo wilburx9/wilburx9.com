@@ -41,8 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVICE: backend
-      API_HASH: echo ::add-mask::${{ needs.generate_keys.outputs.hash }}
-      API_SALT: echo ::add-mask::${{ needs.generate_keys.outputs.salt }}
+      API_HASH: ::add-mask::${{ needs.generate_keys.outputs.hash }}
+      API_SALT: ::add-mask::${{ needs.generate_keys.outputs.salt }}
 
     steps:
       - name: Checkout
@@ -100,41 +100,41 @@ jobs:
   #          channelId: live
   #          projectId: ${{ env.GCP_PROJECT_ID }}
 
-  deploy_cloud_functions:
-    name: Deploy Cloud Functions for Firebase
-    needs: [ generate_keys, build_and_deploy_backend ]
-    runs-on: ubuntu-latest
-    env:
-      WORKING_DIRECTORY: ./scripts/firebase
-      API_PASS: echo ::add-mask::${{ needs.generate_keys.outputs.pass }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 16
-
-      - name: Install npm
-        run: npm install
-        working-directory: ${{ env.WORKING_DIRECTORY }}/functions
-
-      - name: Install Firebase CI
-        run: sudo npm install -g firebase-tools
-
-      - name: Set environement variables
-        working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: |
-          host=$(echo ${{ secrets.REACT_APP_DOMAIN }} | awk -F[/:] '{print $4}')
-          firebase functions:config:set cacheupdate.domain="$host" cacheupdate.key="${{ env.API_PASS }}" --token '${{ secrets.FIREBASE_TOKEN }}'
-
-      - name: Deploy
-        working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'
-
-      - name: Trigger HTTP function
-        run: |
-         curl --request POST --header "Authorization: ${{ env.API_PASS }}" --url "https://${{ env.REGION }}-${{ env.GCP_PROJECT_ID }}.cloudfunctions.net/cacheUpdateViaHttps"
+#  deploy_cloud_functions:
+#    name: Deploy Cloud Functions for Firebase
+#    needs: [ generate_keys, build_and_deploy_backend ]
+#    runs-on: ubuntu-latest
+#    env:
+#      WORKING_DIRECTORY: ./scripts/firebase
+#      API_PASS: ::add-mask::${{ needs.generate_keys.outputs.pass }}
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#
+#      - name: Setup Node
+#        uses: actions/setup-node@v1
+#        with:
+#          node-version: 16
+#
+#      - name: Install npm
+#        run: npm install
+#        working-directory: ${{ env.WORKING_DIRECTORY }}/functions
+#
+#      - name: Install Firebase CI
+#        run: sudo npm install -g firebase-tools
+#
+#      - name: Set environement variables
+#        working-directory: ${{ env.WORKING_DIRECTORY }}
+#        run: |
+#          host=$(echo ${{ secrets.REACT_APP_DOMAIN }} | awk -F[/:] '{print $4}')
+#          firebase functions:config:set cacheupdate.domain="$host" cacheupdate.key="${{ env.API_PASS }}" --token '${{ secrets.FIREBASE_TOKEN }}'
+#
+#      - name: Deploy
+#        working-directory: ${{ env.WORKING_DIRECTORY }}
+#        run: firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'
+#
+#      - name: Trigger HTTP function
+#        run: |
+#         curl --request POST --header "Authorization: ${{ env.API_PASS }}" --url "https://${{ env.REGION }}-${{ env.GCP_PROJECT_ID }}.cloudfunctions.net/cacheUpdateViaHttps"
 
