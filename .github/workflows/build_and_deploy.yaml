@@ -41,8 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVICE: backend
-      API_HASH: "::add-mask::${{ needs.generate_keys.outputs.hash }}"
-      API_SALT: "::add-mask::${{ needs.generate_keys.outputs.salt }}"
+      API_HASH: echo "::add-mask::${{ needs.generate_keys.outputs.hash }}"
+      API_SALT: echo "::add-mask::${{ needs.generate_keys.outputs.salt }}"
 
     steps:
       - name: Checkout
@@ -106,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WORKING_DIRECTORY: ./scripts/firebase
-      API_PASS: "::add-mask::${{ needs.generate_keys.outputs.pass }}"
+      API_PASS: echo "::add-mask::${{ needs.generate_keys.outputs.pass }}"
 
     steps:
       - name: Checkout
@@ -126,7 +126,9 @@ jobs:
 
       - name: Set environement variables
         working-directory: ${{ env.WORKING_DIRECTORY }}
-        run: firebase functions:config:set cacheupdate.domain="${{ secrets.REACT_APP_DOMAIN }}" cacheupdate.key="${{ env.API_PASS }}" --token '${{ secrets.FIREBASE_TOKEN }}'
+        run: |
+          host=$(echo ${{ secrets.REACT_APP_DOMAIN }} | awk -F[/:] '{print $4}')
+          firebase functions:config:set cacheupdate.domain="$host" cacheupdate.key="${{ env.API_PASS }}" --token '${{ secrets.FIREBASE_TOKEN }}'
 
       - name: Deploy
         working-directory: ${{ env.WORKING_DIRECTORY }}
