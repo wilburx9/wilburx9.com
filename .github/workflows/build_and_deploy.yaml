@@ -34,8 +34,6 @@ jobs:
           echo "::set-output salt=$salt"
           echo "::set-output pass=$pass"
 
-
-
   build_and_deploy_backend:
     name: Build and Deploy the backend to Cloud Run
     needs: [ generate_keys ]
@@ -47,9 +45,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-
-      - name: Download api keys
-        uses: actions/download-artifact@v2
 
       - name: Setup Cloud SDK
         uses: google-github-actions/auth@v0
