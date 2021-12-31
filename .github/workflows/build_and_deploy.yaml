@@ -32,9 +32,9 @@ jobs:
           echo "::add-mask::$hash"
           echo "::add-mask::$salt"
           echo "::add-mask::$pass"
-          gh secret set WILBURX9_API_HASH --body "$hash"
-          gh secret set WILBURX9_API_SALT --body "$salt"
-          gh secret set WILBURX9_API_PASS --body "$pass"
+          gh secret set WILBURX9_API_HASH --body $hash
+          gh secret set WILBURX9_API_SALT --body "Example"
+          gh secret set WILBURX9_API_PASS --body "${pass}"
 #          echo "::set-output name=hash::$hash"
 #          echo "::set-output name=salt::$salt"
 #          echo "::set-output name=pass::$pass"
@@ -47,6 +47,7 @@ jobs:
       SERVICE: backend
       API_HASH: ${{ secrets.WILBURX9_API_HASH }}
       API_SALT: ${{ secrets.WILBURX9_API_SALT }}
+      API_PASS: ${{ secrets.WILBURX9_API_PASS }}
 
     steps:
       - name: Checkout
@@ -72,7 +73,7 @@ jobs:
           service: ${{ env.SERVICE }}
           image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
           region: ${{ env.REGION }}
-          env_vars: WILBURX9_API_HASH=${{ env.API_HASH }},WILBURX9_API_SALT=${{ env.API_SALT }}
+          env_vars: WILBURX9_API_HASH=${{ env.API_HASH }},WILBURX9_API_SALT=${{ env.API_SALT }},WILBURX9_API_PASS=${{ env.API_PASS }}
 
   #  build_and_deploy_frontend:
   #    name: Build and Deploy the frontend to Firebase Hosting
