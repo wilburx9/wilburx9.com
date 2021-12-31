@@ -36,7 +36,7 @@ jobs:
           echo "::add-mask::$hash"
           echo "::add-mask::$salt"
           echo "::add-mask::$pass"
-          gh secret set MYSECRETXXX --body "$hash"
+          gh secret set MYSECRETXXX --body "salt"
 #          echo "::set-output name=hash::$hash"
 #          echo "::set-output name=salt::$salt"
 #          echo "::set-output name=pass::$pass"
