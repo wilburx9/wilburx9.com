@@ -41,8 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVICE: backend
-      API_HASH: echo "::add-mask::${{ needs.generate_keys.outputs.hash }}"
-      API_SALT: echo "::add-mask::${{ needs.generate_keys.outputs.salt }}"
+      API_HASH: echo ::add-mask::${{ needs.generate_keys.outputs.hash }}
+      API_SALT: echo ::add-mask::${{ needs.generate_keys.outputs.salt }}
 
     steps:
       - name: Checkout
@@ -106,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       WORKING_DIRECTORY: ./scripts/firebase
-      API_PASS: echo "::add-mask::${{ needs.generate_keys.outputs.pass }}"
+      API_PASS: echo ::add-mask::${{ needs.generate_keys.outputs.pass }}
 
     steps:
       - name: Checkout
