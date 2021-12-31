@@ -38,7 +38,7 @@ jobs:
 #          echo "::set-output name=salt::$salt"
 #          echo "::set-output name=pass::$pass"
       - run: |
-          gh secret set -f ./test.env
+          gh secret set < ./test.env
 
 #  build_and_deploy_backend:
 #    name: Build and Deploy the backend to Cloud Run
