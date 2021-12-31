@@ -46,27 +46,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup Cloud SDK
-        uses: google-github-actions/auth@v0
-        with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+#      - name: Setup Cloud SDK
+#        uses: google-github-actions/auth@v0
+#        with:
+#          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+#
+#      - name: Authorize Docker push
+#        run: gcloud auth configure-docker
+#
+#      - name: Build and Push Container
+#        run: |-
+#          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} -f ./backend/Dockerfile .
+#          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
 
-      - name: Authorize Docker push
-        run: gcloud auth configure-docker
+      - name: Echo Keys
+        run: echo ${{needs.generate_keys.outputs.hash}} ${{needs.generate_keys.outputs.salt}}
 
-      - name: Build and Push Container
-        run: |-
-          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} -f ./backend/Dockerfile .
-          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
-
-      - name: Deploy to Cloud Run
-        id: Deploy
-        uses: google-github-actions/deploy-cloudrun@v0
-        with:
-          service: ${{ env.SERVICE }}
-          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
-          region: ${{ env.REGION }}
-          env_vars: WILBURX9_API_HASH=${{ needs.generate_keys.outputs.hash }},WILBURX9_API_SALT=${{ needs.generate_keys.outputs.salt }}
+#      - name: Deploy to Cloud Run
+#        id: Deploy
+#        uses: google-github-actions/deploy-cloudrun@v0
+#        with:
+#          service: ${{ env.SERVICE }}
+#          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+#          region: ${{ env.REGION }}
+#          env_vars: WILBURX9_API_HASH=${{ needs.generate_keys.outputs.hash }},WILBURX9_API_SALT=${{ needs.generate_keys.outputs.salt }}
 
 #  build_and_deploy_frontend:
 #    name: Build and Deploy the frontend to Firebase Hosting
@@ -116,10 +119,10 @@ jobs:
       - name: Deploy
         working-directory: ${{ env.working_directory }}
         run: |
-          yarn
+          npm install eslint
           firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'
 
-      - name: Trigger HTTP function
-        run: |
-         curl --request POST --header "Authorization: ${{ needs.generate_keys.outputs.pass }}" --url "https://us-central1-wilburx9-336700.cloudfunctions.net/cacheUpdateViaHttps"
+#      - name: Trigger HTTP function
+#        run: |
+#         curl --request POST --header "Authorization: ${{ needs.generate_keys.outputs.pass }}" --url "https://us-central1-wilburx9-336700.cloudfunctions.net/cacheUpdateViaHttps"
 
