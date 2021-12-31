@@ -31,6 +31,9 @@ jobs:
         working-directory: ./scripts/go
         run: | # Generate the keys with main.go, parse the json output and output them
           read hash salt pass < <(echo $(go run main.go | jq -r '.hash, .salt, .pass'))
+          echo "::add-mask::$hash"
+          echo "::add-mask::$hash"
+          echo "::add-mask::$pass"
           echo "::set-output name=hash::$hash"
           echo "::set-output name=salt::$salt"
           echo "::set-output name=pass::$pass"
@@ -41,8 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVICE: backend
-      API_HASH: ::add-mask::${{ needs.generate_keys.outputs.hash }}
-      API_SALT: ::add-mask::${{ needs.generate_keys.outputs.salt }}
+      API_HASH: ${{ needs.generate_keys.outputs.hash }}
+      API_SALT: ${{ needs.generate_keys.outputs.salt }}
 
     steps:
       - name: Checkout
@@ -106,7 +109,7 @@ jobs:
 #    runs-on: ubuntu-latest
 #    env:
 #      WORKING_DIRECTORY: ./scripts/firebase
-#      API_PASS: ::add-mask::${{ needs.generate_keys.outputs.pass }}
+#      API_PASS: ${{ needs.generate_keys.outputs.pass }}
 #
 #    steps:
 #      - name: Checkout
