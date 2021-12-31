@@ -34,9 +34,9 @@ jobs:
           echo "::add-mask::$the_hash"
           echo "::add-mask::$the_salt"
           echo "::add-mask::$the_pass"
-          echo "::set-output name=hash::the_hash"
-          echo "::set-output name=salt::the_salt"
-          echo "::set-output name=pass::the_pass"
+          echo "::set-output name=hash::$the_hash"
+          echo "::set-output name=salt::$the_salt"
+          echo "::set-output name=pass::$the_pass"
 
   build_and_deploy_backend:
     name: Build and Deploy the backend to Cloud Run
