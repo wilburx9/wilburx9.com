@@ -46,57 +46,57 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-#      - name: Setup Cloud SDK
-#        uses: google-github-actions/auth@v0
-#        with:
-#          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-#
-#      - name: Authorize Docker push
-#        run: gcloud auth configure-docker
-#
-#      - name: Build and Push Container
-#        run: |-
-#          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} -f ./backend/Dockerfile .
-#          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+      - name: Setup Cloud SDK
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Build and Push Container
+        run: |-
+          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} -f ./backend/Dockerfile .
+          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
 
       - name: Echo Keys
-        run: echo ${{needs.generate_keys.outputs.hash}} ${{needs.generate_keys.outputs.salt}}
+        run: echo ${{ needs.generate_keys.outputs.hash }} ${{ needs.generate_keys.outputs.salt }}
 
-#      - name: Deploy to Cloud Run
-#        id: Deploy
-#        uses: google-github-actions/deploy-cloudrun@v0
-#        with:
-#          service: ${{ env.SERVICE }}
-#          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
-#          region: ${{ env.REGION }}
-#          env_vars: WILBURX9_API_HASH=${{ needs.generate_keys.outputs.hash }},WILBURX9_API_SALT=${{ needs.generate_keys.outputs.salt }}
+      - name: Deploy to Cloud Run
+        id: Deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ env.SERVICE }}
+          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+          region: ${{ env.REGION }}
+          env_vars: WILBURX9_API_HASH=${{ needs.generate_keys.outputs.hash }},WILBURX9_API_SALT=${{ needs.generate_keys.outputs.salt }}
 
-#  build_and_deploy_frontend:
-#    name: Build and Deploy the frontend to Firebase Hosting
-#    needs: [ build_and_deploy_backend ]
-#    runs-on: ubuntu-latest
-#    env:
-#      REACT_APP_DOMAIN: ${{ secrets.REACT_APP_DOMAIN }}
-#      REACT_APP_H_CAPTCHA_SITE_KEY: ${{ secrets.REACT_APP_H_CAPTCHA_SITE_KEY }}
-#      REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
-#      REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
-#      REACT_APP_GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#
-#      - name: Build with npm
-#        working-directory: ./frontend
-#        run: npm ci && npm run build
-#
-#      - name: Deploy to Firebase Hosting
-#        uses: FirebaseExtended/action-hosting-deploy@v0
-#        with:
-#          entrypoint: ./frontend
-#          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-#          firebaseServiceAccount: '${{ secrets.FIREBASE_SA_KEY }}'
-#          channelId: live
-#          projectId: ${{ env.GCP_PROJECT_ID }}
+  #  build_and_deploy_frontend:
+  #    name: Build and Deploy the frontend to Firebase Hosting
+  #    needs: [ build_and_deploy_backend ]
+  #    runs-on: ubuntu-latest
+  #    env:
+  #      REACT_APP_DOMAIN: ${{ secrets.REACT_APP_DOMAIN }}
+  #      REACT_APP_H_CAPTCHA_SITE_KEY: ${{ secrets.REACT_APP_H_CAPTCHA_SITE_KEY }}
+  #      REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+  #      REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
+  #      REACT_APP_GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  #    steps:
+  #      - name: Checkout
+  #        uses: actions/checkout@v2
+  #
+  #      - name: Build with npm
+  #        working-directory: ./frontend
+  #        run: npm ci && npm run build
+  #
+  #      - name: Deploy to Firebase Hosting
+  #        uses: FirebaseExtended/action-hosting-deploy@v0
+  #        with:
+  #          entrypoint: ./frontend
+  #          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+  #          firebaseServiceAccount: '${{ secrets.FIREBASE_SA_KEY }}'
+  #          channelId: live
+  #          projectId: ${{ env.GCP_PROJECT_ID }}
 
   deploy_cloud_functions:
     name: Deploy Cloud Functions for Firebase
@@ -109,14 +109,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Serup Node
+      - name: Setup Node
         uses: actions/setup-node@v1
         with:
           node-version: 16
 
       - name: Install npm
         run: npm install
-        working-directory: ${{ env.working_directory }}
+        working-directory: ${{ env.working_directory }}/functions
 
       - name: Install Firebase CI
         run: sudo npm install -g firebase-tools
