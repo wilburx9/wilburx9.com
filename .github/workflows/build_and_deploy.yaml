@@ -12,10 +12,6 @@ jobs:
   generate_keys:
     name: Generate API Key
     runs-on: ubuntu-latest
-    outputs:
-      api_hash: ${{ steps.generate-keys.outputs.api_hash }}
-      api_salt: ${{ steps.generate-keys.outputs.api_salt }}
-      api_pass: ${{ steps.generate-keys.outputs.api_pass }}
 
     steps:
       - name: Checkout
@@ -29,14 +25,11 @@ jobs:
       - name: Generate keys
         id: generate-keys
         working-directory: ./scripts/go
-        run: | # Generate the keys with main.go, parse the json output and output them
-          read j_hash j_salt j_pass < <(echo $(go run main.go | jq -r '.hash, .salt, .pass'))
+        run: |
+          read j_hash j_salt < <(echo $(go run main.go | jq -r '.hash, .salt'))
           echo "::add-mask::$j_hash"
-          echo "::add-mask::$j_salt"
-          echo "::add-mask::$j_pass"
           echo "::set-output name=api_hash::$j_hash"
           echo "::set-output name=api_salt::$j_salt"
-          echo "::set-output name=api_pass::$j_pass"
 
 #  build_and_deploy_backend:
 #    name: Build and Deploy the backend to Cloud Run
