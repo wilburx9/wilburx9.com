@@ -37,8 +37,8 @@ jobs:
       - name: Capture outputs
         run: |
           echo "::set-output name=hash::${{ steps.generate-keys.outputs.$hash }}"
-          echo "::set-output name=$salt::${{ steps.generate-keys.outputs.$salt }}"
-          echo "::set-output name=$pass::${{ steps.generate-keys.outputs.$pass }}"
+          echo "::set-output name=salt::${{ steps.generate-keys.outputs.$salt }}"
+          echo "::set-output name=pass::${{ steps.generate-keys.outputs.$pass }}"
 
 #  build_and_deploy_backend:
 #    name: Build and Deploy the backend to Cloud Run
