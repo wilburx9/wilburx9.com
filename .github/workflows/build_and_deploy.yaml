@@ -30,7 +30,7 @@ jobs:
         id: generate-keys
         working-directory: ./scripts/go
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         run: | # Generate the keys with main.go, parse the json output and output them
           read hash salt pass < <(echo $(go run main.go | jq -r '.hash, .salt, .pass'))
           echo "::add-mask::$hash"
