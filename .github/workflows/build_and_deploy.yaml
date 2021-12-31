@@ -41,6 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVICE: backend
+      API_HASH: "::add-mask::${{ needs.generate_keys.outputs.hash }}"
+      API_SALT: "::add-mask::${{ needs.generate_keys.outputs.salt }}"
 
     steps:
       - name: Checkout
@@ -60,7 +62,7 @@ jobs:
           docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
 
       - name: Echo Keys
-        run: echo ${{ needs.generate_keys.outputs.hash }} ${{ needs.generate_keys.outputs.salt }}
+        run: echo "${{ needs.generate_keys.outputs.hash }} :: ${{ needs.generate_keys.outputs.salt }} :: ${{ needs.generate_keys.outputs.pass }}"
 
       - name: Deploy to Cloud Run
         id: Deploy
@@ -69,7 +71,7 @@ jobs:
           service: ${{ env.SERVICE }}
           image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
           region: ${{ env.REGION }}
-          env_vars: WILBURX9_API_HASH=::add-mask::${{ needs.generate_keys.outputs.hash }},WILBURX9_API_SALT=::add-mask::${{ needs.generate_keys.outputs.salt }}
+          env_vars: WILBURX9_API_HASH=${{ env.API_HASH }},WILBURX9_API_SALT=${{ env.API_SALT }}
 
   #  build_and_deploy_frontend:
   #    name: Build and Deploy the frontend to Firebase Hosting
@@ -103,7 +105,8 @@ jobs:
     needs: [ generate_keys, build_and_deploy_backend ]
     runs-on: ubuntu-latest
     env:
-      working_directory: ./scripts/firebase
+      WORKING_DIRECTORY: ./scripts/firebase
+      API_PASS: "::add-mask::${{ needs.generate_keys.outputs.pass }}"
 
     steps:
       - name: Checkout
@@ -116,20 +119,20 @@ jobs:
 
       - name: Install npm
         run: npm install
-        working-directory: ${{ env.working_directory }}/functions
+        working-directory: ${{ env.WORKING_DIRECTORY }}/functions
 
       - name: Install Firebase CI
         run: sudo npm install -g firebase-tools
 
       - name: Set environement variables
-        working-directory: ${{ env.working_directory }}
-        run: firebase functions:config:set cacheupdate.domain="${{ secrets.REACT_APP_DOMAIN }}" cacheupdate.key="::add-mask::${{ needs.generate_keys.outputs.pass }}" --token '${{ secrets.FIREBASE_TOKEN }}'
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: firebase functions:config:set cacheupdate.domain="${{ secrets.REACT_APP_DOMAIN }}" cacheupdate.key="${{ env.API_PASS }}" --token '${{ secrets.FIREBASE_TOKEN }}'
 
       - name: Deploy
-        working-directory: ${{ env.working_directory }}
+        working-directory: ${{ env.WORKING_DIRECTORY }}
         run: firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'
 
       - name: Trigger HTTP function
         run: |
-         curl --request POST --header "Authorization: ${{ needs.generate_keys.outputs.pass }}" --url "https://${{ env.REGION }}-${{ env.GCP_PROJECT_ID }}.cloudfunctions.net/cacheUpdateViaHttps"
+         curl --request POST --header "Authorization: ${{ env.API_PASS }}" --url "https://${{ env.REGION }}-${{ env.GCP_PROJECT_ID }}.cloudfunctions.net/cacheUpdateViaHttps"
 
