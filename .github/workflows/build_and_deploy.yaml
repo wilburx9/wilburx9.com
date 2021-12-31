@@ -6,6 +6,7 @@ on:
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+  REGION: us-central1
 
 jobs:
   generate_keys:
@@ -40,7 +41,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVICE: backend
-      REGION: us-central1
 
     steps:
       - name: Checkout
@@ -69,7 +69,7 @@ jobs:
           service: ${{ env.SERVICE }}
           image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
           region: ${{ env.REGION }}
-          env_vars: WILBURX9_API_HASH=${{ needs.generate_keys.outputs.hash }},WILBURX9_API_SALT=${{ needs.generate_keys.outputs.salt }}
+          env_vars: WILBURX9_API_HASH=::add-mask::${{ needs.generate_keys.outputs.hash }},WILBURX9_API_SALT=::add-mask::${{ needs.generate_keys.outputs.salt }}
 
   #  build_and_deploy_frontend:
   #    name: Build and Deploy the frontend to Firebase Hosting
@@ -100,7 +100,7 @@ jobs:
 
   deploy_cloud_functions:
     name: Deploy Cloud Functions for Firebase
-    needs: [ build_and_deploy_backend ]
+    needs: [ generate_keys, build_and_deploy_backend ]
     runs-on: ubuntu-latest
     env:
       working_directory: ./scripts/firebase
@@ -123,13 +123,13 @@ jobs:
 
       - name: Set environement variables
         working-directory: ${{ env.working_directory }}
-        run: firebase functions:config:set cacheupdate.domain="${{ secrets.REACT_APP_DOMAIN }}" cacheupdate.key="${{ needs.generate_keys.outputs.pass }}" --token '${{ secrets.FIREBASE_TOKEN }}'
+        run: firebase functions:config:set cacheupdate.domain="${{ secrets.REACT_APP_DOMAIN }}" cacheupdate.key="::add-mask::${{ needs.generate_keys.outputs.pass }}" --token '${{ secrets.FIREBASE_TOKEN }}'
 
       - name: Deploy
         working-directory: ${{ env.working_directory }}
         run: firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'
 
-#      - name: Trigger HTTP function
-#        run: |
-#         curl --request POST --header "Authorization: ${{ needs.generate_keys.outputs.pass }}" --url "https://us-central1-wilburx9-336700.cloudfunctions.net/cacheUpdateViaHttps"
+      - name: Trigger HTTP function
+        run: |
+         curl --request POST --header "Authorization: ${{ needs.generate_keys.outputs.pass }}" --url "https://${{ env.REGION }}-${{ env.GCP_PROJECT_ID }}.cloudfunctions.net/cacheUpdateViaHttps"
 
