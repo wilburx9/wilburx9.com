@@ -13,9 +13,9 @@ jobs:
     name: Generate API Key
     runs-on: ubuntu-latest
     outputs:
-      hash: ${{ steps.generate-keys.outputs.hash }}
-      salt: ${{ steps.generate-keys.outputs.salt }}
-      pass: ${{ steps.generate-keys.outputs.pass }}
+      hash: ${{ steps.generate-keys.outputs.api_hash }}
+      salt: ${{ steps.generate-keys.outputs.api_salt }}
+      pass: ${{ steps.generate-keys.outputs.api_pass }}
 
     steps:
       - name: Checkout
@@ -30,51 +30,51 @@ jobs:
         id: generate-keys
         working-directory: ./scripts/go
         run: | # Generate the keys with main.go, parse the json output and output them
-          read the_hash the_salt the_pass < <(echo $(go run main.go | jq -r '.hash, .salt, .pass'))
-          echo "::add-mask::$the_hash"
-          echo "::add-mask::$the_salt"
-          echo "::add-mask::$the_pass"
-          echo "::set-output name=hash::$the_hash"
-          echo "::set-output name=salt::$the_salt"
-          echo "::set-output name=pass::$the_pass"
+          read j_hash j_salt j_pass < <(echo $(go run main.go | jq -r '.hash, .salt, .pass'))
+          echo "::add-mask::$j_hash"
+          echo "::add-mask::$j_salt"
+          echo "::add-mask::$j_pass"
+          echo "::set-output name=api_hash::$j_hash"
+          echo "::set-output name=api_salt::$j_salt"
+          echo "::set-output name=api_pass::$j_pass"
 
-  build_and_deploy_backend:
-    name: Build and Deploy the backend to Cloud Run
-    needs: [ generate_keys ]
-    runs-on: ubuntu-latest
-    env:
-      SERVICE: backend
-      API_HASH: ${{ needs.generate_keys.outputs.hash }}
-      API_SALT: ${{ needs.generate_keys.outputs.salt }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - name: Setup Cloud SDK
-        uses: google-github-actions/auth@v0
-        with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-
-      - name: Authorize Docker push
-        run: gcloud auth configure-docker
-
-      - name: Build and Push Container
-        run: |-
-          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} -f ./backend/Dockerfile .
-          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
-
-      - name: Echo Keys
-        run: echo ${{ needs.generate_keys.outputs.hash }} / ${{ needs.generate_keys.outputs.salt }} / ${{ needs.generate_keys.outputs.pass }}
-
-      - name: Deploy to Cloud Run
-        id: Deploy
-        uses: google-github-actions/deploy-cloudrun@v0
-        with:
-          service: ${{ env.SERVICE }}
-          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
-          region: ${{ env.REGION }}
-          env_vars: WILBURX9_API_HASH=${{ env.API_HASH }},WILBURX9_API_SALT=${{ env.API_SALT }}
+#  build_and_deploy_backend:
+#    name: Build and Deploy the backend to Cloud Run
+#    needs: [ generate_keys ]
+#    runs-on: ubuntu-latest
+#    env:
+#      SERVICE: backend
+#      API_HASH: ${{ needs.generate_keys.outputs.hash }}
+#      API_SALT: ${{ needs.generate_keys.outputs.salt }}
+#
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#
+#      - name: Setup Cloud SDK
+#        uses: google-github-actions/auth@v0
+#        with:
+#          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+#
+#      - name: Authorize Docker push
+#        run: gcloud auth configure-docker
+#
+#      - name: Build and Push Container
+#        run: |-
+#          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} -f ./backend/Dockerfile .
+#          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+#
+#      - name: Echo Keys
+#        run: echo ${{ needs.generate_keys.outputs.hash }} / ${{ needs.generate_keys.outputs.salt }} / ${{ needs.generate_keys.outputs.pass }}
+#
+#      - name: Deploy to Cloud Run
+#        id: Deploy
+#        uses: google-github-actions/deploy-cloudrun@v0
+#        with:
+#          service: ${{ env.SERVICE }}
+#          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+#          region: ${{ env.REGION }}
+#          env_vars: WILBURX9_API_HASH=${{ env.API_HASH }},WILBURX9_API_SALT=${{ env.API_SALT }}
 
   #  build_and_deploy_frontend:
   #    name: Build and Deploy the frontend to Firebase Hosting
