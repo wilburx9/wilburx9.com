@@ -5,6 +5,7 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 	h "html"
@@ -32,8 +33,8 @@ type Rss struct {
 }
 
 // ToResult creates ArticleResult by mapping Rss to a slice of Article
-func (r Rss) ToResult(source string) []internal.DbModel {
-	var articles = make([]internal.DbModel, len(r.Channel.Item))
+func (r Rss) ToResult(source string) []database.Model {
+	var articles = make([]database.Model, len(r.Channel.Item))
 	for i, e := range r.Channel.Item {
 		thumbnail, excerpt := getMediumThumbAndExcerpt(e.Encoded)
 		articles[i] = Article{

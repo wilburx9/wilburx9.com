@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"math"
 	"net/http"
 	"net/url"
@@ -21,26 +22,26 @@ const (
 // Instagram encapsulates the fetching of Instagram images and access token management
 type Instagram struct {
 	AccessToken string
-	internal.Fetch
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
 // Cache fetches and caches Instagram images to db
-func (i Instagram) Cache() int {
-	result := i.fetchImages()
-	err := i.Db.Persist(internal.DbGalleryKey, result...)
+func (i Instagram) Cache() (int, error) {
+	result, err := i.fetchImages()
 	if err != nil {
-		log.Errorf("Couldn't cache Instagram images. Reason :: %v", err)
-		return 0
+		return 0, err
 	}
-	return len(result)
+
+	return len(result), i.Db.Write(internal.DbGalleryKey, result...)
 }
 
 // Recursively fetch all the images
-func (i Instagram) fetchImages() []internal.DbModel {
+func (i Instagram) fetchImages() ([]database.Model, error) {
 	token, err := i.getToken()
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't get token")
-		return nil
+		return nil, err
 	}
 
 	u, _ := url.Parse("https://graph.instagram.com/me/media")
@@ -50,16 +51,11 @@ func (i Instagram) fetchImages() []internal.DbModel {
 	q.Set("limit", instagramLimit)
 	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return nil
-	}
-
+	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return nil
+		return nil, err
 	}
 	defer res.Body.Close()
 
@@ -67,16 +63,16 @@ func (i Instagram) fetchImages() []internal.DbModel {
 	err = json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return nil
+		return nil, err
 	}
 
-	return data.Data.ToImages(instagramKey)
+	return data.Data.ToImages(instagramKey), nil
 }
 
 func (i Instagram) getToken() (string, error) {
 
 	// Attempt to get token from Db
-	keys, _, err := i.Db.Retrieve(internal.DbKeys, "", math.MaxInt)
+	keys, _, err := i.Db.Read(internal.DbKeys, "", math.MaxInt)
 	// If we haven't saved the token before, log an error and refresh the token we have now
 	if err != nil || len(keys) == 0 {
 		log.Warningf("Couldn't get Keys from the db. Possible error: %v", err)
@@ -133,7 +129,7 @@ func (i Instagram) refreshToken(oldToken string) (string, error) {
 	}
 
 	newT.RefreshedAt = time.Now()
-	err = i.Db.Persist(internal.DbKeys, newT)
+	err = i.Db.Write(internal.DbKeys, newT)
 	if err != nil {
 		return "", err
 	}

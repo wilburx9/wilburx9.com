@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"net/http"
 )
 
@@ -18,36 +19,31 @@ const (
 type Unsplash struct {
 	Username  string
 	AccessKey string
-	internal.Fetch
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
 // Cache fetches and caches Unsplash images to db
-func (u Unsplash) Cache() int {
-	result := u.FetchImages()
-	err := u.Db.Persist(internal.DbGalleryKey, result...)
+func (u Unsplash) Cache() (int, error) {
+	result, err := u.FetchImages()
 	if err != nil {
-		log.Errorf("Couldn't cache Unsplash images. Reason :: %v", err)
-		return 0
+		return 0, err
 	}
-	return len(result)
+
+	return len(result), u.Db.Write(internal.DbGalleryKey, result...)
 }
 
 // FetchImages fetches images via HTTP
-func (u Unsplash) FetchImages() []internal.DbModel {
+func (u Unsplash) FetchImages() ([]database.Model, error) {
 	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?per_page=%v", u.Username, unsplashLimit)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return nil
-	}
-
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
 	req.Header.Add("Accept-Version", "v1")
 	req.Header.Add("Authorization", fmt.Sprintf("Client-ID %s", u.AccessKey))
 
 	res, err := u.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return nil
+		return nil, err
 	}
 	defer res.Body.Close()
 
@@ -55,8 +51,8 @@ func (u Unsplash) FetchImages() []internal.DbModel {
 	err = json.NewDecoder(res.Body).Decode(&results)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return nil
+		return nil, err
 	}
 
-	return results.ToImages(unsplashKey)
+	return results.ToImages(unsplashKey), nil
 }

@@ -3,11 +3,12 @@ package articles
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/update"
 	"testing"
 )
 
 func TestMediumFetchArticles(t *testing.T) {
-	var m = Medium{Name: "testUser", Fetch: internal.Fetch{
+	var m = Medium{Name: "testUser", BaseCache: update.BaseCache{
 		Db:         nil,
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/medium_response.xml"},
 	}}

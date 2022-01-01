@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"net/http"
 )
 
@@ -16,33 +17,29 @@ const (
 // Medium encapsulates the fetching and caching of medium articles
 type Medium struct {
 	Name string // should be Medium username (e.g "@Wilburx9") or publication (e.g. flutter-community)
-	internal.Fetch
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
 // Cache fetches and caches all Medium Articles
-func (m Medium) Cache() int {
-	result := m.fetchArticles()
-	err := m.Db.Persist(internal.DbArticlesKey, result...)
+func (m Medium) Cache() (int, error) {
+	result, err := m.fetchArticles()
 	if err != nil {
-		log.Errorf("Couldn't cache Medium articles. Reason :: %v", err)
-		return 0
+		return 0, err
 	}
-	return len(result)
+
+	return len(result), m.Db.Write(internal.DbArticlesKey, result...)
 }
 
 // fetchArticles fetches articles via HTTP
-func (m Medium) fetchArticles() []internal.DbModel {
+func (m Medium) fetchArticles() ([]database.Model, error) {
 	url := fmt.Sprintf("https://medium.com/feed/%s", m.Name)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return nil
-	}
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
 	res, err := m.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return nil
+		return nil, err
 	}
 	defer res.Body.Close()
 
@@ -50,7 +47,7 @@ func (m Medium) fetchArticles() []internal.DbModel {
 	err = xml.NewDecoder(res.Body).Decode(&rss)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return nil
+		return nil, err
 	}
-	return rss.ToResult(mediumKey)
+	return rss.ToResult(mediumKey), nil
 }

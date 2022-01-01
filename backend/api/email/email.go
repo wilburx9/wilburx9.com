@@ -1,4 +1,4 @@
-package contact
+package email
 
 import (
 	"encoding/base64"
@@ -13,7 +13,8 @@ import (
 	"strings"
 )
 
-type requestData struct {
+// Data is a container the fields needed to Send an email
+type Data struct {
 	SenderEmail     string `json:"sender_email"`
 	SenderName      string `json:"sender_name"`
 	Subject         string `json:"subject"`
@@ -23,7 +24,7 @@ type requestData struct {
 
 // Handler validates both request body and captcha, and possibly sends an email
 func Handler(c *gin.Context, client internal.HttpClient) {
-	var data requestData
+	var data Data
 	err := c.ShouldBindJSON(&data)
 	message := validateData(data)
 	if err != nil || message != "" {
@@ -36,7 +37,7 @@ func Handler(c *gin.Context, client internal.HttpClient) {
 		return
 	}
 
-	err = send(data, client)
+	err = Send(data, client)
 	if err != nil {
 		c.JSON(http.StatusBadGateway, internal.MakeErrorResponse("Email not sent"))
 		return
@@ -45,7 +46,8 @@ func Handler(c *gin.Context, client internal.HttpClient) {
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse("Email sent successfully"))
 }
 
-func send(data requestData, client internal.HttpClient) error {
+// Send posts email with the details in the data
+func Send(data Data, client internal.HttpClient) error {
 	u := fmt.Sprintf("https://api.mailgun.net/v3/%v/messages", configs.Config.EmailDomain)
 	payload := url.Values{}
 	payload.Add("from", fmt.Sprintf("%v <%v>", data.SenderName, strings.TrimSpace(data.SenderEmail)))

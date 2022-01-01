@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"time"
 )
 
@@ -53,9 +54,9 @@ type licenseInfo struct {
 }
 
 // ToResult creates RepoResult by mapping GitHub to a slice of Repo
-func (m GitHub) ToResult(source string) []internal.DbModel {
+func (m GitHub) ToResult(source string) []database.Model {
 	nodes := m.Data.Viewer.Repositories.Nodes
-	var repos = make([]internal.DbModel, len(nodes))
+	var repos = make([]database.Model, len(nodes))
 
 	mapLanguages := func(node nodeElement) []language {
 		edges := node.Languages.Edges
