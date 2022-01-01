@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"net/http"
 )
 
@@ -15,33 +16,27 @@ const (
 // WordPress encapsulates fetching and caching of WordPress blog posts
 type WordPress struct {
 	URL string // WP V2 post URL URL e.g https://example.com/wp-json/wp/v2/posts
-	internal.Fetch
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
-// FetchAndCache fetches and caches WordPress articles
-func (w WordPress) FetchAndCache() int {
-	result := w.fetchArticles()
-	w.Db.Persist(internal.DbArticlesKey, wordpressKey, result)
-	return len(result.Articles)
-}
+// Cache fetches and caches WordPress articles
+func (w WordPress) Cache() (int, error) {
+	result, err := w.fetchArticles()
+	if err != nil {
+		return 0, err
+	}
 
-// GetCached returns cached WordPress articles
-func (w WordPress) GetCached(result interface{}) error {
-	return w.Db.Retrieve(internal.DbArticlesKey, wordpressKey, result)
+	return len(result), w.Db.Write(internal.DbArticlesKey, result...)
 }
 
 // fetchArticles gets articles from WordPress via HTTP
-func (w WordPress) fetchArticles() models.ArticleResult {
-	req, err := http.NewRequest(http.MethodGet, w.URL, nil)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return models.EmptyResponse()
-	}
-
+func (w WordPress) fetchArticles() ([]database.Model, error) {
+	req, _ := http.NewRequest(http.MethodGet, w.URL, nil)
 	res, err := w.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return models.EmptyResponse()
+		return nil, err
 	}
 	defer res.Body.Close()
 
@@ -49,7 +44,7 @@ func (w WordPress) fetchArticles() models.ArticleResult {
 	err = json.NewDecoder(res.Body).Decode(&posts)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return models.EmptyResponse()
+		return nil, err
 	}
-	return posts.ToResult()
+	return posts.ToResult(wordpressKey), nil
 }

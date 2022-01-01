@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"net/http"
 )
 
@@ -16,34 +17,29 @@ const (
 // Medium encapsulates the fetching and caching of medium articles
 type Medium struct {
 	Name string // should be Medium username (e.g "@Wilburx9") or publication (e.g. flutter-community)
-	internal.Fetch
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
-// FetchAndCache fetches and caches all Medium Articles
-func (m Medium) FetchAndCache() int {
-	result := m.fetchArticles()
-	m.Db.Persist(internal.DbArticlesKey, mediumKey, result)
-	return len(result.Articles)
-}
+// Cache fetches and caches all Medium Articles
+func (m Medium) Cache() (int, error) {
+	result, err := m.fetchArticles()
+	if err != nil {
+		return 0, err
+	}
 
-// GetCached returns cached Medium articles
-func (m Medium) GetCached(result interface{}) error {
-	return m.Db.Retrieve(internal.DbArticlesKey, mediumKey, result)
+	return len(result), m.Db.Write(internal.DbArticlesKey, result...)
 }
 
 // fetchArticles fetches articles via HTTP
-func (m Medium) fetchArticles() models.ArticleResult {
+func (m Medium) fetchArticles() ([]database.Model, error) {
 	url := fmt.Sprintf("https://medium.com/feed/%s", m.Name)
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return models.EmptyResponse()
-	}
+	req, _ := http.NewRequest(http.MethodGet, url, nil)
 
 	res, err := m.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return models.EmptyResponse()
+		return nil, err
 	}
 	defer res.Body.Close()
 
@@ -51,7 +47,7 @@ func (m Medium) fetchArticles() models.ArticleResult {
 	err = xml.NewDecoder(res.Body).Decode(&rss)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return models.EmptyResponse()
+		return nil, err
 	}
-	return rss.ToResult()
+	return rss.ToResult(mediumKey), nil
 }

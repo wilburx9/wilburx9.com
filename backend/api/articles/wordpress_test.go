@@ -3,11 +3,12 @@ package articles
 import (
 	"github.com/stretchr/testify/assert"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/update"
 	"testing"
 )
 
 func TestWordPressFetchArticles(t *testing.T) {
-	var w = WordPress{URL: "https://example.com/wp-json/wp/v2/posts", Fetch: internal.Fetch{
+	var w = WordPress{URL: "https://example.com/wp-json/wp/v2/posts", BaseCache: update.BaseCache{
 		Db:         nil,
 		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/wordpress_response.json"},
 	}}

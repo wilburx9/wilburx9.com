@@ -16,8 +16,6 @@ func main() {
 	var db = api.SetUpDatabase()
 	defer db.Close()
 
-	api.ScheduleFetchAddCache(db)
-
 	// Setup and start Http server
 	s := api.SetUpServer(db)
 	s.ListenAndServe()

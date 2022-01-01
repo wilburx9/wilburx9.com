@@ -2,6 +2,7 @@ package models
 
 import (
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"time"
 )
 
@@ -53,9 +54,9 @@ type licenseInfo struct {
 }
 
 // ToResult creates RepoResult by mapping GitHub to a slice of Repo
-func (m GitHub) ToResult() RepoResult {
+func (m GitHub) ToResult(source string) []database.Model {
 	nodes := m.Data.Viewer.Repositories.Nodes
-	var repos = make([]Repo, len(nodes))
+	var repos = make([]database.Model, len(nodes))
 
 	mapLanguages := func(node nodeElement) []language {
 		edges := node.Languages.Edges
@@ -80,19 +81,19 @@ func (m GitHub) ToResult() RepoResult {
 
 	for i, node := range nodes {
 		repos[i] = Repo{
+			ID:          internal.MakeId(source, node.ID),
 			Name:        node.Name,
 			Stars:       node.StargazerCount,
 			Forks:       node.ForkCount,
 			Url:         node.URL,
 			Description: node.Description,
-			CreatedAt:   internal.StringToTime(time.RFC3339, node.CreatedAt),
-			UpdatedAt:   internal.StringToTime(time.RFC3339, node.UpdatedAt),
+			CreatedOn:   internal.StringToTime(time.RFC3339, node.CreatedAt),
+			UpdatedOn:   internal.StringToTime(time.RFC3339, node.UpdatedAt),
 			License:     getLicense(node),
 			Languages:   mapLanguages(node),
+			Score:       node.StargazerCount + node.ForkCount,
+			Source:      source,
 		}
 	}
-	return RepoResult{
-		Result: internal.Result{UpdatedAt: time.Now()},
-		Repos:  repos,
-	}
+	return repos
 }

@@ -6,53 +6,56 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
+	"math"
 	"net/http"
+	"net/url"
 	"time"
 )
 
 const (
 	instagramKey          = "instagram"
 	minTokenRemainingLife = 24 * time.Hour * 5 // 5 Days
+	instagramLimit        = "20"
 )
 
 // Instagram encapsulates the fetching of Instagram images and access token management
 type Instagram struct {
 	AccessToken string
-	internal.Fetch
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
-// FetchAndCache fetches and caches data from Instagram
-func (i Instagram) FetchAndCache() int {
-	accessToken := i.getToken()
-	fields := "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type"
-	u := fmt.Sprintf("https://graph.instagram.com/me/media?fields=%s&access_token=%s", fields, accessToken)
-
-	images := i.fetchImage([]models.Image{}, u)
-	result := models.ImageResult{
-		Result: internal.Result{UpdatedAt: time.Now()},
-		Images: images,
+// Cache fetches and caches Instagram images to db
+func (i Instagram) Cache() (int, error) {
+	result, err := i.fetchImages()
+	if err != nil {
+		return 0, err
 	}
-	i.Db.Persist(internal.DbGalleryKey, instagramKey, result)
-	return len(images)
-}
 
-// GetCached fetches Instagram images from the db that was previously saved in Cache
-func (i Instagram) GetCached(result interface{}) error {
-	return i.Db.Retrieve(internal.DbGalleryKey, instagramKey, result)
+	return len(result), i.Db.Write(internal.DbGalleryKey, result...)
 }
 
 // Recursively fetch all the images
-func (i Instagram) fetchImage(fetched []models.Image, url string) []models.Image {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+func (i Instagram) fetchImages() ([]database.Model, error) {
+	token, err := i.getToken()
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return fetched
+		log.WithFields(log.Fields{"error": err}).Warning("Couldn't get token")
+		return nil, err
 	}
 
+	u, _ := url.Parse("https://graph.instagram.com/me/media")
+	q := u.Query()
+	q.Set("fields", "caption,id,media_url,timestamp,permalink,thumbnail_url,media_type")
+	q.Set("access_token", token)
+	q.Set("limit", instagramLimit)
+	u.RawQuery = q.Encode()
+
+	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return fetched
+		return nil, err
 	}
 	defer res.Body.Close()
 
@@ -60,66 +63,76 @@ func (i Instagram) fetchImage(fetched []models.Image, url string) []models.Image
 	err = json.NewDecoder(res.Body).Decode(&data)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return fetched
+		return nil, err
 	}
 
-	fetched = append(fetched, data.Data.ToImages()...)
-
-	// Return the fetched images if there are no more images to fetch
-	if data.Paging.Next == "" {
-		return fetched
-	}
-
-	// Fetch the next page
-	return i.fetchImage(fetched, data.Paging.Next)
+	return data.Data.ToImages(instagramKey), nil
 }
 
-func (i Instagram) getToken() string {
-	var tk models.InstaToken
+func (i Instagram) getToken() (string, error) {
+
 	// Attempt to get token from Db
-	err := i.Db.Retrieve(internal.DbKeys, instagramKey, &tk)
+	keys, _, err := i.Db.Read(internal.DbKeys, "", math.MaxInt)
 	// If we haven't saved the token before, log an error and refresh the token we have now
-	if err != nil {
+	if err != nil || len(keys) == 0 {
+		log.Warningf("Couldn't get Keys from the db. Possible error: %v", err)
+		return i.refreshToken(i.AccessToken)
+	}
+
+	var tk models.InstaToken
+	// Get token map from keys
+	for _, m := range keys {
+		if _, ok := m["id"]; ok && m["id"] == instagramKey {
+			if bytes, err := json.Marshal(m); err == nil {
+				json.Unmarshal(bytes, &tk)
+			}
+			break
+		}
+	}
+
+	if tk.ID == "" || tk.Value == "" {
 		return i.refreshToken(i.AccessToken)
 	}
 
 	// Check for expired token.
 	if tk.Expired() {
-		// Token has expired and we can't refresh it. This should never happen.
-		log.Error("Instagram access token has expired")
-		return ""
+		// Token has expired and it can't be refreshed. This should never happen.
+		return "", fmt.Errorf("instagram access token has expired")
 	}
 
 	// Refresh the token if need be
-	if tk.ShouldRefresh(minTokenRemainingLife) {
+	if tk.IsAboutToExpire(minTokenRemainingLife) {
 		return i.refreshToken(tk.Value)
 	}
-	return tk.Value
+	return tk.Value, nil
 }
 
-func (i Instagram) refreshToken(oldToken string) string {
-	url := fmt.Sprintf("https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=%v", oldToken)
+func (i Instagram) refreshToken(oldToken string) (string, error) {
+	u, _ := url.Parse("https://graph.instagram.com/refresh_access_token")
+	q := u.Query()
+	q.Set("grant_type", "ig_refresh_token")
+	q.Set("access_token", oldToken)
+	u.RawQuery = q.Encode()
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, _ := http.NewRequest(http.MethodGet, u.String(), nil)
 
-	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return oldToken
-	}
 	res, err := i.HttpClient.Do(req)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return oldToken
+		return "", err
 	}
 	defer res.Body.Close()
 
-	var newT models.InstaToken
+	var newT = models.NewInstaToken(instagramKey)
 	err = json.NewDecoder(res.Body).Decode(&newT)
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall refresh token response")
-		return newT.Value
+		return "", err
 	}
+
 	newT.RefreshedAt = time.Now()
-	i.Db.Persist(internal.DbKeys, instagramKey, newT)
-	return newT.Value
+	err = i.Db.Write(internal.DbKeys, newT)
+	if err != nil {
+		return "", err
+	}
+
+	return newT.Value, nil
 }

@@ -8,7 +8,7 @@ import {
 } from "@chakra-ui/react";
 import React, {useContext} from "react";
 import {DataContext} from "../DataProvider";
-import {ArticleModel} from "../models/ArticleModel";
+import {ArticleModel} from "./ArticleModel";
 import {HiArrowRight} from "react-icons/hi";
 
 export const ArticlesComponent = () => {
@@ -18,9 +18,9 @@ export const ArticlesComponent = () => {
 
   return (
     <VStack align='start'>
-      <Heading pt={6} size='xl' align="start" fontWeight="black">&#47;&#47;Articles</Heading>
+      <Heading pt={2} size='xl' align="start" fontWeight="black">&#47;&#47; Articles</Heading>
       <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
-        {articles.map((article) => <ArticleComponent {...article} key={article.title}/>)}
+        {articles.map((article) => <ArticleComponent {...article} key={article.id}/>)}
       </SimpleGrid>
     </VStack>
   )

@@ -27,6 +27,8 @@ type appConfig struct {
 	EmailAPIKey          string `mapstructure:"email_api_key"`
 	HCaptchaSecret       string `mapstructure:"h_captcha_secret"`
 	HCaptchaSiteKey      string `mapstructure:"h_captcha_site_key"`
+	APIHash              string `mapstructure:"api_hash"`
+	APISalt              string `mapstructure:"api_salt"`
 }
 
 // IsRelease returns true for release Env and false otherwise

@@ -6,12 +6,11 @@ import (
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
 	"github.com/wilburt/wilburx9.dev/backend/api/repos/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/configs"
 	"io/ioutil"
 	"net/http"
-	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -24,37 +23,35 @@ const (
 type GitHub struct {
 	Auth     string
 	Username string
-	internal.Fetch
+	Db         database.ReadWrite
+	HttpClient internal.HttpClient
 }
 
-// FetchAndCache fetches and saves GitHub repositories to DB
-func (g GitHub) FetchAndCache() int {
-	res := g.fetchRepos()
-	g.Db.Persist(internal.DbReposKey, githubKey, res)
-	return len(res.Repos)
-}
-
-// GetCached retrieves saved GitHub repositories
-func (g GitHub) GetCached(result interface{}) error {
-	return g.Db.Retrieve(internal.DbReposKey, githubKey, result)
-}
-
-func (g GitHub) fetchRepos() models.RepoResult {
-	url := "https://api.github.com/graphql"
-
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(getGraphQlQuery()))
+// Cache fetches and saves GitHub repositories to DB
+func (g GitHub) Cache() (int, error) {
+	result, err := g.fetchRepos()
 	if err != nil {
-		log.WithFields(log.Fields{"error": err}).Warning("Couldn't init http request")
-		return models.EmptyResponse()
+		return 0, err
 	}
 
+	return len(result), g.Db.Write(internal.DbReposKey, result...)
+}
+
+func (g GitHub) fetchRepos() ([]database.Model, error) {
+	url := "https://api.github.com/graphql"
+
+	query, err := getGraphQlQuery()
+	if err != nil {
+		return nil, err
+	}
+	req, _ := http.NewRequest(http.MethodPost, url, strings.NewReader(query))
 	auth := base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("%v:%v", g.Username, g.Auth)))
 	req.Header.Add("Authorization", fmt.Sprintf("Basic %v", auth))
 
 	resp, err := g.HttpClient.Do(req)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't send request")
-		return models.EmptyResponse()
+		return nil, err
 	}
 	defer resp.Body.Close()
 
@@ -62,29 +59,23 @@ func (g GitHub) fetchRepos() models.RepoResult {
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't Unmarshall data")
-		return models.EmptyResponse()
+		return nil, err
 	}
 
-	return data.ToResult()
+	return data.ToResult(githubKey), nil
 }
 
-func getGraphQlQuery() string {
+func getGraphQlQuery() (string, error) {
 	queryPath := fmt.Sprintf("%v/api/repos/internal/files/github_query.graphql", configs.Config.AppHome)
-	bytes, err1 := ioutil.ReadFile(queryPath)
-	if err1 != nil {
-		root, err := filepath.Abs(filepath.Dir(os.Args[0]))
-		if err != nil {
-			log.Fatalf("Could not read root directory %s", err)
-			return ""
-		}
-		log.Println(fmt.Sprintf("Current directory is %v", root))
-		log.WithFields(log.Fields{"error": err1}).Error("Could not load graphql query file")
-		return ""
+	bytes, err := ioutil.ReadFile(queryPath)
+	if err != nil {
+		log.WithFields(log.Fields{"error": err}).Error("Could not load graphql query file")
+		return "", err
 	}
 
 	// Strip it of all new line characters
 	re := regexp.MustCompile(`\r?\n`)
 	cleaned := re.ReplaceAllString(string(bytes), "")
 
-	return fmt.Sprintf(`{"query":"%v"}`, cleaned)
+	return fmt.Sprintf(`{"query":"%v"}`, cleaned), nil
 }

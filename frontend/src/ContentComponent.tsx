@@ -1,11 +1,11 @@
 import React, {useContext, useEffect} from "react";
-import {DataContext} from "../DataProvider";
+import {DataContext} from "./DataProvider";
 import {Box, Center, Fade, Flex, Spinner, useColorModeValue} from "@chakra-ui/react";
-import {ColorModeSwitcher} from "./ColorModeSwitcher";
-import {ArticlesComponent} from "./ArticlesComponent";
-import {ReposComponent} from "./ReposComponent";
-import {AttributionComponent} from "./AttributionComponent";
-import {ContactComponent} from "./ContactComponent";
+import {ColorModeSwitcher} from "./theme/ColorModeSwitcher";
+import {ArticlesComponent} from "./articles/ArticlesComponent";
+import {ReposComponent} from "./repos/ReposComponent";
+import {AttributionComponent} from "./footer/AttributionComponent";
+import {ContactComponent} from "./contact/ContactComponent";
 
 export const ContentComponent = () => {
   const {hasData} = useContext(DataContext)

@@ -16,4 +16,7 @@ const (
 
 	// DbKeys is the key to the collection of gateway keys
 	DbKeys = "keys"
+
+	// UpdatesKey is the key for saving the last time an update was made to a collection
+	UpdatesKey = "updates"
 )

@@ -1,9 +1,9 @@
 import React, {Component} from "react";
-import {ArticleModel, ArticleResponse} from "./models/ArticleModel";
+import {ArticleModel, ArticleResponse} from "./articles/ArticleModel";
 import axios, {AxiosError, AxiosResponse} from "axios";
-import {RepoModel, RepoResponse} from "./models/RepoModel";
-import {ContactResponse, ContactData} from "./models/ContactModel";
-import {FormResponse} from "./components/ContactComponent";
+import {RepoModel, RepoResponse} from "./repos/RepoModel";
+import {ContactResponse, ContactData} from "./contact/ContactModel";
+import {FormResponse} from "./contact/ContactComponent";
 import {getAnalyticsParams, logAnalyticsEvent} from "./analytics/firebase";
 import {AnalyticsEvent} from "./analytics/events";
 import {AnalyticsKey} from "./analytics/keys";
@@ -102,8 +102,8 @@ export class DataProvider extends Component<any, DataState> {
 
 function logNetworkError(e: AxiosError, data?: string) {
   let params = getAnalyticsParams()
-  params.set(AnalyticsKey.url, `${e.config.baseURL}${e.config.url}`)
-  params.set(AnalyticsKey.method, e.config.method)
+  params.set(AnalyticsKey.url, `${e.config?.baseURL}${e.config?.url}`)
+  params.set(AnalyticsKey.method, e.config?.method)
   params.set(AnalyticsKey.message, e.message)
 
   if (data) params.set(AnalyticsKey.data, data)
