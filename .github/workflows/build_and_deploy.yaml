@@ -2,7 +2,7 @@ name: Build and Deploy to Firebase and Cloud Run
 
 on:
   pull_request:
-    branches: [ develop ]  #TODO: Change to live
+    branches: [ live ]
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
