@@ -9,9 +9,11 @@ env:
   REGION: us-central1
 
 jobs:
-  generate_keys:
-    name: Generate API Key
+  deploy_backend:
+    name: Build and Deploy Backend
     runs-on: ubuntu-latest
+    env:
+      SERVICE: backend
 
     steps:
       - name: Checkout
@@ -22,115 +24,88 @@ jobs:
         with:
           go-version: '1.17.5'
 
-      - name: Generate keys
-        id: generate-keys
+      - name: Generate Keys
+        id: api_keys
         working-directory: ./scripts/go
+        run: | # Generate the keys with main.go and parse the json output
+          read _hash _salt _pass < <(echo $(go run main.go | jq -r '.hash, .salt, .pass'))
+          echo "::add-mask::$_hash"
+          echo "::add-mask::$_salt"
+          echo "::add-mask::$_pass"
+          echo "::set-output name=hash::$_hash"
+          echo "::set-output name=salt::$_salt"
+          echo "::set-output name=pass::$_pass"
+
+      - name: Setup Cloud SDK
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Build and Push Container
+        run: |-
+          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} -f ./backend/Dockerfile .
+          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+
+      - name: Echo Keys # TODO: Remove
+        run: echo ${{ steps.api_keys.outputs.hash }} / ${{ steps.api_keys.outputs.salt }} / ${{ steps.api_keys.outputs.pass }}
+
+      - name: Deploy to Cloud Run
+        id: Deploy
+        uses: google-github-actions/deploy-cloudrun@v0
+        with:
+          service: ${{ env.SERVICE }}
+          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
+          region: ${{ env.REGION }}
+          env_vars: WILBURX9_hash=${{ steps.api_keys.outputs.hash }},WILBURX9_salt=${{ steps.api_keys.outputs.salt }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
+      - name: Install npm
+        working-directory: ./scripts/firebase/functions
+        run: npm install
+
+      - name: Deploy Cloud Functions
+        working-directory: ./scripts/firebase
         run: |
-          read j_hash j_salt < <(echo $(go run main.go | jq -r '.hash, .salt'))
-          echo "::add-mask::$j_hash"
-          echo "::set-output name=api_hash::$j_hash"
-          echo "::set-output name=api_salt::$j_salt"
+          sudo npm install -g firebase-tools
+          host=$(echo ${{ secrets.REACT_APP_DOMAIN }} | awk -F[/:] '{print $4}') `#Strip out the protocol`
+          firebase functions:config:set cacheupdate.domain="$host" cacheupdate.key="${{ steps.api_keys.outputs.pass }}" --token '${{ secrets.FIREBASE_TOKEN }}'
+          firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'
 
-#  build_and_deploy_backend:
-#    name: Build and Deploy the backend to Cloud Run
-#    needs: [ generate_keys ]
-#    runs-on: ubuntu-latest
-#    env:
-#      SERVICE: backend
-#      API_HASH: ${{ needs.generate_keys.outputs.hash }}
-#      API_SALT: ${{ needs.generate_keys.outputs.salt }}
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#
-#      - name: Setup Cloud SDK
-#        uses: google-github-actions/auth@v0
-#        with:
-#          credentials_json: '${{ secrets.GCP_SA_KEY }}'
-#
-#      - name: Authorize Docker push
-#        run: gcloud auth configure-docker
-#
-#      - name: Build and Push Container
-#        run: |-
-#          docker build -t gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }} -f ./backend/Dockerfile .
-#          docker push gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
-#
-#      - name: Echo Keys
-#        run: echo ${{ needs.generate_keys.outputs.hash }} / ${{ needs.generate_keys.outputs.salt }} / ${{ needs.generate_keys.outputs.pass }}
-#
-#      - name: Deploy to Cloud Run
-#        id: Deploy
-#        uses: google-github-actions/deploy-cloudrun@v0
-#        with:
-#          service: ${{ env.SERVICE }}
-#          image: gcr.io/${{ env.GCP_PROJECT_ID }}/${{ env.SERVICE }}:${{  github.sha }}
-#          region: ${{ env.REGION }}
-#          env_vars: WILBURX9_API_HASH=${{ env.API_HASH }},WILBURX9_API_SALT=${{ env.API_SALT }}
+      - name: Trigger HTTP Cloud Function
+        run: |
+          curl --request POST --header "Authorization: ${{ steps.api_keys.outputs.pass }}" --url "https://${{ env.REGION }}-${{ env.GCP_PROJECT_ID }}.cloudfunctions.net/cacheUpdateViaHttps"
+          
 
-  #  build_and_deploy_frontend:
-  #    name: Build and Deploy the frontend to Firebase Hosting
-  #    needs: [ build_and_deploy_backend ]
-  #    runs-on: ubuntu-latest
-  #    env:
-  #      REACT_APP_DOMAIN: ${{ secrets.REACT_APP_DOMAIN }}
-  #      REACT_APP_H_CAPTCHA_SITE_KEY: ${{ secrets.REACT_APP_H_CAPTCHA_SITE_KEY }}
-  #      REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
-  #      REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
-  #      REACT_APP_GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
-  #    steps:
-  #      - name: Checkout
-  #        uses: actions/checkout@v2
-  #
-  #      - name: Build with npm
-  #        working-directory: ./frontend
-  #        run: npm ci && npm run build
-  #
-  #      - name: Deploy to Firebase Hosting
-  #        uses: FirebaseExtended/action-hosting-deploy@v0
-  #        with:
-  #          entrypoint: ./frontend
-  #          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-  #          firebaseServiceAccount: '${{ secrets.FIREBASE_SA_KEY }}'
-  #          channelId: live
-  #          projectId: ${{ env.GCP_PROJECT_ID }}
+  deploy_frontend:
+    name: Build and Deploy Frontend
+    needs: [ deploy_backend ]
+    runs-on: ubuntu-latest
+    env:
+      REACT_APP_DOMAIN: ${{ secrets.REACT_APP_DOMAIN }}
+      REACT_APP_H_CAPTCHA_SITE_KEY: ${{ secrets.REACT_APP_H_CAPTCHA_SITE_KEY }}
+      REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+      REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
+      REACT_APP_GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-#  deploy_cloud_functions:
-#    name: Deploy Cloud Functions for Firebase
-#    needs: [ generate_keys, build_and_deploy_backend ]
-#    runs-on: ubuntu-latest
-#    env:
-#      WORKING_DIRECTORY: ./scripts/firebase
-#      API_PASS: ${{ needs.generate_keys.outputs.pass }}
-#
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#
-#      - name: Setup Node
-#        uses: actions/setup-node@v1
-#        with:
-#          node-version: 16
-#
-#      - name: Install npm
-#        run: npm install
-#        working-directory: ${{ env.WORKING_DIRECTORY }}/functions
-#
-#      - name: Install Firebase CI
-#        run: sudo npm install -g firebase-tools
-#
-#      - name: Set environement variables
-#        working-directory: ${{ env.WORKING_DIRECTORY }}
-#        run: |
-#          host=$(echo ${{ secrets.REACT_APP_DOMAIN }} | awk -F[/:] '{print $4}')
-#          firebase functions:config:set cacheupdate.domain="$host" cacheupdate.key="${{ env.API_PASS }}" --token '${{ secrets.FIREBASE_TOKEN }}'
-#
-#      - name: Deploy
-#        working-directory: ${{ env.WORKING_DIRECTORY }}
-#        run: firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'
-#
-#      - name: Trigger HTTP function
-#        run: |
-#         curl --request POST --header "Authorization: ${{ env.API_PASS }}" --url "https://${{ env.REGION }}-${{ env.GCP_PROJECT_ID }}.cloudfunctions.net/cacheUpdateViaHttps"
+      - name: Build with npm
+        working-directory: ./frontend
+        run: npm ci && npm run build
 
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          entrypoint: ./frontend
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SA_KEY }}'
+          channelId: live
+          projectId: ${{ env.GCP_PROJECT_ID }}
