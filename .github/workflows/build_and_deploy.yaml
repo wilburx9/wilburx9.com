@@ -73,7 +73,7 @@ jobs:
           sudo npm install -g firebase-tools
           host=$(echo ${{ secrets.REACT_APP_DOMAIN }} | awk -F[/:] '{print $4}') `#Strip out the protocol`
           firebase functions:config:set cacheupdate.domain="$host" cacheupdate.key="${{ steps.api_keys.outputs.pass }}" --token '${{ secrets.FIREBASE_TOKEN }}'
-          firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}'
+          firebase deploy --only functions --token '${{ secrets.FIREBASE_TOKEN }}' --project ${{ env.GCP_PROJECT_ID }}
 
       - name: Trigger HTTP Cloud Function
         run: |
