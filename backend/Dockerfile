@@ -25,7 +25,7 @@ FROM alpine:3
 RUN apk add --no-cache ca-certificates
 
 # Copy the binary to the production image from the builder stage.
-COPY --from=builder /app/backend/cmd/server /backend/server
+COPY --from=builder /app/backend/cmd/server /backend/cmd/server
 # Copy the config template to the production image
 COPY --from=builder /app/backend/configs/config.yaml /app/backend/configs/config.yaml
 
