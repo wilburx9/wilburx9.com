@@ -26,8 +26,8 @@ RUN apk add --no-cache ca-certificates
 
 # Copy the binary to the production image from the builder stage.
 COPY --from=builder /app/backend/cmd/server /backend/server
-# Copy the config file to the production image
-COPY /app/backend/configs/config.yaml /app/backend/configs/config.yaml
+# Copy the config template to the production image
+COPY --from=builder /app/backend/configs/config.yaml /app/backend/configs/config.yaml
 
 # Run the web service on container startup.
 CMD ["/backend/cmd/server"]
