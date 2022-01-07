@@ -1,6 +1,6 @@
 # wilburx9.dev
 
-My personal site.
+My website.
 
 ## Running Locally
 
