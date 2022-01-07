@@ -5,7 +5,7 @@ import {App} from "./App"
 import {initializeFirebase} from "./analytics/firebase";
 
 // Redirect to custom URL if coming from Firebase Hosting provided URLs
-if (window.location.hostname.indexOf((new URL(process.env.REACT_APP_DOMAIN!)).hostname) === -1) {
+if (process.env.NODE_ENV === 'production' && window.location.hostname.indexOf((new URL(process.env.REACT_APP_DOMAIN!)).hostname) === -1) {
   window.location.replace(process.env.REACT_APP_DOMAIN!);
 }
 

@@ -40,12 +40,16 @@ func Handler(c *gin.Context, h internal.HttpClient) {
 	}
 	results, duration := updateCache()
 
-	err := email.Send(generateEmail(results, duration), h)
+	var sent bool
+	if configs.Config.IsRelease() {
+		err := email.Send(generateEmail(results, duration), h)
+		sent = err == nil
+	}
 
 	data := map[string]interface{}{
-		"results":              results,
-		"duration":             duration,
-		"email_report_success": err == nil,
+		"results":           results,
+		"duration":          duration,
+		"email_report_sent": sent,
 	}
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse(data))
 }
