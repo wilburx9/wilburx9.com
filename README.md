@@ -6,8 +6,9 @@ My personal site.
 
 1. Fill out the backend [config file](./backend/configs/config.yaml) or add keys (prepend them with `WILBURX9`) in the linked file to environment variable.
 2. Next, fill out the frontend [config file](./frontend/.env.development) or add the keys to environment variable.
-3. Ensure [Go is installed](https://go.dev/doc/install) and run `go run backend/cmd/main.go` from the root project directory.
-4. Finally, run `cd frontend && npm install && npm run build`.
+3. Ensure [Go is installed](https://go.dev/doc/install) and execute `go run backend/cmd/main.go` from the root project directory.
+4. Then, send a POST request to `http://localhost:$PORT/api/protected/cache` to populate the local db.
+5. Finally, run `cd frontend && npm install && npm run build`.
 
 ## Live Deployment
 1. Add the backend config variables to [Cloud Run](https://cloud.google.com/run/docs/configuring/environment-variables#setting).
