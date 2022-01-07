@@ -18,16 +18,17 @@ RUN go mod download
 # -mod=readonly ensures immutable go.mod and go.sum in container builds.
 RUN CGO_ENABLED=0 GOOS=linux go build -mod=readonly -v -o cmd/server cmd/main.go
 
+# Delete all files and folders except the server binary, config, and graphql files
+RUN find . -type f -not \( -name 'server' -or -name '*.graphql' -or -name '*.yaml' \) -delete && find . -type d -empty -delete
+
 # Use the official Alpine image for a lean production container.
 # https://hub.docker.com/_/alpine
 # https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
 FROM alpine:3
 RUN apk add --no-cache ca-certificates
 
-# Copy the binary to the production image from the builder stage.
-COPY --from=builder /app/backend/cmd/server /backend/cmd/server
-# Copy the config template to the production image
-COPY --from=builder /app/backend/configs/config.yaml /backend/configs/config.yaml
+# Copy the backend directory to the production image from the builder stage.
+COPY --from=builder /app/backend /backend
 
 # Run the web service on container startup.
 CMD ["/backend/cmd/server"]
