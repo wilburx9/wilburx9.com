@@ -1,18 +1,18 @@
-port: ""
-medium_username: ""
-wp_url: ""
+port: "" # Server PORT.
+medium_username: "" # Medium username (e.g "@Wilburx9") or publication (e.g. flutter-community)
+wp_url: "" # WordPress URL
 unsplash_username: ""
-unsplash_access_key: ""
-env: ""
-instagram_access_token: ""
-github_token: ""
+unsplash_access_key: "" # See https://unsplash.com/documentation
+env: "" # Use either "debug" or "release" to denote the build environment
+instagram_access_token: "" # Long-lasting Instagram Access Token. See https://developers.facebook.com/docs/instagram-basic-display-api/overview#instagram-user-access-tokens
+github_token: "" # GitHub personal access token. See https://docs.github.com/en/graphql/guides/forming-calls-with-graphql#authenticating-with-graphql
 github_username: ""
-app_home: ""
-gcp_project_id: ""
-email_api_key: ""
-email_receiver: ""
-email_domain: ""
-h_captcha_secret: ""
-h_captcha_site_key: ""
-api_hash: ""
-api_salt: ""
+app_home: "" # The path of the backend directory. Use value printed when you run `cd backend && pwd`
+gcp_project_id: "" # The id of the project on Google Cloud Platform. Not needed when running locally
+email_api_key: "" # Mailgun API key
+email_receiver: "" # Which email receives the message sent from the contact form?
+email_domain: "" # Mailgun domain
+h_captcha_secret: "" # See https://docs.hcaptcha.com
+h_captcha_site_key: "" # See https://docs.hcaptcha.com
+api_hash: "" # Auto-generated during production deployment.
+api_salt: "" # Auto-generated during production deployment.

@@ -48,7 +48,7 @@ const makeRequest = (auth: string): Promise<string> => {
         const message = `Request failed with status: ${res.statusCode}`;
         return reject(new Error(message));
       }
-      res.on("end", () => {
+      res.on("data", () => {
         return resolve(`Requested succeeded with status: ${res.statusCode}`);
       });
     });
