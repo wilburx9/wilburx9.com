@@ -13,8 +13,7 @@ import (
 const defaultLimit = 6
 
 // Handler retrieves a list of all git repos, sorted in descending stars and forks
-func Handler(c *gin.Context) {
-	db := c.MustGet(internal.Db).(database.ReadWrite)
+func Handler(c *gin.Context, db database.ReadWrite) {
 
 	limit, err := getLimit(c.DefaultQuery("size", strconv.FormatInt(defaultLimit, 10)))
 	if err != nil {

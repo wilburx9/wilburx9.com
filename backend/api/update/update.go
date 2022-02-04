@@ -33,8 +33,7 @@ func SetUp(http internal.HttpClient, db database.ReadWrite) {
 }
 
 // Handler fetches data from sources and cache the results
-func Handler(c *gin.Context, h internal.HttpClient) {
-	db := c.MustGet(internal.Db).(database.ReadWrite)
+func Handler(c *gin.Context, db database.ReadWrite, h internal.HttpClient) {
 	if cap(cachers) == 0 {
 		SetUp(h, db)
 	}

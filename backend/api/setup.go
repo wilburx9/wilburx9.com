@@ -33,9 +33,6 @@ func SetUpServer(db database.ReadWrite) *http.Server {
 		c.JSON(http.StatusNotFound, gin.H{"message": "It seems you are lost? Find your way buddy 😂"})
 	})
 
-	// Attach API middleware
-	router.Use(apiMiddleware(db))
-
 	// Attach recovery middleware
 	router.Use(gin.CustomRecovery(func(c *gin.Context, recovered interface{}) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, internal.MakeErrorResponse("Something went wrong"))
@@ -55,14 +52,14 @@ func SetUpServer(db database.ReadWrite) *http.Server {
 
 	// Setup API route.
 	api := router.Group("/api")
-	api.GET("/articles", articles.Handler)
-	api.GET("/gallery", gallery.Handler)
-	api.GET("/repos", repos.Handler)
+	api.GET("/articles", func(c *gin.Context) { articles.Handler(c, db) })
+	api.GET("/gallery", func(c *gin.Context) { gallery.Handler(c, db) })
+	api.GET("/repos", func(c *gin.Context) { repos.Handler(c, db) })
 	api.POST("/contact", func(c *gin.Context) { email.Handler(c, httpClient) })
 
 	auth := api.Group("/protected")
 	auth.Use(internal.AuthMiddleware())
-	auth.POST("/cache", func(c *gin.Context) { update.Handler(c, httpClient) })
+	auth.POST("/cache", func(c *gin.Context) { update.Handler(c, db, httpClient) })
 
 	// Start Http server
 	s := &http.Server{Addr: fmt.Sprintf(":%s", configs.Config.Port), Handler: router}
@@ -79,14 +76,6 @@ func SetUpLogrus() {
 		FullTimestamp: true,
 		PadLevelText:  true,
 	})
-}
-
-// ApiMiddleware adds custom params to request contexts
-func apiMiddleware(db database.ReadWrite) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set(internal.Db, db)
-		c.Next()
-	}
 }
 
 // SetUpDatabase sets up Firebase Firestore in release  and a local db in debug
