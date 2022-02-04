@@ -23,7 +23,7 @@ func TestMediumFetchArticles(t *testing.T) {
 	httpClient := new(internal.MockHttpClient)
 
 	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: file}, nil).Once()
-	var m = Medium{Db: nil, HttpClient: httpClient}
+	var m = Medium{HttpClient: httpClient}
 	articles, err := m.fetchArticles()
 	assert.Nil(err)
 	assert.Equal(2, len(articles))
@@ -38,14 +38,14 @@ func TestMediumFetchArticles(t *testing.T) {
 
 	httpClient = new(internal.MockHttpClient)
 	httpClient.On("Do", mock.Anything).Return(nil, errors.New("something went wrong")).Once()
-	m = Medium{Db: nil, HttpClient: httpClient}
+	m = Medium{HttpClient: httpClient}
 	articles, err = m.fetchArticles()
 	assert.Nil(articles)
 	assert.NotNil(err)
 
 	httpClient = new(internal.MockHttpClient)
 	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: io.NopCloser(strings.NewReader("Lorem"))}, nil).Once()
-	m = Medium{Db: nil, HttpClient: httpClient}
+	m = Medium{HttpClient: httpClient}
 	articles, err = m.fetchArticles()
 	assert.Nil(articles)
 	assert.NotNil(err)
