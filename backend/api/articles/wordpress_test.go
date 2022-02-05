@@ -8,9 +8,11 @@ import (
 	"github.com/wilburt/wilburx9.dev/backend/api/articles/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 	"testing"
 	"time"
 )
@@ -32,6 +34,20 @@ func TestWordPressFetchArticles(t *testing.T) {
 	assert.Equal(second.UpdatedOn, time.Date(2018, time.June, 13, 15, 0, 55, 0, time.UTC))
 	assert.Equal(second.Url, "https://www.lorem.com/54321/lorem-dolor-blatty-blah")
 	assert.Equal(first.Thumbnail, "https://lorem.com/dolor/s.jpg")
+
+	httpClient = new(internal.MockHttpClient)
+	httpClient.On("Do", mock.Anything).Return(nil, errors.New("something went wrong")).Once()
+	w = WordPress{HttpClient: httpClient}
+	articles, err = w.fetchArticles()
+	assert.Nil(articles)
+	assert.NotNil(err)
+
+	httpClient = new(internal.MockHttpClient)
+	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: io.NopCloser(strings.NewReader("Lorem"))}, nil).Once()
+	w = WordPress{HttpClient: httpClient}
+	articles, err = w.fetchArticles()
+	assert.Nil(articles)
+	assert.NotNil(err)
 }
 
 func TestWordPressCache(t *testing.T) {

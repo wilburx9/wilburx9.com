@@ -15,7 +15,7 @@ func (m *MockDb) Read(source, orderBy string, limit int) ([]map[string]interface
 	if !ok {
 		data = nil
 	}
-	return data, args.Get(1).(UpdatedAt), args.Error(3)
+	return data, args.Get(1).(UpdatedAt), args.Error(2)
 }
 
 func (m *MockDb) Write(source string, models ...Model) error {
