@@ -1,7 +1,6 @@
 # wilburx9.dev
 [![Coverage Status](https://coveralls.io/repos/github/wilburt/wilburx9.dev/badge.svg?branch=develop)](https://coveralls.io/github/wilburt/wilburx9.dev?branch=develop)
-[![Test Workflow](https://github.com/wilburt/wilburx9.dev/actions/workflows/test.yaml/badge.svg?branch=backend-test)](https://github.com/wilburt/wilburx9.dev/actions/workflows/test.yaml)
-
+[![Build Status](https://img.shields.io/github/workflow/status/wilburt/wilburx9.dev/Run%20tests%20and%20update%20Coveralls/backend-test)](https://github.com/wilburt/wilburx9.dev/actions/workflows/test.yaml)
 
 My personal site.
 
