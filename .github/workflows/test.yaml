@@ -23,6 +23,7 @@ jobs:
           go test ./... -v -coverprofile=coverage.out; gcov2lcov -infile=coverage.out -outfile=../backend.lcov
 
       - name: Coveralls
+        if: always()
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
