@@ -1,4 +1,4 @@
-name: Build and Deploy to Firebase and Cloud Run
+name: Deploy to Firebase and Cloud Run
 
 on:
   push:
