@@ -21,6 +21,9 @@ jobs:
         run: |-
           go install github.com/jandelgado/gcov2lcov@latest
           go test ./... -v -coverprofile=coverage.out; gcov2lcov -infile=coverage.out -outfile=../backend.lcov
+          ls -a
+          cd ..
+          ls -a
 
       - name: Coveralls
         if: always()
