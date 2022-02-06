@@ -18,7 +18,7 @@ jobs:
 
       - name: Run tests
         working-directory: ./backend
-        run: |-
+        run: |
           go install github.com/jandelgado/gcov2lcov@latest
           go test ./... -v -coverprofile=coverage.out; gcov2lcov -infile=coverage.out -outfile=../backend.lcov
           ls -a
