@@ -18,20 +18,17 @@ jobs:
 
       - name: Run tests
         working-directory: ./backend
+        run: go test ./... -v -coverprofile=coverage.out
+
+      - name: Convert coverage to lcov
+        if: always()
         run: |
-          go test ./... -v -coverprofile=coverage.out
           go install github.com/jandelgado/gcov2lcov@latest
-          gcov2lcov -infile=coverage.out -outfile=../backend.lcov
+          gcov2lcov -infile=./backend/coverage.out -outfile=backend.lcov
 
       - name: Coveralls
         if: always()
-#        uses: coverallsapp/github-action@master
-#        with:
-#          github-token: ${{ secrets.github_token }}
-#          path-to-lcov: ./backend.lcov
-        run: |
-          pwd
-          ls -a
-          cd backend
-          ls -a
-          
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          path-to-lcov: ./backend.lcov
