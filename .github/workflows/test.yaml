@@ -22,13 +22,15 @@ jobs:
 
       - name: Convert coverage to lcov
         if: always()
-        run: |
-          go install github.com/jandelgado/gcov2lcov@latest
-          gcov2lcov -infile=./backend/coverage.out -outfile=backend.lcov
+        uses: jandelgado/gcov2lcov-action@v1.0.8
+        with:
+          infile: coverage.out
+          outfile: coverage.lcov
+          working-directory: backend
 
       - name: Coveralls
         if: always()
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
-          path-to-lcov: ./backend.lcov
+          path-to-lcov: ./backend/coverage.lcov
