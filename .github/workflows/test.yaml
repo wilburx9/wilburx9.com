@@ -19,8 +19,9 @@ jobs:
       - name: Run tests
         working-directory: ./backend
         run: |
+          go test ./... -v -coverprofile=coverage.out
           go install github.com/jandelgado/gcov2lcov@latest
-          go test ./... -v -coverprofile=coverage.out; gcov2lcov -infile=coverage.out -outfile=../backend.lcov; ls -a; cd ..; ls -a
+          gcov2lcov -infile=coverage.out -outfile=../backend.lcov
 
       - name: Coveralls
         if: always()
@@ -30,5 +31,7 @@ jobs:
 #          path-to-lcov: ./backend.lcov
         run: |
           pwd
+          ls -a
+          cd backend
           ls -a
           
