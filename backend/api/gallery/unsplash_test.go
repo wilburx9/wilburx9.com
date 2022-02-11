@@ -1,37 +1,81 @@
 package gallery
 
 import (
-	"github.com/stretchr/testify/assert"
+	"errors"
+	"github.com/sirupsen/logrus"
+	testify "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery/internal/models"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
-	"github.com/wilburt/wilburx9.dev/backend/api/update"
+	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
+	"io"
+	"io/ioutil"
 	"net/http"
-	"strconv"
+	"os"
+	"strings"
 	"testing"
-	"time"
 )
 
 func TestUnsplashFetchImages(t *testing.T) {
-	const expectedResults = 3
-	var header = http.Header{}
-	header.Add("X-Total", strconv.Itoa(expectedResults))
+	logrus.SetOutput(ioutil.Discard)
+	assert := testify.New(t)
+	file, _ := os.Open("./testdata/unsplash_response.json")
+	httpClient := new(internal.MockHttpClient)
 
-	var u = Unsplash{Username: "x", AccessKey: "xa", BaseCache: update.BaseCache{
-		HttpClient: &internal.HttpClientMock{ResponseFilePath: "./testdata/unsplash_response.json", Header: header},
-	}}
-	var images = u.FetchImages()
-
-	assert.Equal(t, len(images), expectedResults)
-
+	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: file}, nil).Once()
+	var u = Unsplash{HttpClient: httpClient}
+	images, err := u.fetchImages()
+	assert.Nil(err)
+	assert.Equal(1, len(images))
 	first := images[0].(models.Image)
-	assert.Equal(t, first.Url, "https://images.unsplash.com/photo-56789-098yhj?crop=entropy&cs=srgb&fm=jpg&ixid=OIFGHJIUGGH=rb-1.2.1&q=85")
-	assert.Equal(t, first.Page, "https://unsplash.com/photos/blah_blah")
-	assert.Equal(t, first.Caption, "ABC")
-	assert.NotEqual(t, first.UploadedOn.Year(), time.Now().Year())
-
+	assert.Equal(first.Url, "https://images.unsplash.com/photo-56789-098yhj?crop=entropy&cs=srgb&fm=jpg&ixid=OIFGHJIUGGH=rb-1.2.1&q=85")
+	assert.Equal(first.Page, "https://unsplash.com/photos/blah_blah")
+	assert.Equal(first.Caption, "ABC")
 	user, ok := first.Meta["user"].(models.User)
-	if assert.True(t, ok) {
-		assert.Equal(t, user.Username, "aafgotiigg")
-		assert.Equal(t, user.Name, "Larry Emeka")
-	}
+	assert.True(ok)
+	assert.Equal(user.Username, "aafgotiigg")
+	assert.Equal(user.Name, "Larry Emeka")
+
+	httpClient = new(internal.MockHttpClient)
+	httpClient.On("Do", mock.Anything).Return(nil, errors.New("something went wrong")).Once()
+	u = Unsplash{HttpClient: httpClient}
+	images, err = u.fetchImages()
+	assert.Nil(images)
+	assert.NotNil(err)
+
+	httpClient = new(internal.MockHttpClient)
+	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: io.NopCloser(strings.NewReader("Lorem"))}, nil).Once()
+	u = Unsplash{HttpClient: httpClient}
+	images, err = u.fetchImages()
+	assert.Nil(images)
+	assert.NotNil(err)
+}
+
+func TestUnsplashCache(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
+	assert := testify.New(t)
+	httpClient := new(internal.MockHttpClient)
+	db := new(database.MockDb)
+
+	file, _ := os.Open("./testdata/unsplash_response.json")
+	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: file}, nil).Once()
+	db.On("Write", mock.Anything, mock.Anything).Return(nil).Once()
+	var m = Unsplash{Db: db, HttpClient: httpClient}
+	size, err := m.Cache()
+	assert.Nil(err)
+	assert.Equal(1, size)
+
+	file, _ = os.Open("./testdata/unsplash_response.json")
+	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: file}, nil).Once()
+	db.On("Write", mock.Anything, mock.Anything).Return(errors.New("error")).Once()
+	m = Unsplash{Db: db, HttpClient: httpClient}
+	size, err = m.Cache()
+	assert.NotNil(err)
+	assert.Equal(1, size)
+
+	httpClient.On("Do", mock.Anything).Return(nil, errors.New("test")).Once()
+	m = Unsplash{Db: db, HttpClient: httpClient}
+	size, err = m.Cache()
+	assert.NotNil(err)
+	assert.Equal(0, size)
 }
