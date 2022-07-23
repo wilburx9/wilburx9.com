@@ -13,17 +13,12 @@ import {
   VStack
 } from "@chakra-ui/react";
 import {Language, RepoModel} from "./RepoModel";
-import {
-  AiFillStar,
-  CgGitFork, DiCss3,
-  DiSwift,
-  SiGo,
-  IoLogoJavascript,
-  SiDart,
-  SiKotlin,
-  SiTypescript, SiJava
-} from "react-icons/all";
 import {IconType} from "react-icons";
+import {SiDart, SiGo, SiJava, SiKotlin, SiTypescript} from "react-icons/si";
+import {DiCss3, DiSwift} from "react-icons/di";
+import {IoLogoJavascript} from "react-icons/io";
+import {AiFillStar} from "react-icons/ai";
+import {CgGitFork} from "react-icons/cg";
 
 
 export const ReposComponent = () => {
@@ -33,7 +28,7 @@ export const ReposComponent = () => {
 
   return (
     <VStack align='start'>
-      <Heading pt={16} size='xl' align="start" fontWeight="black">&#47;&#47; Open-source Projects</Heading>
+      <Heading pt={16} size='xl' fontWeight="black">&#47;&#47; Open-source Projects</Heading>
       <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
         {repos.map((repo) =>
           <RepoComponent {...repo} key={repo.id}/>
@@ -64,7 +59,7 @@ function RepoComponent(props: RepoModel) {
         p={4}
         _groupHover={{borderColor: hoverBorderColor}}>
         <VStack w='full' h='full' alignItems='flex-start' justify='center'>
-          <Heading mb={1} size='sm' align="start">{props.name}</Heading>
+          <Heading mb={1} size='sm'>{props.name}</Heading>
           <Text mb={3} fontSize='sm' align="start">{props.description}</Text>
           <HStack w='full' justify='space-between'>
             <HStack spacing={0}>

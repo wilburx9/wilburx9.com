@@ -1,7 +1,8 @@
 import {Flex, HStack, Icon, LinkBox, LinkOverlay, Text} from "@chakra-ui/react";
 import React from "react";
 import {IconType} from "react-icons";
-import {AiFillGithub, AiFillLinkedin, AiOutlineTwitter, SiGo, SiReact} from "react-icons/all";
+import {AiFillGithub, AiFillLinkedin, AiOutlineTwitter} from "react-icons/ai";
+import {SiGo, SiReact} from "react-icons/si";
 
 class Attr {
   name: string

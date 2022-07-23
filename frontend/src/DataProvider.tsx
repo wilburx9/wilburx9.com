@@ -57,6 +57,7 @@ export class DataProvider extends Component<any, DataState> {
         this.setState({repos: response.data.data})
       })
       .catch(e => {
+        console.error(e)
         logNetworkError(e)
       })
   }

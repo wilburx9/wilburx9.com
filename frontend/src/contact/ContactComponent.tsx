@@ -7,7 +7,7 @@ import {
   Input, Stack, Textarea, useBreakpointValue, useColorMode, useToast,
   VStack
 } from "@chakra-ui/react";
-import {HiOutlineArrowRight} from "react-icons/all";
+import {HiOutlineArrowRight} from "react-icons/hi";
 import HCaptcha from '@hcaptcha/react-hcaptcha';
 import {Form, Formik, Field, FormikHelpers} from 'formik';
 import * as Yup from 'yup';
@@ -69,7 +69,7 @@ export const ContactComponent = () => {
   }
 
   return <VStack align='start' spacing={6} mt={16} mb={6}>
-    <Heading pt={2} size='xl' align="start" fontWeight="black">&#47;&#47; Reach Out</Heading>
+    <Heading pt={2} size='xl' fontWeight="black">&#47;&#47; Reach Out</Heading>
     <Box py={6} px={{base: 5, md: 6, lg: 20}} borderRadius='xl'
          bg={isLightMode ? 'gray.50' : 'gray.900'} w='full'>
       <Formik<FormData>
