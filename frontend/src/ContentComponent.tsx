@@ -1,11 +1,11 @@
 import React, {useContext, useEffect} from "react";
 import {DataContext} from "./DataProvider";
-import {Box, Center, Fade, Flex, Spinner, useColorModeValue} from "@chakra-ui/react";
-import {ColorModeSwitcher} from "./theme/ColorModeSwitcher";
+import {Box, Center, Fade, Spinner, VStack} from "@chakra-ui/react";
 import {ArticlesComponent} from "./articles/ArticlesComponent";
 import {ReposComponent} from "./repos/ReposComponent";
 import {AttributionComponent} from "./footer/AttributionComponent";
 import {ContactComponent} from "./contact/ContactComponent";
+import {HeaderComponent} from "./header/HeaderComponent";
 
 export const ContentComponent = () => {
   const {hasData} = useContext(DataContext)
@@ -14,7 +14,6 @@ export const ContentComponent = () => {
     hasData?.()
   }, [hasData])
 
-  let footerColorBg = useColorModeValue('gray.100', 'gray.900');
   let hasAnyData = hasData?.();
 
   if (hasAnyData == null || !hasAnyData) {
@@ -25,23 +24,15 @@ export const ContentComponent = () => {
 
   return (
     <Fade in={hasAnyData} unmountOnExit transition={{enter: {duration: 2}}}>
-      <Flex flexDir="column">
-        <ColorModeSwitcher ml='auto'/>
-        <Box
-          flex='1'
-          maxW="container.xl"
-          px={[5, null, 10]}
-          alignSelf="center">
+      <Box maxW="container.xl" mx='auto'>
+        <VStack>
+          <HeaderComponent/>
           <ArticlesComponent/>
           <ReposComponent/>
           <ContactComponent/>
-        </Box>
-        <Box bg={footerColorBg}>
-          <Box maxW="container.xl" mx='auto'>
-            <AttributionComponent />
-          </Box>
-        </Box>
-      </Flex>
+          <AttributionComponent/>
+        </VStack>
+      </Box>
     </Fade>
   );
 }
