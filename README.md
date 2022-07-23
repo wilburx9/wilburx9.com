@@ -1,6 +1,11 @@
 # wilburx9.dev
+[![Test Workflow](https://github.com/wilburt/wilburx9.dev/actions/workflows/test.yaml/badge.svg)](https://github.com/wilburt/wilburx9.dev/actions/workflows/test.yaml)
+[![Coverage Status](https://coveralls.io/repos/github/wilburt/wilburx9.dev/badge.svg?branch=develop)](https://coveralls.io/github/wilburt/wilburx9.dev?branch=develop)
+
 
 My website.
+
+
 
 ## Running Locally
 
