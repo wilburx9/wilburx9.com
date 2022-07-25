@@ -1,4 +1,6 @@
 import {extendTheme, theme as base, ThemeComponentProps, ThemeConfig, withDefaultVariant} from "@chakra-ui/react";
+import {mode, StyleFunctionProps} from "@chakra-ui/theme-tools";
+import {Dict} from "@chakra-ui/utils";
 
 const config: ThemeConfig = {
   initialColorMode: 'dark',
@@ -17,9 +19,16 @@ const inputStyles = {
 
 const theme = extendTheme({
     config,
+    styles: {
+      global: (props: Dict | StyleFunctionProps) => ({
+        body: {
+          bg: mode("white", "#1A1B22")(props),
+        }
+      })
+    },
     fonts: {
-      heading: `'Roboto Mono', monospace, ${base.fonts?.heading}`,
-      body: `'Roboto Mono', monospace, ${base.fonts?.body}`,
+      heading: `'Inter', sans-serif, ${base.fonts?.heading}`,
+      body: `'Inter', sans-serif, ${base.fonts?.body}`,
     },
     components: {
       Textarea: {...inputStyles},

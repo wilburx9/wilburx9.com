@@ -5,7 +5,7 @@ import {ArticlesComponent} from "./articles/ArticlesComponent";
 import {ReposComponent} from "./repos/ReposComponent";
 import {AttributionComponent} from "./footer/AttributionComponent";
 import {ContactComponent} from "./contact/ContactComponent";
-import {HeaderComponent} from "./header/HeaderComponent";
+import {TopComponent} from "./top/TopComponent";
 
 export const ContentComponent = () => {
   const {hasData} = useContext(DataContext)
@@ -24,9 +24,9 @@ export const ContentComponent = () => {
 
   return (
     <Fade in={hasAnyData} unmountOnExit transition={{enter: {duration: 2}}}>
-      <Box maxW="container.xl" mx='auto'>
+      <Box maxW="container.xl" mx='auto' px={{base:'2.5', sm: '4', xl: '0'}}>
         <VStack>
-          <HeaderComponent/>
+          <TopComponent/>
           <ArticlesComponent/>
           <ReposComponent/>
           <ContactComponent/>
