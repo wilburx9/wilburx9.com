@@ -1,19 +1,20 @@
 import {
-  Box,
+  Box, Fade,
   Flex, Heading,
   Icon,
   IconButton,
-  Image, Link,
+  Image, Link, Text,
   useColorMode,
   useColorModeValue
 } from "@chakra-ui/react";
-import React from "react";
+import React, {useContext, useEffect} from "react";
 import avatar from './avatar.png'
 import {IconType} from "react-icons";
 import {VscGithub} from "react-icons/vsc";
 import {ImLinkedin, ImTwitter} from "react-icons/im";
-import {RiMoonFill, RiSunFill} from "react-icons/ri";
+import {RiArrowRightSLine, RiMoonFill, RiSunFill} from "react-icons/ri";
 import {IoArrowDown} from "react-icons/io5";
+import {DataContext, DataValue} from "../DataProvider";
 
 class Social {
   name: string
@@ -37,10 +38,8 @@ export const TopComponent = () => (
   <Box w='full' h='100vh'>
     <Flex direction='column' h='100%'>
       <TopSection/>
-      <Flex direction='column' flex='1' justify='space-between'>
-        This is a box
-        <BottomSection/>
-      </Flex>
+      <MiddleSection/>
+      <BottomSection/>
     </Flex>
   </Box>
 )
@@ -52,7 +51,7 @@ const TopSection = function () {
   return <Flex alignItems='center' pt='4vh'>
     <Image src={avatar} boxSize='64px' alt="Wilbur's Avatar"/>
     <Flex flex='1' justifyContent='end' alignItems='center'>
-      {socials.map(e => <Link href={e.url} isExternal>
+      {socials.map(e => <Link href={e.url} isExternal key={e.url}>
         <Icon as={e.icon!} marginStart={9} boxSize={5} display='block'/>
       </Link>)}
       <IconButton
@@ -70,15 +69,29 @@ const TopSection = function () {
 }
 
 const MiddleSection = function () {
-  
+  const {articles} = useContext<DataValue>(DataContext)
+
+  useEffect(() => {
+  }, [articles])
+
+  const postColor = useColorModeValue('#1A1B22', 'white')
+  return <Fade in={articles.length > 0} unmountOnExit>
+    <Box mt='5vh'>
+      <Icon as={RiArrowRightSLine} verticalAlign='middle' color={'#596065'}/>
+      <Text as='span' verticalAlign='middle' fontWeight='medium' fontSize='md' color={'#8D949D'}>Read my latest
+        article</Text>
+    </Box>
+    <Text textAlign='start' fontWeight='normal' fontSize='xl' color={postColor}
+          width={{base: 'full', md: '70vw', 'lg': '40vw'}} mt={4}>{articles[0]?.title}</Text>
+  </Fade>
 }
 
 const BottomSection = function () {
   const color = useColorModeValue('#1A1B22', 'white')
-  return <Flex direction='row' align='end' w='full' mb={4}>
+  return <Flex flex='1' direction={{base: 'column-reverse', md: 'row'}} align='end' w='full' mb={{base: 0, md: 4}}>
     <IconButton
       isRound={true}
-      mb={10}
+      mb={{base: 6, md: 10}}
       variant="ghost"
       color="current"
       fontSize='32px'
@@ -86,10 +99,12 @@ const BottomSection = function () {
       minW='70px'
       icon={<IoArrowDown/>}
       aria-label={'Scroll down'}/>
-    <Heading as='h1' textAlign='right' flex='1' fontSize='10vh' color={color}>
-      I am Wilberforce{<br/>}
-      Software Engineer{<br/>}
-      at <span style={{color: "#8D949D"}}>Mindvalley</span>
-    </Heading>
+    <Flex flex='1' justifyContent='flex-end'>
+      <Heading display='inline-block' alignSelf='flex-end' as='h1' textAlign='end'  fontSize='min(10vw, 10vh)' color={color} mb={{base: '5vh', md: 0}}>
+        I am Wilberforce{<br/>}
+        Software Engineer{<br/>}
+        at <span style={{color: "#8D949D"}}>Mindvalley</span>
+      </Heading>
+    </Flex>
   </Flex>;
 }

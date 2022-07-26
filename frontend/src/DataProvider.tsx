@@ -13,11 +13,10 @@ export type DataValue = {
   repos: RepoModel[],
   fetchArticles: () => void,
   fetchRepos: () => void,
-  postEmail: (data: ContactData) => Promise<FormResponse>,
-  hasData: () => boolean,
+  postEmail: (data: ContactData) => Promise<FormResponse>
 }
 
-const DataContext = React.createContext<Partial<DataValue>>({});
+const DataContext = React.createContext<DataValue>({} as DataValue);
 
 const http = axios.create({
   baseURL: `${process.env.REACT_APP_DOMAIN}/api`,
@@ -93,7 +92,6 @@ export class DataProvider extends Component<any, DataState> {
           fetchArticles: this.fetchArticles,
           fetchRepos: this.fetchRepos,
           postEmail: this.postEmail,
-          hasData: this.hasData
         }}>
         {this.props.children}
       </DataContext.Provider>
