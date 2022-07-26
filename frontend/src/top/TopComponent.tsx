@@ -15,6 +15,7 @@ import {ImLinkedin, ImTwitter} from "react-icons/im";
 import {RiArrowRightSLine, RiMoonFill, RiSunFill} from "react-icons/ri";
 import {IoArrowDown} from "react-icons/io5";
 import {DataContext, DataValue} from "../DataProvider";
+import {ArticleModel} from "../articles/ArticleModel";
 
 class Social {
   name: string
@@ -74,15 +75,22 @@ const MiddleSection = function () {
   useEffect(() => {
   }, [articles])
 
-  const postColor = useColorModeValue('#1A1B22', 'white')
-  return <Fade in={articles.length > 0} unmountOnExit>
-    <Box mt='5vh'>
-      <Icon as={RiArrowRightSLine} verticalAlign='middle' color={'#596065'}/>
-      <Text as='span' verticalAlign='middle' fontWeight='medium' fontSize='md' color={'#8D949D'}>Read my latest
-        article</Text>
+  let firstArticle: ArticleModel | null = articles[0]
+  const postColor = useColorModeValue('black', 'white')
+  return <Fade in={firstArticle != null} unmountOnExit>
+    <Box width={{base: '20vw', md: '70vw', 'lg': '40vw'}}>
+      <Box mt='5vh'>
+        <Icon as={RiArrowRightSLine} verticalAlign='middle' color={'#596065'}/>
+        <Text as='span' verticalAlign='middle' fontWeight='medium' fontSize='md' color={'#8D949D'}>Read my latest
+          article</Text>
+      </Box>
+      <Box _hover={{opacity: 0.7}}>
+        <Link href={firstArticle?.url} _hover={{textDecoration: 'none'}}>
+          <Text textAlign='start' fontWeight='normal' fontSize='xl' color={postColor} mt={4}
+                noOfLines={5}>{firstArticle?.title}</Text>
+        </Link>
+      </Box>
     </Box>
-    <Text textAlign='start' fontWeight='normal' fontSize='xl' color={postColor}
-          width={{base: 'full', md: '70vw', 'lg': '40vw'}} mt={4}>{articles[0]?.title}</Text>
   </Fade>
 }
 
@@ -100,7 +108,8 @@ const BottomSection = function () {
       icon={<IoArrowDown/>}
       aria-label={'Scroll down'}/>
     <Flex flex='1' justifyContent='flex-end'>
-      <Heading display='inline-block' alignSelf='flex-end' as='h1' textAlign='end'  fontSize='min(10vw, 10vh)' color={color} mb={{base: '5vh', md: 0}}>
+      <Heading display='inline-block' alignSelf='flex-end' as='h1' textAlign='end' fontSize='min(10vw, 10vh)'
+               color={color} mb={{base: '5vh', md: 0}}>
         I am Wilberforce{<br/>}
         Software Engineer{<br/>}
         at <span style={{color: "#8D949D"}}>Mindvalley</span>
