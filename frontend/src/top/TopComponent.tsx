@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import React, {useContext, useEffect} from "react";
 import avatar from './avatar.png'
+import emission from './emission.jpeg'
 import {IconType} from "react-icons";
 import {VscGithub} from "react-icons/vsc";
 import {ImLinkedin, ImTwitter} from "react-icons/im";
@@ -50,7 +51,7 @@ const TopSection = function () {
   const text = useColorModeValue("dark", "light")
   const SwitchIcon = useColorModeValue(RiMoonFill, RiSunFill)
   return <Flex alignItems='center' pt='4vh'>
-    <Image src={avatar} boxSize='64px' alt="Wilbur's Avatar"/>
+    <Image src={avatar} boxSize='64px' alt="Wilberforce Memoji"/>
     <Flex flex='1' justifyContent='end' alignItems='center'>
       {socials.map(e => <Link href={e.url} isExternal key={e.url}>
         <Icon as={e.icon!} marginStart={9} boxSize={5} display='block'/>
@@ -106,13 +107,19 @@ const BottomSection = function () {
       minH='70px'
       minW='70px'
       icon={<IoArrowDown/>}
+      onClick={() => document.getElementById('articles')?.scrollIntoView({behavior: "smooth"})}
       aria-label={'Scroll down'}/>
     <Flex flex='1' justifyContent='flex-end'>
       <Heading display='inline-block' alignSelf='flex-end' as='h1' textAlign='end' fontSize='min(10vw, 10vh)'
                color={color} mb={{base: '5vh', md: 0}}>
-        I am Wilberforce{<br/>}
-        Software Engineer{<br/>}
-        at <span style={{color: "#8D949D"}}>Mindvalley</span>
+        I am Wilberforce,{<br/>}
+        a Software Engineer{<br/>}
+        from <span style={{
+        background: `url(${emission}) no-repeat center / cover`,
+        WebkitTextFillColor: "transparent",
+        WebkitBackgroundClip: "text",
+        color: "#8D949D"
+      }}>Earth</span>
       </Heading>
     </Flex>
   </Flex>;

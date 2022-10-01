@@ -17,7 +17,7 @@ export const ArticlesComponent = () => {
   if (!articles || articles.length === 0) return <Box/>
 
   return (
-    <VStack align='start'>
+    <VStack align='start' id="articles">
       <Heading pt={2} size='xl' fontWeight="black">&#47;&#47; Articles</Heading>
       <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
         {articles.map((article) => <ArticleComponent {...article} key={article.id}/>)}

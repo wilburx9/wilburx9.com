@@ -80,10 +80,6 @@ export class DataProvider extends Component<any, DataState> {
     return {message: "Something went wrong. Please, try again", success: false}
   }
 
-  hasData = (): boolean => {
-    return this.state.repos.length > 0 || this.state.articles.length > 0
-  }
-
   render() {
     return (
       <DataContext.Provider
