@@ -1,9 +1,8 @@
 import {
-  Box, Fade,
-  Flex, Heading,
+  Box, Flex, Heading,
   Icon,
   IconButton,
-  Image, Link, Text,
+  Image, Link, SlideFade, Text,
   useColorMode,
   useColorModeValue
 } from "@chakra-ui/react";
@@ -37,8 +36,10 @@ let socials: Social[] = [
 ]
 
 export const TopComponent = () => (
-  <Box w='full' h='100vh'>
-    <Flex direction='column' h='100%'>
+  <Box w='full'
+       h='100vh'>
+    <Flex direction='column'
+          h='100%'>
       <TopSection/>
       <MiddleSection/>
       <BottomSection/>
@@ -50,11 +51,21 @@ const TopSection = function () {
   const {toggleColorMode} = useColorMode()
   const text = useColorModeValue("dark", "light")
   const SwitchIcon = useColorModeValue(RiMoonFill, RiSunFill)
-  return <Flex alignItems='center' pt='4vh'>
-    <Image src={avatar} boxSize='64px' alt="Wilberforce Memoji"/>
-    <Flex flex='1' justifyContent='end' alignItems='center'>
-      {socials.map(e => <Link href={e.url} isExternal key={e.url}>
-        <Icon as={e.icon!} marginStart={9} boxSize={5} display='block'/>
+  return <Flex alignItems='center'
+               pt='4vh'>
+    <Image src={avatar}
+           boxSize='64px'
+           alt="Wilberforce Memoji"/>
+    <Flex flex='1'
+          justifyContent='end'
+          alignItems='center'>
+      {socials.map(e => <Link href={e.url}
+                              isExternal
+                              key={e.url}>
+        <Icon as={e.icon!}
+              marginStart={9}
+              boxSize={5}
+              display='block'/>
       </Link>)}
       <IconButton
         size="lg"
@@ -78,26 +89,43 @@ const MiddleSection = function () {
 
   let firstArticle: ArticleModel | null = articles[0]
   const postColor = useColorModeValue('black', 'white')
-  return <Fade in={firstArticle != null} unmountOnExit>
+  return <SlideFade in={firstArticle != null}
+                    offsetY='10px'
+                    unmountOnExit>
     <Box width={{base: '20vw', md: '70vw', 'lg': '40vw'}}>
       <Box mt='5vh'>
-        <Icon as={RiArrowRightSLine} verticalAlign='middle' color={'#596065'}/>
-        <Text as='span' verticalAlign='middle' fontWeight='medium' fontSize='md' color={'#8D949D'}>Read my latest
+        <Icon as={RiArrowRightSLine}
+              verticalAlign='middle'
+              color={'#596065'}/>
+        <Text as='span'
+              verticalAlign='middle'
+              fontWeight='medium'
+              fontSize='md'
+              color={'#8D949D'}>Read my latest
           article</Text>
       </Box>
       <Box _hover={{opacity: 0.7}}>
-        <Link href={firstArticle?.url} _hover={{textDecoration: 'none'}}>
-          <Text textAlign='start' fontWeight='normal' fontSize='xl' color={postColor} mt={4}
+        <Link href={firstArticle?.url}
+              _hover={{textDecoration: 'none'}}>
+          <Text textAlign='start'
+                fontWeight='normal'
+                fontSize='xl'
+                color={postColor}
+                mt={4}
                 noOfLines={5}>{firstArticle?.title}</Text>
         </Link>
       </Box>
     </Box>
-  </Fade>
+  </SlideFade>
 }
 
+// TODO: Show arrow icon only if the scroll position is close to the top
 const BottomSection = function () {
-  const color = useColorModeValue('#1A1B22', 'white')
-  return <Flex flex='1' direction={{base: 'column-reverse', md: 'row'}} align='end' w='full' mb={{base: 0, md: 4}}>
+  return <Flex flex='1'
+               direction={{base: 'column-reverse', md: 'row'}}
+               align='end'
+               w='full'
+               mb={{base: 0, md: 4}}>
     <IconButton
       isRound={true}
       mb={{base: 6, md: 10}}
@@ -107,11 +135,16 @@ const BottomSection = function () {
       minH='70px'
       minW='70px'
       icon={<IoArrowDown/>}
-      onClick={() => document.getElementById('articles')?.scrollIntoView({behavior: "smooth"})}
+      onClick={() => document.getElementById('articles')?.scrollIntoView({behavior: 'smooth'})}
       aria-label={'Scroll down'}/>
-    <Flex flex='1' justifyContent='flex-end'>
-      <Heading display='inline-block' alignSelf='flex-end' as='h1' textAlign='end' fontSize='min(10vw, 10vh)'
-               color={color} mb={{base: '5vh', md: 0}}>
+    <Flex flex='1'
+          justifyContent='flex-end'>
+      <Heading display='inline-block'
+               alignSelf='flex-end'
+               as='h1'
+               textAlign='end'
+               fontSize='min(10vw, 10vh)'
+               mb={{base: '5vh', md: 0}}>
         I am Wilberforce,{<br/>}
         a Software Engineer{<br/>}
         from <span style={{
