@@ -3,7 +3,6 @@ import {Box, VStack} from "@chakra-ui/react";
 import {ArticlesComponent} from "./articles/ArticlesComponent";
 import {ReposComponent} from "./repos/ReposComponent";
 import {AttributionComponent} from "./footer/AttributionComponent";
-import {ContactComponent} from "./contact/ContactComponent";
 import {TopComponent} from "./top/TopComponent";
 
 export const ContentComponent = () => (
@@ -12,7 +11,6 @@ export const ContentComponent = () => (
       <TopComponent/>
       <ArticlesComponent/>
       <ReposComponent/>
-      <ContactComponent/>
       <AttributionComponent/>
     </VStack>
   </Box>

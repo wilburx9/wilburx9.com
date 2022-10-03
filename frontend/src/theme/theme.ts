@@ -1,21 +1,10 @@
-import {extendTheme, theme as base, ThemeComponentProps, ThemeConfig, withDefaultVariant} from "@chakra-ui/react";
+import {extendTheme, theme as base, ThemeComponentProps, ThemeConfig} from "@chakra-ui/react";
 import {mode, StyleFunctionProps} from "@chakra-ui/theme-tools";
 import {Dict} from "@chakra-ui/utils";
 
 const config: ThemeConfig = {
   initialColorMode: 'dark',
   useSystemColorMode: true,
-}
-
-// TODO: Remove input styles after removing contact form
-const inputStyles = {
-  variants: {
-    filled: (props: ThemeComponentProps) => ({
-      field: {
-        ...getInputFilledStyle(props.colorMode === 'light')
-      }
-    })
-  }
 }
 
 const theme = extendTheme({
@@ -46,8 +35,6 @@ const theme = extendTheme({
       body: `'Inter', sans-serif, ${base.fonts?.body}`,
     },
     components: {
-      Textarea: {...inputStyles},
-      Input: {...inputStyles}, // This doesn't work, and I don't know why. Apply theme on Textarea manually
       Heading: {
         baseStyle: (props: ThemeComponentProps) => {
           return ({
@@ -60,24 +47,6 @@ const theme = extendTheme({
       }
     }
   },
-  withDefaultVariant({
-    variant: 'filled',
-    components: ['Input', 'Textarea']
-  }),
 );
-
-export function getInputFilledStyle(isLightMode: boolean) {
-  return {
-    bg: isLightMode ? 'gray.200' : 'whiteAlpha.50',
-    _focus: {
-      borderWidth: '1px',
-      boxShadow: 'none',
-      borderColor: isLightMode ? 'black' : 'white'
-    },
-    _invalid: {
-      borderColor: 'red.300', boxShadow: 'none', borderWidth: "1px"
-    }
-  }
-}
 
 export default theme
