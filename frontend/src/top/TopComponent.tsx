@@ -1,12 +1,12 @@
 import {
-  Box, Flex, Heading,
+  Box, Fade, Flex, Heading,
   Icon,
   IconButton,
   Image, Link, SlideFade, Text,
   useColorMode,
   useColorModeValue
 } from "@chakra-ui/react";
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import avatar from './avatar.png'
 import emission from './emission.jpeg'
 import {IconType} from "react-icons";
@@ -16,6 +16,7 @@ import {RiArrowRightSLine, RiMoonFill, RiSunFill} from "react-icons/ri";
 import {IoArrowDown} from "react-icons/io5";
 import {DataContext, DataValue} from "../DataProvider";
 import {ArticleModel} from "../articles/ArticleModel";
+import useWindowDimensions from "../common/Utils";
 
 class Social {
   name: string
@@ -119,24 +120,46 @@ const MiddleSection = function () {
   </SlideFade>
 }
 
-// TODO: Show arrow icon only if the scroll position is close to the top
 const BottomSection = function () {
+  const {height} = useWindowDimensions();
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    window.addEventListener("scroll", listenToScroll);
+    return () =>
+      window.removeEventListener("scroll", listenToScroll);
+  })
+
+  const listenToScroll = () => {
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    let offset = (winScroll / height) * 100;
+
+    if (offset > 70) {
+      isVisible && setIsVisible(false);
+    } else {
+      setIsVisible(true);
+    }
+  };
+
   return <Flex flex='1'
                direction={{base: 'column-reverse', md: 'row'}}
                align='end'
                w='full'
                mb={{base: 0, md: 4}}>
-    <IconButton
-      isRound={true}
-      mb={{base: 6, md: 10}}
-      variant="ghost"
-      color="current"
-      fontSize='32px'
-      minH='70px'
-      minW='70px'
-      icon={<IoArrowDown/>}
-      onClick={() => document.getElementById('articles')?.scrollIntoView({behavior: 'smooth'})}
-      aria-label={'Scroll down'}/>
+    <Fade in={isVisible}
+          unmountOnExit>
+      <IconButton
+        isRound={true}
+        mb={{base: 6, md: 10}}
+        variant="ghost"
+        color="current"
+        fontSize='32px'
+        minH='70px'
+        minW='70px'
+        icon={<IoArrowDown/>}
+        onClick={() => document.getElementById('articles')?.scrollIntoView({behavior: 'smooth'})}
+        aria-label={'Scroll down'}/>
+    </Fade>
     <Flex flex='1'
           justifyContent='flex-end'>
       <Heading display='inline-block'
