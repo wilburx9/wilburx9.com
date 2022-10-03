@@ -64,7 +64,7 @@ func (s instaImgs) ToImages(source string) []database.Model {
 			Page:       e.Permalink,
 			Url:        e.MediaURL,
 			Caption:    e.Caption,
-			UploadedOn: internal.StringToTime(timeLayout, e.Timestamp),
+			UploadedOn: internal.StringToTime(timeLayout, e.Timestamp, "Insta"),
 			Source:     source,
 		}
 	}

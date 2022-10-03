@@ -14,10 +14,11 @@ const (
 )
 
 // StringToTime parses timeStr with layout. Returns the current time if parsing fails
-func StringToTime(layout string, timeStr string) time.Time {
+func StringToTime(layout, timeStr, ts string) time.Time {
 	t, err := time.Parse(layout, timeStr)
 	if err != nil {
 		log.WithFields(log.Fields{
+			"caller": ts,
 			"source": timeStr,
 			"layout": layout,
 			"error":  err,
@@ -34,17 +35,16 @@ func MakeId(source string, currentId string) string {
 	return hex.EncodeToString(hash[:])
 }
 
-
 // GetCacheControl returns Cache-Control instructions
 func GetCacheControl(dataUpdatedAt time.Time) string {
 	maxAge := oneDay.Seconds()
 	now := time.Now()
 	diff := now.Sub(dataUpdatedAt)
-	
+
 	// Check if the data is upto two weeks old yet
 	if twoWeeks > diff {
 		expiresIn := dataUpdatedAt.Add(twoWeeks).Sub(now) // Get how long until the data is two weeks old.
-		maxAge =  expiresIn.Seconds()
+		maxAge = expiresIn.Seconds()
 	}
 
 	sMaxAge := maxAge / 2

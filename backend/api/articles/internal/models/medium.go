@@ -42,8 +42,8 @@ func (r Rss) ToResult(source string) []database.Model {
 			Title:     h.UnescapeString(e.Title),
 			Thumbnail: thumbnail,
 			Url:       e.Link,
-			PostedOn:  internal.StringToTime(time.RFC1123, e.PubDate),
-			UpdatedOn: internal.StringToTime(time.RFC3339, e.Updated),
+			PostedOn:  internal.StringToTime(time.RFC1123, e.PubDate, "Medium"),
+			UpdatedOn: internal.StringToTime(time.RFC3339, e.Updated, "Medium"),
 			Excerpt:   fmt.Sprintf("%v..", h.UnescapeString(excerpt)),
 			Source:    source,
 		}

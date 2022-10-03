@@ -42,8 +42,8 @@ func (p WpPosts) ToResult(source string) []database.Model {
 			Title:     html.UnescapeString(e.Title.Rendered),
 			Thumbnail: e.Meta.Thumbnail,
 			Url:       e.Link,
-			PostedOn:  internal.StringToTime(timeLayout, e.Date),
-			UpdatedOn: internal.StringToTime(timeLayout, e.Date),
+			PostedOn:  internal.StringToTime(timeLayout, e.Date, "WP"),
+			UpdatedOn: internal.StringToTime(timeLayout, e.Date, "WP"),
 			Excerpt:   fmt.Sprintf("%v..", html.UnescapeString(getWpExcept(e.Excerpt.Rendered))),
 			Source:    source,
 		}

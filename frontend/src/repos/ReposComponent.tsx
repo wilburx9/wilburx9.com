@@ -18,7 +18,7 @@ import {SiDart, SiGo, SiJava, SiKotlin, SiTypescript} from "react-icons/si";
 import {DiCss3, DiSwift} from "react-icons/di";
 import {IoLogoJavascript} from "react-icons/io";
 import {AiFillStar} from "react-icons/ai";
-import {CgGitFork} from "react-icons/cg";
+import {RiGitBranchFill} from "react-icons/ri";
 
 
 export const ReposComponent = () => {
@@ -27,9 +27,17 @@ export const ReposComponent = () => {
   if (!repos || repos.length === 0) return <Box/>
 
   return (
-    <VStack align='start'>
-      <Heading pt={16} size='xl' fontWeight="black">&#47;&#47; Open-source Projects</Heading>
-      <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={10} py={4}>
+    <VStack align='start'
+            w='full'>
+      <Heading pt={20}
+               size='xl'
+               as='h4'>And here are my open-source <Box
+        as='span'
+        color='cyan.500'>contributions</Box>.</Heading>
+      <SimpleGrid columns={{base: 1, md: 2}}
+                  spacing={8}
+                  w='full'
+                  py={10}>
         {repos.map((repo) =>
           <RepoComponent {...repo} key={repo.id}/>
         )}
@@ -45,30 +53,49 @@ function RepoComponent(props: RepoModel) {
     return new _Language(l, icon?.icon, icon?.size)
   }).filter((l) => l.icon != null)
 
-  let hoverBorderColor = useColorModeValue('black', 'white');
-  let bgColor = useColorModeValue('gray.100', 'gray.900');
+  let hoverBorderColor = useColorModeValue('#BFC6CF', '#596065');
+  let bgColor = useColorModeValue('#F7F8F8', '#26272D');
 
   return <LinkBox>
-    <LinkOverlay href={props.url} isExternal role="group">
+    <LinkOverlay href={props.url}
+                 isExternal
+                 role="group">
       <Box
         w='full'
         h='full'
         bg={bgColor}
-        borderWidth='1px'
+        borderWidth='1.5px'
         borderRadius='lg'
-        p={4}
+        borderColor={bgColor}
+        py={5}
+        px={6}
         _groupHover={{borderColor: hoverBorderColor}}>
-        <VStack w='full' h='full' alignItems='flex-start' justify='center'>
-          <Heading mb={1} size='sm'>{props.name}</Heading>
-          <Text mb={3} fontSize='sm' align="start">{props.description}</Text>
-          <HStack w='full' justify='space-between'>
+        <VStack w='full'
+                h='full'
+                alignItems='flex-start'
+                justify='center'>
+          <Heading mb={1}
+                   size='md'>{props.name}</Heading>
+          <Text mb={3}
+                fontSize='sm'
+                align="start">{props.description}</Text>
+          <HStack w='full'
+                  justify='space-between'
+                  pt={6}>
             <HStack spacing={0}>
-              <Icon as={CgGitFork}/>
-              <Text fontSize='xs' fontWeight='bold' pr={4}>{props.forks}</Text>
-              <Icon as={AiFillStar} pr={0.5}/>
-              <Text fontSize='xs' fontWeight='bold' pr={4}>{props.stars}</Text>
+              <Icon as={RiGitBranchFill}/>
+              <Text fontSize='sm'
+                    fontWeight='bold'
+                    pl={2}
+                    pr={6}>{props.forks}</Text>
+              <Icon as={AiFillStar}
+                    pr={0.5}/>
+              <Text fontSize='sm'
+                    fontWeight='bold'
+                    pl={2}
+                    pr={6}>{props.stars}</Text>
             </HStack>
-            <HStack>
+            <HStack spacing={4}>
               {languages.map((l) => <LanguageComponent {...l} key={l.name}/>)}
             </HStack>
           </HStack>
@@ -79,7 +106,10 @@ function RepoComponent(props: RepoModel) {
 }
 
 function LanguageComponent(props: _Language) {
-  return <Icon as={props.icon!} color={props.color} w={props.iconSize} h={props.iconSize}/>
+  return <Icon as={props.icon!}
+               color={props.color}
+               w={props.iconSize}
+               h={props.iconSize}/>
 }
 
 let lngIconMap: Map<string, { icon: IconType, size: number }> = new Map([

@@ -17,6 +17,7 @@ export const ArticlesComponent = () => {
 
   return (
     <VStack align='start'
+            w='full'
             id="articles">
       <Heading pt={20}
                size='xl'
@@ -24,7 +25,8 @@ export const ArticlesComponent = () => {
         as='span'
         color='secondary.300'>articles</Box>.</Heading>
       <SimpleGrid columns={{base: 1, md: 2, lg: 3}}
-                  spacing={10}
+                  spacing={12}
+                  w='full'
                   py={4}>
         {articles.map((article) => <ArticleComponent {...article} key={article.id}/>)}
       </SimpleGrid>
