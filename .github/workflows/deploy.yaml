@@ -86,7 +86,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REACT_APP_DOMAIN: ${{ secrets.REACT_APP_DOMAIN }}
-      REACT_APP_H_CAPTCHA_SITE_KEY: ${{ secrets.REACT_APP_H_CAPTCHA_SITE_KEY }}
       REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
       REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
       REACT_APP_GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
