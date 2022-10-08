@@ -85,10 +85,7 @@ func SetUpDatabase() database.ReadWrite {
 		if err != nil {
 			log.Fatalf("Failed to create Firestore cleint: %v", err)
 		}
-		return &database.FirebaseFirestore{
-			Client: client,
-			Ctx:    ctx,
-		}
+		return &database.FirebaseFirestore{Client: client}
 	} else {
 		return &database.LocalDatabase{}
 	}

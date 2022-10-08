@@ -21,7 +21,7 @@ func Handler(c *gin.Context, db database.ReadWrite) {
 		return
 	}
 
-	repos, at, err := db.Read(internal.DbReposKey, "score", limit)
+	repos, at, err := db.Read(c, internal.DbReposKey, "score", limit)
 
 	if err != nil && len(repos) == 0 {
 		c.JSON(http.StatusInternalServerError, internal.MakeErrorResponse(repos))

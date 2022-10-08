@@ -10,7 +10,7 @@ import (
 
 // Handler retrieves a list of all the images sorted in descending creation date
 func Handler(c *gin.Context, db database.ReadWrite) {
-	images, at, err := db.Read(internal.DbGalleryKey, "uploaded_on", 30)
+	images, at, err := db.Read(c, internal.DbGalleryKey, "uploaded_on", 30)
 
 	if err != nil && len(images) == 0 {
 		c.JSON(http.StatusInternalServerError, internal.MakeErrorResponse(images))

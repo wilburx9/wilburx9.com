@@ -11,11 +11,10 @@ import (
 // FirebaseFirestore gets and saves data to Firebase Firestore
 type FirebaseFirestore struct {
 	Client *firestore.Client
-	Ctx    context.Context
 }
 
 // Persist saves the data to Firebase Firestore
-func (f FirebaseFirestore) Write(source string, models ...Model) error {
+func (f FirebaseFirestore) Write(ctx context.Context, source string, models ...Model) error {
 	if len(models) == 0 {
 		return fmt.Errorf("models is empty")
 	}
@@ -27,7 +26,7 @@ func (f FirebaseFirestore) Write(source string, models ...Model) error {
 	}
 
 	batch.Set(f.Client.Collection(internal.UpdatesKey).Doc(source), UpdatedAt{})
-	_, err := batch.Commit(f.Ctx)
+	_, err := batch.Commit(ctx)
 	if err != nil {
 		return err
 	}
@@ -36,7 +35,7 @@ func (f FirebaseFirestore) Write(source string, models ...Model) error {
 }
 
 // Retrieve gets the data saved to Firebase Firestore
-func (f FirebaseFirestore) Read(source, orderBy string, limit int) ([]map[string]interface{}, UpdatedAt, error) {
+func (f FirebaseFirestore) Read(ctx context.Context, source, orderBy string, limit int) ([]map[string]interface{}, UpdatedAt, error) {
 	var data []map[string]interface{}
 	q := f.Client.Collection(source).Query
 	if orderBy != "" {
@@ -46,7 +45,7 @@ func (f FirebaseFirestore) Read(source, orderBy string, limit int) ([]map[string
 		q = q.Limit(limit)
 	}
 
-	iter := q.Documents(f.Ctx)
+	iter := q.Documents(ctx)
 	for {
 		doc, err := iter.Next()
 		if err == iterator.Done {
@@ -60,7 +59,7 @@ func (f FirebaseFirestore) Read(source, orderBy string, limit int) ([]map[string
 	}
 
 	var updatedAt UpdatedAt
-	snapshot, err := f.Client.Collection(internal.UpdatesKey).Doc(source).Get(f.Ctx)
+	snapshot, err := f.Client.Collection(internal.UpdatesKey).Doc(source).Get(ctx)
 	if err == nil {
 		snapshot.DataTo(&updatedAt)
 	}

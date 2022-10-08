@@ -1,6 +1,7 @@
 package repos
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -21,20 +22,20 @@ const (
 
 // GitHub handles fetching and caching of GitHub repositories
 type GitHub struct {
-	Auth     string
-	Username string
+	Auth       string
+	Username   string
 	Db         database.ReadWrite
 	HttpClient internal.HttpClient
 }
 
 // Cache fetches and saves GitHub repositories to DB
-func (g GitHub) Cache() (int, error) {
+func (g GitHub) Cache(ctx context.Context) (int, error) {
 	result, err := g.fetchRepos()
 	if err != nil {
 		return 0, err
 	}
 
-	return len(result), g.Db.Write(internal.DbReposKey, result...)
+	return len(result), g.Db.Write(ctx, internal.DbReposKey, result...)
 }
 
 func (g GitHub) fetchRepos() ([]database.Model, error) {

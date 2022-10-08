@@ -61,7 +61,7 @@ func TestUnsplashCache(t *testing.T) {
 	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: file}, nil).Once()
 	db.On("Write", mock.Anything, mock.Anything).Return(nil).Once()
 	var m = Unsplash{Db: db, HttpClient: httpClient}
-	size, err := m.Cache()
+	size, err := m.Cache(nil)
 	assert.Nil(err)
 	assert.Equal(1, size)
 
@@ -69,13 +69,13 @@ func TestUnsplashCache(t *testing.T) {
 	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: file}, nil).Once()
 	db.On("Write", mock.Anything, mock.Anything).Return(errors.New("error")).Once()
 	m = Unsplash{Db: db, HttpClient: httpClient}
-	size, err = m.Cache()
+	size, err = m.Cache(nil)
 	assert.NotNil(err)
 	assert.Equal(1, size)
 
 	httpClient.On("Do", mock.Anything).Return(nil, errors.New("test")).Once()
 	m = Unsplash{Db: db, HttpClient: httpClient}
-	size, err = m.Cache()
+	size, err = m.Cache(nil)
 	assert.NotNil(err)
 	assert.Equal(0, size)
 }

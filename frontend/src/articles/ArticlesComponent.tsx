@@ -19,7 +19,7 @@ export const ArticlesComponent = () => {
     <VStack align='start'
             w='full'
             id="articles">
-      <Heading pt={20}
+      <Heading pt={{base: 0, md: 20}}
                size='xl'
                as='h4'>Here are some of my from <Box
         as='span'
@@ -35,7 +35,7 @@ export const ArticlesComponent = () => {
 }
 
 function ArticleComponent(props: ArticleModel) {
-  return <LinkBox mt={10}>
+  return <LinkBox mt={{base: 0, md: 8}}>
     <LinkOverlay href={props.url}
                  isExternal
                  role="group">

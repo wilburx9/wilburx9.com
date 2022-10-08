@@ -1,6 +1,7 @@
 package gallery
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -24,13 +25,13 @@ type Unsplash struct {
 }
 
 // Cache fetches and caches Unsplash images to db
-func (u Unsplash) Cache() (int, error) {
+func (u Unsplash) Cache(ctx context.Context) (int, error) {
 	result, err := u.fetchImages()
 	if err != nil {
 		return 0, err
 	}
 
-	return len(result), u.Db.Write(internal.DbGalleryKey, result...)
+	return len(result), u.Db.Write(ctx, internal.DbGalleryKey, result...)
 }
 
 // fetchImages fetches images via HTTP

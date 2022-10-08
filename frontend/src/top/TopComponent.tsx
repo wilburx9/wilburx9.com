@@ -2,7 +2,7 @@ import {
   Box, Fade, Flex, Heading,
   Icon,
   IconButton,
-  Image, Link, SlideFade, Text,
+  Image, Link, Show, SlideFade, Text,
   useColorMode,
   useColorModeValue
 } from "@chakra-ui/react";
@@ -93,7 +93,7 @@ const MiddleSection = function () {
   return <SlideFade in={firstArticle != null}
                     offsetY='10px'
                     unmountOnExit>
-    <Box width={{base: '20vw', md: '70vw', 'lg': '40vw'}}>
+    <Box width={{base: '80vw', md: '70vw', 'lg': '40vw'}}>
       <Box mt='5vh'>
         <Icon as={RiArrowRightSLine}
               verticalAlign='middle'
@@ -101,16 +101,15 @@ const MiddleSection = function () {
         <Text as='span'
               verticalAlign='middle'
               fontWeight='medium'
-              fontSize='md'
-              color={'#8D949D'}>Read my latest
-          article</Text>
+              fontSize={{base: 'xs', md: 'md'}}
+              color={'#8D949D'}>Read my latest article</Text>
       </Box>
       <Box _hover={{opacity: 0.7}}>
         <Link href={firstArticle?.url}
               _hover={{textDecoration: 'none'}}>
           <Text textAlign='start'
                 fontWeight='normal'
-                fontSize='xl'
+                fontSize={{base: 'sm', md: 'xl'}}
                 color={postColor}
                 mt={4}
                 noOfLines={5}>{firstArticle?.title}</Text>
@@ -142,24 +141,26 @@ const BottomSection = function () {
   };
 
   return <Flex flex='1'
-               direction={{base: 'column-reverse', md: 'row'}}
+               direction='row'
                align='end'
                w='full'
                mb={{base: 0, md: 4}}>
-    <Fade in={isVisible}
-          unmountOnExit>
-      <IconButton
-        isRound={true}
-        mb={{base: 6, md: 10}}
-        variant="ghost"
-        color="current"
-        fontSize='32px'
-        minH='70px'
-        minW='70px'
-        icon={<IoArrowDown/>}
-        onClick={() => document.getElementById('articles')?.scrollIntoView({behavior: 'smooth'})}
-        aria-label={'Scroll down'}/>
-    </Fade>
+    <Show above='md'>
+      <Fade in={isVisible}
+            unmountOnExit>
+        <IconButton
+          isRound={true}
+          mb={{base: 6, md: 10}}
+          variant="ghost"
+          color="current"
+          fontSize='32px'
+          minH='70px'
+          minW='70px'
+          icon={<IoArrowDown/>}
+          onClick={() => document.getElementById('articles')?.scrollIntoView({behavior: 'smooth'})}
+          aria-label={'Scroll down'}/>
+      </Fade>
+    </Show>
     <Flex flex='1'
           justifyContent='flex-end'>
       <Heading display='inline-block'
@@ -167,7 +168,7 @@ const BottomSection = function () {
                as='h1'
                textAlign='end'
                fontSize='min(10vw, 10vh)'
-               mb={{base: '5vh', md: 0}}>
+               mb={{base: '8vh', md: 0}}>
         I am Wilberforce,{<br/>}
         a Software Engineer{<br/>}
         from <span style={{

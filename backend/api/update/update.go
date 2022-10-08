@@ -2,6 +2,7 @@ package update
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -37,7 +38,7 @@ func Handler(c *gin.Context, db database.ReadWrite, h internal.HttpClient) {
 	if cap(cachers) == 0 {
 		SetUp(h, db)
 	}
-	results, duration := updateCache()
+	results, duration := updateCache(c)
 
 	log.Infof("Update cache: %v", generateLogMsg(results, duration))
 
@@ -64,7 +65,7 @@ func generateLogMsg(results []result, duration string) string {
 	return buffer.String()
 }
 
-func updateCache() ([]result, string) {
+func updateCache(ctx context.Context) ([]result, string) {
 	var startTime = time.Now()
 
 	rc := make(chan result, len(cachers))
@@ -75,7 +76,7 @@ func updateCache() ([]result, string) {
 		go func(cacher database.Cacher) {
 			defer wg.Done()
 
-			size, err := cacher.Cache()
+			size, err := cacher.Cache(ctx)
 
 			var errV *errorV
 			if err != nil {
