@@ -2,10 +2,11 @@ package update
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles"
-	"github.com/wilburt/wilburx9.dev/backend/api/email"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
@@ -33,28 +34,21 @@ func SetUp(http internal.HttpClient, db database.ReadWrite) {
 }
 
 // Handler fetches data from sources and cache the results
-func Handler(c *gin.Context, h internal.HttpClient) {
-	db := c.MustGet(internal.Db).(database.ReadWrite)
+func Handler(c *gin.Context, db database.ReadWrite, h internal.HttpClient) {
 	if cap(cachers) == 0 {
 		SetUp(h, db)
 	}
-	results, duration := updateCache()
+	results, duration := updateCache(c)
 
-	var sent bool
-	if configs.Config.IsRelease() {
-		err := email.Send(generateEmail(results, duration), h)
-		sent = err == nil
-	}
+	log.Infof("Update cache: %v", generateLogMsg(results, duration))
 
 	data := map[string]interface{}{
-		"results":           results,
-		"duration":          duration,
-		"email_report_sent": sent,
+		"duration": duration,
 	}
 	c.JSON(http.StatusOK, internal.MakeSuccessResponse(data))
 }
 
-func generateEmail(results []result, duration string) email.Data {
+func generateLogMsg(results []result, duration string) string {
 	buffer := &bytes.Buffer{}
 	for _, r := range results {
 		buffer.WriteString(fmt.Sprintln("\n", "-----------------"))
@@ -68,15 +62,10 @@ func generateEmail(results []result, duration string) email.Data {
 	}
 	buffer.WriteString(fmt.Sprintln("\n", "Total duration:", duration))
 
-	return email.Data{
-		SenderEmail: configs.Config.EmailReceiver,
-		SenderName:  "Jesse Bruce Pinkman",
-		Subject:     "Yo! Batch cache update report!",
-		Message:     buffer.String(),
-	}
+	return buffer.String()
 }
 
-func updateCache() ([]result, string) {
+func updateCache(ctx context.Context) ([]result, string) {
 	var startTime = time.Now()
 
 	rc := make(chan result, len(cachers))
@@ -87,7 +76,7 @@ func updateCache() ([]result, string) {
 		go func(cacher database.Cacher) {
 			defer wg.Done()
 
-			size, err := cacher.Cache()
+			size, err := cacher.Cache(ctx)
 
 			var errV *errorV
 			if err != nil {

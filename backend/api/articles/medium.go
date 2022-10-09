@@ -1,6 +1,7 @@
 package articles
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -16,19 +17,19 @@ const (
 
 // Medium encapsulates the fetching and caching of medium articles
 type Medium struct {
-	Name string // should be Medium username (e.g "@Wilburx9") or publication (e.g. flutter-community)
+	Name       string // should be Medium username (e.g "@Wilburx9") or publication (e.g. flutter-community)
 	Db         database.ReadWrite
 	HttpClient internal.HttpClient
 }
 
 // Cache fetches and caches all Medium Articles
-func (m Medium) Cache() (int, error) {
+func (m Medium) Cache(ctx context.Context) (int, error) {
 	result, err := m.fetchArticles()
 	if err != nil {
 		return 0, err
 	}
 
-	return len(result), m.Db.Write(internal.DbArticlesKey, result...)
+	return len(result), m.Db.Write(ctx, internal.DbArticlesKey, result...)
 }
 
 // fetchArticles fetches articles via HTTP

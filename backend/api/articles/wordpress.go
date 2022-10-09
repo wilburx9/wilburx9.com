@@ -1,6 +1,7 @@
 package articles
 
 import (
+	"context"
 	"encoding/json"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles/internal/models"
@@ -15,19 +16,19 @@ const (
 
 // WordPress encapsulates fetching and caching of WordPress blog posts
 type WordPress struct {
-	URL string // WP V2 post URL URL e.g https://example.com/wp-json/wp/v2/posts
+	URL        string // WP V2 post URL URL e.g https://example.com/wp-json/wp/v2/posts
 	Db         database.ReadWrite
 	HttpClient internal.HttpClient
 }
 
 // Cache fetches and caches WordPress articles
-func (w WordPress) Cache() (int, error) {
+func (w WordPress) Cache(ctx context.Context) (int, error) {
 	result, err := w.fetchArticles()
 	if err != nil {
 		return 0, err
 	}
 
-	return len(result), w.Db.Write(internal.DbArticlesKey, result...)
+	return len(result), w.Db.Write(ctx, internal.DbArticlesKey, result...)
 }
 
 // fetchArticles gets articles from WordPress via HTTP
