@@ -41,7 +41,7 @@ func (m UnsplashImgs) ToImages(source string) []database.Model {
 			Page:       e.Links.HTML,
 			Url:        e.Urls.Full,
 			Caption:    e.Description,
-			UploadedOn: internal.StringToTime(time.RFC3339, e.CreatedAt, "Unsplash"),
+			UploadedOn: internal.StringToTime(time.RFC3339, e.CreatedAt),
 			Source:     source,
 			Meta: map[string]interface{}{
 				"user": e.User,

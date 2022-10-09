@@ -14,11 +14,10 @@ const (
 )
 
 // StringToTime parses timeStr with layout. Returns the current time if parsing fails
-func StringToTime(layout, timeStr, ts string) time.Time {
+func StringToTime(layout, timeStr string) time.Time {
 	t, err := time.Parse(layout, timeStr)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"caller": ts,
 			"source": timeStr,
 			"layout": layout,
 			"error":  err,
