@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -9,7 +10,7 @@ type MockDb struct {
 	mock.Mock
 }
 
-func (m *MockDb) Read(source, orderBy string, limit int) ([]map[string]interface{}, UpdatedAt, error) {
+func (m *MockDb) Read(ctx context.Context, source, orderBy string, limit int) ([]map[string]interface{}, UpdatedAt, error) {
 	args := m.Called(source, orderBy, limit)
 	data, ok := args.Get(0).([]map[string]interface{})
 	if !ok {
@@ -18,7 +19,7 @@ func (m *MockDb) Read(source, orderBy string, limit int) ([]map[string]interface
 	return data, args.Get(1).(UpdatedAt), args.Error(2)
 }
 
-func (m *MockDb) Write(source string, models ...Model) error {
+func (m *MockDb) Write(ctx context.Context, source string, models ...Model) error {
 	args := m.Called(source, models)
 	return args.Error(0)
 }

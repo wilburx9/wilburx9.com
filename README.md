@@ -19,7 +19,7 @@ My website.
 1. Add the backend config variables to [Cloud Run](https://cloud.google.com/run/docs/configuring/environment-variables#setting).
 2. Add the following [GitHub Secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
    
-   | Secret       | Description                                                                                                                                                         |
+   | Secret      | Description                                                                                                                                                         |
    |-----------------| ------------- |
    | FIREBASE_SA_KEY | For deploying the frontend to Firebase Hosting. See [how to generate](https://github.com/FirebaseExtended/action-hosting-deploy/blob/main/docs/service-account.md). |
    | FIREBASE_TOKEN | For deploying the Cloud Functions. See [how to generate](https://firebase.google.com/docs/cli#cli-ci-systems).                                                      |
@@ -27,8 +27,7 @@ My website.
    | GCP_SA_KEY | The service account for deploying the backend to Cloud Run. See [how to setup](https://github.com/google-github-actions/deploy-cloudrun#setup).                     |
    | REACT_APP_DOMAIN | The domain issued by Firebase Hosting.                                                                                                                              |
    | REACT_APP_FIREBASE_API_KEY | For configuring Firebase Analytics. See [documentation](https://firebase.google.com/docs/analytics/get-started?platform=web#add-sdk).                               |
-   | REACT_APP_FIREBASE_APP_ID | Same as above                                                                                                                                                       |
-   | REACT_APP_H_CAPTCHA_SITE_KEY | For configuring HCaptcha. See [how to get it](https://docs.hcaptcha.com).                                                                                           |
+   | REACT_APP_FIREBASE_APP_ID | Same as above                                                                                                                                                       |                                                                                           |
 3. Any push to the `live` branch triggers a deployment to Cloud Run, Firebase Hosting and Cloud Functions for Firebase. See [GitHub Workflow](./.github/workflows/build_and_deploy.yaml).
 
 

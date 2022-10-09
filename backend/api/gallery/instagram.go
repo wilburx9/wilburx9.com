@@ -1,6 +1,7 @@
 package gallery
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -22,23 +23,23 @@ const (
 // Instagram encapsulates the fetching of Instagram images and access token management
 type Instagram struct {
 	AccessToken string
-	Db         database.ReadWrite
-	HttpClient internal.HttpClient
+	Db          database.ReadWrite
+	HttpClient  internal.HttpClient
 }
 
 // Cache fetches and caches Instagram images to db
-func (i Instagram) Cache() (int, error) {
-	result, err := i.fetchImages()
+func (i Instagram) Cache(ctx context.Context) (int, error) {
+	result, err := i.fetchImages(ctx)
 	if err != nil {
 		return 0, err
 	}
 
-	return len(result), i.Db.Write(internal.DbGalleryKey, result...)
+	return len(result), i.Db.Write(ctx, internal.DbGalleryKey, result...)
 }
 
 // Recursively fetch all the images
-func (i Instagram) fetchImages() ([]database.Model, error) {
-	token, err := i.getToken()
+func (i Instagram) fetchImages(ctx context.Context) ([]database.Model, error) {
+	token, err := i.getToken(ctx)
 	if err != nil {
 		log.WithFields(log.Fields{"error": err}).Warning("Couldn't get token")
 		return nil, err
@@ -69,14 +70,14 @@ func (i Instagram) fetchImages() ([]database.Model, error) {
 	return data.Data.ToImages(instagramKey), nil
 }
 
-func (i Instagram) getToken() (string, error) {
+func (i Instagram) getToken(ctx context.Context) (string, error) {
 
 	// Attempt to get token from Db
-	keys, _, err := i.Db.Read(internal.DbKeys, "", math.MaxInt)
+	keys, _, err := i.Db.Read(ctx, internal.DbKeys, "", math.MaxInt)
 	// If we haven't saved the token before, log an error and refresh the token we have now
 	if err != nil || len(keys) == 0 {
 		log.Warningf("Couldn't get Keys from the db. Possible error: %v", err)
-		return i.refreshToken(i.AccessToken)
+		return i.refreshToken(ctx, i.AccessToken)
 	}
 
 	var tk models.InstaToken
@@ -91,7 +92,7 @@ func (i Instagram) getToken() (string, error) {
 	}
 
 	if tk.ID == "" || tk.Value == "" {
-		return i.refreshToken(i.AccessToken)
+		return i.refreshToken(ctx, i.AccessToken)
 	}
 
 	// Check for expired token.
@@ -102,12 +103,12 @@ func (i Instagram) getToken() (string, error) {
 
 	// Refresh the token if need be
 	if tk.IsAboutToExpire(minTokenRemainingLife) {
-		return i.refreshToken(tk.Value)
+		return i.refreshToken(ctx, tk.Value)
 	}
 	return tk.Value, nil
 }
 
-func (i Instagram) refreshToken(oldToken string) (string, error) {
+func (i Instagram) refreshToken(ctx context.Context, oldToken string) (string, error) {
 	u, _ := url.Parse("https://graph.instagram.com/refresh_access_token")
 	q := u.Query()
 	q.Set("grant_type", "ig_refresh_token")
@@ -129,7 +130,7 @@ func (i Instagram) refreshToken(oldToken string) (string, error) {
 	}
 
 	newT.RefreshedAt = time.Now()
-	err = i.Db.Write(internal.DbKeys, newT)
+	err = i.Db.Write(ctx, internal.DbKeys, newT)
 	if err != nil {
 		return "", err
 	}

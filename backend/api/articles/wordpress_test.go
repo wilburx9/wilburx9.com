@@ -60,7 +60,7 @@ func TestWordPressCache(t *testing.T) {
 	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: file}, nil).Once()
 	db.On("Write", mock.Anything, mock.Anything).Return(nil).Once()
 	var m = WordPress{Db: db, HttpClient: httpClient}
-	size, err := m.Cache()
+	size, err := m.Cache(nil)
 	assert.Nil(err)
 	assert.Equal(2, size)
 
@@ -68,13 +68,13 @@ func TestWordPressCache(t *testing.T) {
 	httpClient.On("Do", mock.Anything).Return(&http.Response{Body: file}, nil).Once()
 	db.On("Write", mock.Anything, mock.Anything).Return(errors.New("error")).Once()
 	m = WordPress{Db: db, HttpClient: httpClient}
-	size, err = m.Cache()
+	size, err = m.Cache(nil)
 	assert.NotNil(err)
 	assert.Equal(2, size)
 
 	httpClient.On("Do", mock.Anything).Return(nil, errors.New("test")).Once()
 	m = WordPress{Db: db, HttpClient: httpClient}
-	size, err = m.Cache()
+	size, err = m.Cache(nil)
 	assert.NotNil(err)
 	assert.Equal(0, size)
 }

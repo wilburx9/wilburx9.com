@@ -9,10 +9,5 @@ github_token: "" # GitHub personal access token. See https://docs.github.com/en/
 github_username: ""
 app_home: "" # The path of the backend directory. Use value printed when you run `cd backend && pwd`
 gcp_project_id: "" # The id of the project on Google Cloud Platform. Not needed when running locally
-email_api_key: "" # Mailgun API key
-email_receiver: "" # Which email receives the message sent from the contact form?
-email_domain: "" # Mailgun domain
-h_captcha_secret: "" # See https://docs.hcaptcha.com
-h_captcha_site_key: "" # See https://docs.hcaptcha.com
 api_hash: "" # Auto-generated during production deployment.
 api_salt: "" # Auto-generated during production deployment.

@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"github.com/wilburt/wilburx9.dev/backend/api/articles"
-	"github.com/wilburt/wilburx9.dev/backend/api/email"
 	"github.com/wilburt/wilburx9.dev/backend/api/gallery"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
@@ -55,7 +54,6 @@ func SetUpServer(db database.ReadWrite) *http.Server {
 	api.GET("/articles", func(c *gin.Context) { articles.Handler(c, db) })
 	api.GET("/gallery", func(c *gin.Context) { gallery.Handler(c, db) })
 	api.GET("/repos", func(c *gin.Context) { repos.Handler(c, db) })
-	api.POST("/contact", func(c *gin.Context) { email.Handler(c, httpClient) })
 
 	auth := api.Group("/protected")
 	auth.Use(internal.AuthMiddleware())
@@ -87,10 +85,7 @@ func SetUpDatabase() database.ReadWrite {
 		if err != nil {
 			log.Fatalf("Failed to create Firestore cleint: %v", err)
 		}
-		return &database.FirebaseFirestore{
-			Client: client,
-			Ctx:    ctx,
-		}
+		return &database.FirebaseFirestore{Client: client}
 	} else {
 		return &database.LocalDatabase{}
 	}

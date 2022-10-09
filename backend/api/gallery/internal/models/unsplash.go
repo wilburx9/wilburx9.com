@@ -3,6 +3,7 @@ package models
 import (
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal/database"
+	"time"
 )
 
 // UnsplashImgs represents a slice of unsplashImg
@@ -31,7 +32,6 @@ type User struct {
 
 // ToImages maps this slice of unsplashImg to slice of Image
 func (m UnsplashImgs) ToImages(source string) []database.Model {
-	var timeLayout = "2006-01-02T03:04:05-07:00"
 	var images = make([]database.Model, len(m))
 
 	for i, e := range m {
@@ -41,7 +41,7 @@ func (m UnsplashImgs) ToImages(source string) []database.Model {
 			Page:       e.Links.HTML,
 			Url:        e.Urls.Full,
 			Caption:    e.Description,
-			UploadedOn: internal.StringToTime(timeLayout, e.CreatedAt),
+			UploadedOn: internal.StringToTime(time.RFC3339, e.CreatedAt),
 			Source:     source,
 			Meta: map[string]interface{}{
 				"user": e.User,

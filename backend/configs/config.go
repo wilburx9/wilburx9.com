@@ -22,11 +22,6 @@ type appConfig struct {
 	GithubUsername       string `mapstructure:"github_username"`
 	AppHome              string `mapstructure:"app_home"`
 	GcpProjectId         string `mapstructure:"gcp_project_id"`
-	EmailDomain          string `mapstructure:"email_domain"`
-	EmailReceiver        string `mapstructure:"email_receiver"`
-	EmailAPIKey          string `mapstructure:"email_api_key"`
-	HCaptchaSecret       string `mapstructure:"h_captcha_secret"`
-	HCaptchaSiteKey      string `mapstructure:"h_captcha_site_key"`
 	APIHash              string `mapstructure:"api_hash"`
 	APISalt              string `mapstructure:"api_salt"`
 }

@@ -2,7 +2,7 @@ name: Deploy to Firebase and Cloud Run
 
 on:
   push:
-    branches: [ live ]
+    tags: [ v* ]
 
 env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
@@ -78,7 +78,7 @@ jobs:
       - name: Trigger HTTP Cloud Function
         run: |
           curl --request POST --header "Authorization: ${{ steps.api_keys.outputs.pass }}" --url "https://${{ env.REGION }}-${{ env.GCP_PROJECT_ID }}.cloudfunctions.net/cacheUpdateViaHttps"
-          
+  
 
   deploy_frontend:
     name: Build and Deploy Frontend
@@ -86,7 +86,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REACT_APP_DOMAIN: ${{ secrets.REACT_APP_DOMAIN }}
-      REACT_APP_H_CAPTCHA_SITE_KEY: ${{ secrets.REACT_APP_H_CAPTCHA_SITE_KEY }}
       REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
       REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
       REACT_APP_GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT }}
