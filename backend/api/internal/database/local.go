@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/wilburt/wilburx9.dev/backend/api/internal"
@@ -19,7 +20,7 @@ type LocalDatabase struct{}
 func (l LocalDatabase) Close() {}
 
 // Persist saves the data to a local .json file
-func (l LocalDatabase) Write(source string, models ...Model) error {
+func (l LocalDatabase) Write(ctx context.Context, source string, models ...Model) error {
 	currentData, path, _ := l.retrieve(source)
 
 	for _, model := range models {
@@ -46,7 +47,7 @@ func (l LocalDatabase) Write(source string, models ...Model) error {
 }
 
 // Retrieve gets the data saved to a local .json file. The results are  not ordered
-func (l LocalDatabase) Read(source, _ string, limit int) ([]map[string]interface{}, UpdatedAt, error) {
+func (l LocalDatabase) Read(ctx context.Context, source, orderBy string, limit int) ([]map[string]interface{}, UpdatedAt, error) {
 	result, _, err := l.retrieve(source)
 	if err != nil {
 		return nil, UpdatedAt{}, err

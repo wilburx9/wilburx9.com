@@ -1,4 +1,21 @@
-export function redact(s: string, size: number = 1): string {
-  let max = Math.max(1, size)
-  return `${s.slice(0, max)}****${s.slice(-max)}`
+import {useEffect, useState} from "react";
+
+function getWindowDimensions() {
+  const {innerWidth: width, innerHeight: height} = window;
+  return {width, height};
+}
+
+export default function useWindowDimensions() {
+  const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowDimensions(getWindowDimensions());
+    }
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return windowDimensions;
 }

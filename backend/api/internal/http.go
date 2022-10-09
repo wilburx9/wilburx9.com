@@ -1,33 +1,14 @@
 package internal
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/mock"
 	"net/http"
-	"os"
 )
 
 // HttpClient provides function fot http request
 type HttpClient interface {
 	Do(req *http.Request) (*http.Response, error)
-}
-
-// HttpClientMock is a mock HttpClient for testing
-type HttpClientMock struct {
-	ResponseFilePath string
-	Header           http.Header
-}
-
-// Do return an instance of http.Response with body set to the file at cm.ResponseFilePath
-func (cm *HttpClientMock) Do(_ *http.Request) (*http.Response, error) {
-	file, err := os.Open(cm.ResponseFilePath)
-	if err != nil {
-		log.Errorln(fmt.Sprintf("error while opening file %v", err))
-		return nil, err
-	}
-
-	return &http.Response{Body: file, Header: cm.Header}, nil
 }
 
 // MakeSuccessResponse returns a template of a successful response
@@ -38,4 +19,19 @@ func MakeSuccessResponse(data interface{}) gin.H {
 // MakeErrorResponse returns a template of an error response
 func MakeErrorResponse(data interface{}) gin.H {
 	return gin.H{"success": false, "data": data}
+}
+
+// MockHttpClient is a mock HttpClient for testing
+type MockHttpClient struct {
+	mock.Mock
+}
+
+// Do stub http.Do function
+func (c *MockHttpClient) Do(r *http.Request) (*http.Response, error) {
+	args := c.Called(r)
+	response, ok := args.Get(0).(*http.Response)
+	if !ok {
+		response = nil
+	}
+	return response, args.Error(1)
 }

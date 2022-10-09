@@ -1,6 +1,7 @@
 package gallery
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -17,24 +18,24 @@ const (
 
 // Unsplash handles fetching and caching of data from Unsplash. And also returning the cached data
 type Unsplash struct {
-	Username  string
-	AccessKey string
+	Username   string
+	AccessKey  string
 	Db         database.ReadWrite
 	HttpClient internal.HttpClient
 }
 
 // Cache fetches and caches Unsplash images to db
-func (u Unsplash) Cache() (int, error) {
-	result, err := u.FetchImages()
+func (u Unsplash) Cache(ctx context.Context) (int, error) {
+	result, err := u.fetchImages()
 	if err != nil {
 		return 0, err
 	}
 
-	return len(result), u.Db.Write(internal.DbGalleryKey, result...)
+	return len(result), u.Db.Write(ctx, internal.DbGalleryKey, result...)
 }
 
-// FetchImages fetches images via HTTP
-func (u Unsplash) FetchImages() ([]database.Model, error) {
+// fetchImages fetches images via HTTP
+func (u Unsplash) fetchImages() ([]database.Model, error) {
 	url := fmt.Sprintf("https://api.unsplash.com/users/%s/photos?per_page=%v", u.Username, unsplashLimit)
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 	req.Header.Add("Accept-Version", "v1")
