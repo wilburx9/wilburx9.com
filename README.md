@@ -28,7 +28,7 @@ My website.
    | REACT_APP_DOMAIN | The domain issued by Firebase Hosting.                                                                                                                              |
    | REACT_APP_FIREBASE_API_KEY | For configuring Firebase Analytics. See [documentation](https://firebase.google.com/docs/analytics/get-started?platform=web#add-sdk).                               |
    | REACT_APP_FIREBASE_APP_ID | Same as above                                                                                                                                                       |                                                                                           |
-3. Any push to the `live` branch triggers a deployment to Cloud Run, Firebase Hosting and Cloud Functions for Firebase. See [GitHub Workflow](./.github/workflows/build_and_deploy.yaml).
+3. Pushing any tag prefixed with "v" triggers a deployment to Cloud Run, Firebase Hosting and Cloud Functions for Firebase. See [GitHub Workflow](./.github/workflows/build_and_deploy.yaml).
 
 
 ## Contribution
