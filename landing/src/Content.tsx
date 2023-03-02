@@ -22,17 +22,18 @@ function Left() {
             <div className="flex flex-row gap-x-4 pt-8">
                 <button className="grow basis-0 bg-bgSet-dark dark:bg-bgSet-light bg-cover
                 text-bgSet-light dark:text-bgSet-dark rounded-[12px] text-button font-medium leading-20 py-4
-                hover:bg-orangeSet-light dark:hover:bg-orangeSet-dark hover:text-bgSet-dark dark:hover:text-bgSet-light
-                focus:bg-orangeSet-light dark:focus:bg-orangeSet-dark focus:text-bgSet-dark dark:focus:text-bgSet-light
-                active:bg-orangeSet-light dark:active:bg-orangeSet-dark active:text-bgSet-dark dark:active:text-bgSet-light">
+                hover:bg-orangeSet-light dark:hover:bg-orangeSet-dark hover:text-bgSet-light dark:hover:text-bgSet-light
+                focus:bg-orangeSet-light dark:focus:bg-orangeSet-dark focus:text-bgSet-light dark:focus:text-bgSet-light
+                active:bg-orangeSet-light dark:active:bg-orangeSet-dark active:text-bgSet-light dark:active:text-bgSet-light">
                     Blog
                 </button>
-                <button className="grow basis-0 border rounded-[12px]
+                <button className="grow basis-0 border border-blackSet-light bg-cover dark:border-blackSet-dark rounded-[12px]
                 text-bgSet-dark dark:text-bgSet-light text-button ont-medium leading-20 py-4
-                hover:bg-orangeSet-light dark:hover:bg-orangeSet-dark hover:text-bgSet-dark dark:hover:text-bgSet-light
-                focus:bg-orangeSet-light dark:focus:bg-orangeSet-dark focus:text-bgSet-dark dark:focus:text-bgSet-light
-                active:bg-orangeSet-light dark:active:bg-orangeSet-dark active:text-bgSet-dark dark:active:text-bgSet-light
-                hover:border-transparent focus:border-transparent active:border-transparent">
+                hover:bg-orangeSet-light dark:hover:bg-orangeSet-dark hover:text-bgSet-light dark:hover:text-bgSet-light
+                focus:bg-orangeSet-light dark:focus:bg-orangeSet-dark focus:text-bgSet-light dark:focus:text-bgSet-light
+                active:bg-orangeSet-light dark:active:bg-orangeSet-dark active:text-bgSet-light dark:active:text-bgSet-light
+                hover:border-transparent focus:border-transparent active:border-transparent
+                hover:dark:border-transparent focus:dark:border-transparent active:dark:border-transparent">
                     LinkedIn
                 </button>
             </div>
@@ -47,8 +48,7 @@ function Right() {
             bg-[url('./images/pattern_light.svg')]
             dark:bg-[url('./images/pattern_dark.svg')]
             hover:bg-[url('./images/pattern.svg')]
-            hover:dark:bg-[url('./images/pattern.svg')]"
-            >
+            hover:dark:bg-[url('./images/pattern.svg')]">
                 <div className="w-[43.5%] h-[43.5%] bg-auto bg-no-repeat bg-center bg-contain mx-auto my-auto
             bg-[url('./images/me_bw.png')] group-hover:bg-[url('./images/me.png')]"/>
             </div>
