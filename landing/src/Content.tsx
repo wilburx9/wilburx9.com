@@ -20,22 +20,24 @@ function Left() {
                 to deliver impactful digital experiences.
             </h2>
             <div className="flex flex-row gap-x-4 pt-8">
-                <button className="grow basis-0 bg-bgSet-dark dark:bg-bgSet-light bg-cover
+                <a href="/blog" className="grow basis-0 bg-bgSet-dark dark:bg-bgSet-light bg-cover
                 text-bgSet-light dark:text-bgSet-dark rounded-[12px] text-button font-medium leading-20 py-4
                 hover:bg-orangeSet-light dark:hover:bg-orangeSet-dark hover:text-bgSet-light dark:hover:text-bgSet-light
                 focus:bg-orangeSet-light dark:focus:bg-orangeSet-dark focus:text-bgSet-light dark:focus:text-bgSet-light
-                active:bg-orangeSet-light dark:active:bg-orangeSet-dark active:text-bgSet-light dark:active:text-bgSet-light">
+                active:bg-orangeSet-light dark:active:bg-orangeSet-dark active:text-bgSet-light dark:active:text-bgSet-light
+                text-center no-underline">
                     Blog
-                </button>
-                <button className="grow basis-0 border border-blackSet-light bg-cover dark:border-blackSet-dark rounded-[12px]
-                text-bgSet-dark dark:text-bgSet-light text-button ont-medium leading-20 py-4
+                </a>
+                <a href="https://www.linkedin.com/in/wilburx9"
+                   className="grow basis-0 border border-blackSet-light bg-cover dark:border-blackSet-dark rounded-[12px]
+                text-bgSet-dark dark:text-bgSet-light text-button ont-medium leading-20 py-4 no-underline
                 hover:bg-orangeSet-light dark:hover:bg-orangeSet-dark hover:text-bgSet-light dark:hover:text-bgSet-light
                 focus:bg-orangeSet-light dark:focus:bg-orangeSet-dark focus:text-bgSet-light dark:focus:text-bgSet-light
                 active:bg-orangeSet-light dark:active:bg-orangeSet-dark active:text-bgSet-light dark:active:text-bgSet-light
                 hover:border-transparent focus:border-transparent active:border-transparent
-                hover:dark:border-transparent focus:dark:border-transparent active:dark:border-transparent">
+                hover:dark:border-transparent focus:dark:border-transparent active:dark:border-transparent text-center">
                     LinkedIn
-                </button>
+                </a>
             </div>
         </div>
     )
