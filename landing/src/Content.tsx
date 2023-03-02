@@ -17,8 +17,7 @@ function Left() {
                     </span>, a Software Engineer and Visual Storyteller.</h1>
             <h2 className="pt-2 font-normal text-headline4 text-fontGrey-light dark:text-fontGrey-dark leading-24">
                 Seasoned software engineer and avid photographer. Combining technical expertise with a creative eye
-                to
-                deliver impactful digital experiences.
+                to deliver impactful digital experiences.
             </h2>
             <div className="flex flex-row gap-x-4 pt-8">
                 <button className="grow basis-0 bg-bgSet-dark dark:bg-bgSet-light bg-cover
@@ -45,7 +44,11 @@ function Right() {
     return (
         <div className="grow basis-0">
             <div className="group flex justify-center items-center w-full h-full bg-auto bg-no-repeat bg-center
-            bg-[url('./images/pattern_bw.svg')] hover:bg-[url('./images/pattern.svg')]">
+            bg-[url('./images/pattern_light.svg')]
+            dark:bg-[url('./images/pattern_dark.svg')]
+            hover:bg-[url('./images/pattern.svg')]
+            hover:dark:bg-[url('./images/pattern.svg')]"
+            >
                 <div className="w-[43.5%] h-[43.5%] bg-auto bg-no-repeat bg-center bg-contain mx-auto my-auto
             bg-[url('./images/me_bw.png')] group-hover:bg-[url('./images/me.png')]"/>
             </div>
