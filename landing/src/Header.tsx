@@ -7,7 +7,7 @@ export default function Header() {
     const [theme, setTheme] = useDarkMode()
     let isDarkTheme = theme === "dark"
     return (
-        <div className="flex flex-row w-full">
+        <div className="flex flex-row w-full justify-between pt-12">
             <img src={logo} alt="Logo"/>
             <img src={isDarkTheme ? sun : moon} alt={`Switch to ${isDarkTheme ? "light" : "dark"} mode`}
                  onClick={() => setTheme(isDarkTheme ? "light" : "dark")}/>

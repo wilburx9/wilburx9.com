@@ -6,10 +6,12 @@ import Footer from "./Footer";
 
 export default function App() {
     return (
-        <div className="h-screen w-screen bg-bg-light dark:bg-bg-dark flex flex-col">
-            <Header/>
-            <Content/>
-            <Footer/>
+        <div className="h-screen w-screen bg-bgSet-light dark:bg-bgSet-dark">
+            <div className="max-w-[1192px] h-screen  flex flex-col mx-auto">
+                <Header/>
+                <Content/>
+                <Footer/>
+            </div>
         </div>
     )
 }
