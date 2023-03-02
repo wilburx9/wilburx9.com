@@ -34,14 +34,15 @@ module.exports = {
         fontSize: {
             'largeTitle': "62px",
             'headline4': "20px",
-            "button": "16px"
+            "button": "16px",
+            "body3": "12px",
         },
         lineHeight: {
             '72': '72px',
             '24': '24px',
             '20': '20px',
+            '16': '16px',
         }
-
     },
     plugins: [],
 }
