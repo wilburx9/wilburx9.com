@@ -2,13 +2,13 @@
 export default function Footer() {
     let year = new Date().getFullYear()
     return (
-        <div className="flex flex-row w-full justify-between pb-[70px] pt-5 items-center">
+        <div className="flex flex-col md:flex-row w-full justify-between pt-5 items-center pt-8 md:pb-16 xl:pb-24">
             <div className="flex flex-row gap-x-6 items-center">
                 <a href="https://github.com/wilburt"><Github/></a>
                 <a href="https://twitter.com/wilburx09"><Twitter/></a>
                 <a href="https://instagram.com/wilburx9"><Instagram/></a>
             </div>
-            <p className="text-body3 font-normal leading-16 text-bgSet-dark dark:text-bgSet-light">
+            <p className="text-center md:text-left text-body3 text-bgSet-dark dark:text-bgSet-light py-4">
                 {`Copyright ${String.fromCharCode(169)} ${year} All rights reserved.`}
             </p>
         </div>

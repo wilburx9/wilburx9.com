@@ -1,6 +1,6 @@
 export default function Content() {
     return (
-        <div className="grow flex flex-row gap-x-6">
+        <div className="grow flex flex-col-reverse xl:flex-row gap-x-6 justify-center gap-y-4 pt-3">
             <Left/>
             <Right/>
         </div>
@@ -10,18 +10,18 @@ export default function Content() {
 
 function Left() {
     return (
-        <div className="grow basis-0 flex flex-col justify-center">
-            <h1 className="font-bold text-blackSet-light dark:text-blackSet-dark text-largeTitle leading-72">
+        <div className="grow basis-0 flex flex-col justify-center px-0 lg:px-20 xl:px-0">
+            <h1 className="text-center md:text-left  text-blackSet-light dark:text-blackSet-dark text-largeTitle md:text-largeTitle2 xl:text-largeTitle3">
                 I am
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-pizazz to-electricViolet"> Wilberforce
-                    </span>, a Software Engineer and Visual Storyteller.</h1>
-            <h2 className="pt-2 font-normal text-headline4 text-fontGrey-light dark:text-fontGrey-dark leading-24">
+                    </span>,<br/>a Software Engineer and Visual Storyteller.</h1>
+            <h2 className="text-center md:text-left pt-2 text-headline md:text-headline2 xl:text-headline3 text-fontGrey-light dark:text-fontGrey-dark">
                 Seasoned software engineer and avid photographer. Combining technical expertise with a creative eye
                 to deliver impactful digital experiences.
             </h2>
             <div className="flex flex-row gap-x-4 pt-8">
                 <a href="/blog" className="grow basis-0 bg-bgSet-dark dark:bg-bgSet-light bg-cover
-                text-bgSet-light dark:text-bgSet-dark rounded-[12px] text-button font-medium leading-20 py-4
+                text-bgSet-light dark:text-bgSet-dark rounded-[12px] text-button py-4
                 hover:bg-orangeSet-light dark:hover:bg-orangeSet-dark hover:text-bgSet-light dark:hover:text-bgSet-light
                 focus:bg-orangeSet-light dark:focus:bg-orangeSet-dark focus:text-bgSet-light dark:focus:text-bgSet-light
                 active:bg-orangeSet-light dark:active:bg-orangeSet-dark active:text-bgSet-light dark:active:text-bgSet-light
@@ -30,7 +30,7 @@ function Left() {
                 </a>
                 <a href="https://www.linkedin.com/in/wilburx9"
                    className="grow basis-0 border border-blackSet-light bg-cover dark:border-blackSet-dark rounded-[12px]
-                text-bgSet-dark dark:text-bgSet-light text-button ont-medium leading-20 py-4 no-underline
+                text-bgSet-dark dark:text-bgSet-light text-button py-4 no-underline
                 hover:bg-orangeSet-light dark:hover:bg-orangeSet-dark hover:text-bgSet-light dark:hover:text-bgSet-light
                 focus:bg-orangeSet-light dark:focus:bg-orangeSet-dark focus:text-bgSet-light dark:focus:text-bgSet-light
                 active:bg-orangeSet-light dark:active:bg-orangeSet-dark active:text-bgSet-light dark:active:text-bgSet-light
@@ -46,7 +46,7 @@ function Left() {
 function Right() {
     return (
         <div className="grow basis-0">
-            <div className="group flex justify-center items-center w-full h-full bg-auto bg-no-repeat bg-center
+            <div className="group flex justify-center items-center w-full h-full bg-contain bg-no-repeat bg-center
             bg-[url('./images/pattern_light.svg')]
             dark:bg-[url('./images/pattern_dark.svg')]
             hover:bg-[url('./images/pattern.svg')]

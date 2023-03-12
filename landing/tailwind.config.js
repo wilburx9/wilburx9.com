@@ -32,17 +32,39 @@ module.exports = {
             "sans": ["Poppins", ...defaultTheme.fontFamily.sans]
         },
         fontSize: {
-            'largeTitle': "62px",
-            'headline4': "20px",
-            "button": "16px",
-            "body3": "12px",
+            'largeTitle': ["24px", {
+                "lineHeight": "28px",
+                "fontWeight": "700"
+            }],
+            'largeTitle2': ["58px", {
+                "lineHeight": "68px",
+                "fontWeight": "700"
+            }],
+            'largeTitle3': ["62px", {
+                "lineHeight": "72px",
+                "fontWeight": "700"
+            }],
+            'headline': ["14px", {
+                "lineHeight": "20px",
+                "fontWeight": "400"
+            }],
+            'headline2': ["16px", {
+                "lineHeight": "20px",
+                "fontWeight": "400"
+            }],
+            'headline3': ["20px", {
+                "lineHeight": "24px",
+                "fontWeight": "400"
+            }],
+            "button": ["16px", {
+                "lineHeight": "20px",
+                "fontWeight": "500"
+            }],
+            "body3": ["12px", {
+                "lineHeight": "16px",
+                "fontWeight": "400"
+            }],
         },
-        lineHeight: {
-            '72': '72px',
-            '24': '24px',
-            '20': '20px',
-            '16': '16px',
-        }
     },
     plugins: [],
 }
