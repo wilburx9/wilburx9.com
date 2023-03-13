@@ -13,6 +13,7 @@ var autoprefixer = require('autoprefixer');
 var colorFunction = require('postcss-color-mod-function');
 var cssnano = require('cssnano');
 var easyimport = require('postcss-easy-import');
+var tailwindcss = require('tailwindcss');
 
 function serve(done) {
     livereload.listen();
@@ -33,12 +34,14 @@ function hbs(done) {
         src(['*.hbs', '**/**/*.hbs', '!node_modules/**/*.hbs']),
         livereload()
     ], handleError(done));
+    css(done);
 }
 
 function css(done) {
     var processors = [
         easyimport,
         colorFunction(),
+        tailwindcss(),
         autoprefixer(),
         cssnano()
     ];

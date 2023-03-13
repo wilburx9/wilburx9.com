@@ -5,6 +5,11 @@ production stylesheet in assets/built/screen.css using: gulp dev
 
 */
 
+/* Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Lib - Local component imports
 /* ---------------------------------------------------------- */
 
