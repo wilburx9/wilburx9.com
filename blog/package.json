@@ -1,7 +1,7 @@
 {
-    "name": "ghost-starter-theme",
-    "description": "A custom theme for ghost",
-    "demo": "https://starter.ghost.io",
+    "name": "wilburx9",
+    "description": "A custom ghost theme for wilburx9.com/blog",
+    "demo": "https://wilburx9.com/blog",
     "version": "1.0.0",
     "engines": {
         "ghost": ">=4.0.0"
@@ -20,29 +20,38 @@
         "ship": "STATUS=$(git status --porcelain); echo $STATUS; if [ -z \"$STATUS\" ]; then yarn version && git push --follow-tags; fi"
     },
     "author": {
-        "name": "Ghost Foundation",
-        "email": "hello@ghost.org",
-        "url": "https://ghost.org"
+        "name": "Wilberforce Uwadiegwu",
+        "email": "me@wilbur.com",
+        "url": "https://wilburx9.com"
     },
     "gpm": {
         "type": "theme",
         "categories": [
-            "Minimal",
-            "Magazine"
+            "Wilburx9",
+            "Photography",
+            "Coding"
         ]
     },
     "keywords": [
         "ghost",
         "theme",
-        "ghost-theme"
+        "ghost-theme",
+        "wilburx9"
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/TryGhost/Starter.git"
+        "url": "https://github.com/wilburt/wilburx9.com"
     },
-    "bugs": "https://github.com/TryGhost/Starter/issues",
-    "contributors": "https://github.com/TryGhost/Starter/graphs/contributors",
+    "bugs": "https://github.com/wilburt/wilburx9.com",
+    "contributors": [
+        {
+            "name": "Wilberforce Uwadiegwu",
+            "email": "me@wilbur.com",
+            "url": "https://wilburx9.com"
+        }
+    ],
     "devDependencies": {
+        "@tailwindcss/line-clamp": "^0.4.2",
         "@tailwindcss/typography": "^0.5.9",
         "autoprefixer": "10.4.14",
         "beeper": "2.1.0",
