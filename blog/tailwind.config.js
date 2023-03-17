@@ -24,6 +24,14 @@ module.exports = {
                 'blackSet': {
                     DEFAULT: '#000000',
                     dark: '#FFFFFF',
+                },
+                'bgSet': {
+                    DEFAULT: '#FFFFFF',
+                    dark: '#0A1018',
+                },
+                'orangeSet': {
+                    DEFAULT: '#DF7902',
+                    dark: '#F59300',
                 }
             }
         },
@@ -32,6 +40,10 @@ module.exports = {
             'mono': ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
         },
         fontSize: {
+            'body1': ['16px', {
+                'lineHeight': '20px',
+                'fontWeight': '400'
+            }],
             'body1Bold': ['16px', {
                 'lineHeight': '20px',
                 'fontWeight': '700'

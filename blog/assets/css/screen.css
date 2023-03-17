@@ -33,21 +33,20 @@ production stylesheet in assets/built/screen.css using: gulp dev
 /* ---------------------------------------------------------- */
 
 html,
-.gh-viewport {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background: #fff;
+.gh-body {
+    @apply h-screen w-screen bg-bgSet dark:bg-bgSet-dark
+}
+
+.gh-content {
+    @apply max-w-screen-xl h-screen flex flex-col mx-auto px-4 md:px-20 xl:px-4 2xl:px-0
 }
 
 .gh-main {
-    flex: 1 0 auto;
-    display: flex;
-    flex-direction: column;
+    @apply w-full
 }
 
 .gh-page {
-    padding: 0 4vmin;
+    @apply w-full flex flex-col
 }
 
 .gh-article {
@@ -58,6 +57,7 @@ html,
     @apply grid grid-cols-3 gap-6
 }
 
+/*TODO: Remove. .gh-page should be enough */
 .gh-container {
     width: 100%;
     max-width: 1200px;
@@ -86,6 +86,38 @@ html,
 
 /* Index
 /* ---------------------------------------------------------- */
+
+.gh-full-header {
+    @apply flex flex-row w-full items-center pt-11 pb-9 gap-x-4
+}
+
+.gh-full-header nav {
+    @apply grow flex flex-row justify-between items-center
+}
+
+.gh-tag-nav-container {
+    @apply
+    flex flex-col gap-x-0 items-center
+    bg-bgSet dark:bg-bgSet-dark
+    no-underline
+}
+
+.gh-tag-nav {
+    @apply
+    flex flex-row gap-x-1 items-center
+    px-2.5 py-3.5
+    text-body1 text-greySet dark:text-greySet-dark
+    stroke-greySet dark:stroke-greySet-dark
+}
+
+.gh-tag-nav-indicator {
+    @apply
+    w-11/12 h-1
+    rounded-t-full
+    bg-transparent
+    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+    group-hover:w-full group-hover:bg-orangeSet dark:group-hover:bg-orangeSet-dark group-hover:-translate-y-1
+}
 
 .gh-card {
     @apply rounded-lg overflow-hidden bg-cardSet dark:bg-cardSet-dark
@@ -226,4 +258,18 @@ html,
     .gh-author-meta {
         font-size: 1.6rem;
     }
+}
+
+/* Components */
+.chip {
+    @apply
+    flex flex-row gap-x-1 items-center
+    px-4 py-2
+    bg-bgSet dark:bg-bgSet-dark
+    border rounded-full border-blackSet dark:border-blackSet-dark
+    hover:border-orangeSet dark:hover:border-orangeSet-dark
+    active:border-orangeSet dark:active:border-orangeSet-dark
+    focus:border-orangeSet dark:focus:border-orangeSet-dark
+    text-body1 text-greySet dark:text-greySet-dark
+    no-underline transition
 }
