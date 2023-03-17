@@ -2,15 +2,18 @@
 
 <div class="gh-page">
     {{> "full-header"}}
-
+    <nav class="lg:hidden w-full flex grow flex-row justify-between items-center pb-6">
+        {{> "header-nav"}}
+    </nav>
     <div class="gh-postfeed">
         {{#foreach posts}}
             {{> "post-card"}}
         {{/foreach}}
     </div>
 
-    <div class="flex flex-col gap-x-1 pt-20 pb-24 items-center">
-        <img class="w-32 pb-3 rounded-full" src="{{asset "images/resting_alien.png"}}" alt="An alien working on a computer">
+    <div class="flex flex-col gap-x-1 pt-11 md:pt-20 pb-11 md:pb-24 items-center">
+        <img class="w-32 pb-3 rounded-full" src="{{asset "images/resting_alien.png"}}"
+             alt="An alien working on a computer">
         <h4 class="text-body1Bold text-blackSet dark:text-blackSet-dark">
             Exciting updates in the works!
         </h4>

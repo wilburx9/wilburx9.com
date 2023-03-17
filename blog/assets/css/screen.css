@@ -54,7 +54,9 @@ html,
 }
 
 .gh-postfeed {
-    @apply grid grid-cols-3 gap-6
+    @apply grid
+    grid-cols-1 md:grid-cols-2 lg:grid-cols-3
+    gap-4 md:gap-6
 }
 
 /*TODO: Remove. .gh-page should be enough */
@@ -88,11 +90,8 @@ html,
 /* ---------------------------------------------------------- */
 
 .gh-full-header {
-    @apply flex flex-row w-full items-center pt-11 pb-9 gap-x-4
-}
-
-.gh-full-header nav {
-    @apply grow flex flex-row justify-between items-center
+    @apply flex flex-row w-full items-center gap-x-4
+    pt-6 lg:pt-11 pb-5 lg:pb-9
 }
 
 .gh-tag-nav-container {
