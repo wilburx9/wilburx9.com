@@ -48,6 +48,10 @@ module.exports = {
                 'lineHeight': '20px',
                 'fontWeight': '700'
             }],
+            'body2': ['14px', {
+                'lineHeight': '20px',
+                'fontWeight': '400'
+            }],
             'body3': ['12px', {
                 'lineHeight': '16px',
                 'fontWeight': '400'

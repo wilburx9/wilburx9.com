@@ -43,15 +43,6 @@
     <script src="{{asset "built/infinitescroll.js"}}"></script>
 {{/if}}
 
-<script>
-    $(document).ready(function () {
-        // Mobile Menu Trigger
-        $('.gh-burger').click(function () {
-            $('body').toggleClass('gh-head-open');
-        });
-    });
-</script>
-
 {{#is "post, page"}}
     <script src="{{asset "built/jquery.fitvids.js"}}"></script>
     <script>

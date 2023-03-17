@@ -265,7 +265,7 @@ html,
     @apply
     w-full
     flex flex-col md:flex-row justify-between items-center
-    pt-8 md:pb-16
+    pb-8 md:pb-16
 }
 
 .gh-footer > span {
