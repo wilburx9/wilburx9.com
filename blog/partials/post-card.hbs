@@ -20,14 +20,7 @@
         <div class="gh-card-content">
             {{#primary_tag}}
                 <span class="gh-post-primary-tag">
-                    {{#match slug 'programming'}}
-                        <svg width="20px" height="20px" viewBox="0 0 20 20" fill="none">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                          d="m5 13 3-3-3-3m6 6h4m-9.2 6h8.4c1.68 0 2.52 0 3.162-.327a3 3 0 0 0 1.311-1.311C19 16.72 19 15.88 19 14.2V5.8c0-1.68 0-2.52-.327-3.162a3 3 0 0 0-1.311-1.311C16.72 1 15.88 1 14.2 1H5.8c-1.68 0-2.52 0-3.162.327a3 3 0 0 0-1.311 1.311C1 3.28 1 4.12 1 5.8v8.4c0 1.68 0 2.52.327 3.162a3 3 0 0 0 1.311 1.311C3.28 19 4.12 19 5.8 19Z"/></svg>
-                    {{else}}
-                        <svg width="20px" height="20px" viewBox="0 0 22 22" fill="none">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-                          d="M20.416 14.341a9.17 9.17 0 0 1-9.539.659M1.584 7.659a9.17 9.17 0 0 1 9.56-.648m3.23 6.113A9.17 9.17 0 0 0 18.6 4.512M7.581 8.904A9.17 9.17 0 0 0 3.4 17.488m11.128-8.351a9.172 9.172 0 0 0-5.345-7.965M7.476 12.926a9.172 9.172 0 0 0 5.342 7.902m5.253-16.9c3.905 3.906 3.905 10.238 0 14.143-3.905 3.905-10.237 3.905-14.142 0-3.905-3.905-3.905-10.237 0-14.142C7.834.024 14.166.024 18.07 3.929Zm-4.243 4.244a4 4 0 1 1-5.656 5.656 4 4 0 0 1 5.656-5.656Z"/></svg>
+                    {{#match slug 'programming'}} {{> "icons/programming"}} {{else}} {{> "icons/photography"}}
                     {{/match}}
                     <span>{{name}}</span>
                 </span>
