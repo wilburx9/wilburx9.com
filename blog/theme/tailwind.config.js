@@ -40,6 +40,10 @@ module.exports = {
             'mono': ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
         },
         fontSize: {
+            'text1': ['20px', {
+                'lineHeight': '32px',
+                'fontWeight': '400'
+            }],
             'body1': ['16px', {
                 'lineHeight': '20px',
                 'fontWeight': '400'
@@ -56,10 +60,13 @@ module.exports = {
                 'lineHeight': '16px',
                 'fontWeight': '400'
             }],
+            'headline1Bold': ['24px', {
+                'lineHeight': '28px',
+                'fontWeight': '700'
+            }],
         }
     },
     plugins: [
-        require('@tailwindcss/typography'),
         require('@tailwindcss/line-clamp')
     ],
 }

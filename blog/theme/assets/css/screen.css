@@ -49,10 +49,6 @@ html,
     @apply w-full flex flex-col
 }
 
-.gh-article {
-    padding: 8vmin 0;
-}
-
 .gh-postfeed {
     @apply grid
     grid-cols-1 md:grid-cols-2 lg:grid-cols-3
@@ -116,6 +112,8 @@ html,
     bg-transparent
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
     group-hover:w-full group-hover:bg-orangeSet dark:group-hover:bg-orangeSet-dark group-hover:-translate-y-1
+    group-active:w-full group-active:bg-orangeSet dark:group-active:bg-orangeSet-dark group-active:-translate-y-1
+    group-focus:w-full group-focus:bg-orangeSet dark:group-focus:bg-orangeSet-dark group-focus:-translate-y-1
 }
 
 .gh-card {
@@ -131,8 +129,13 @@ html,
 }
 
 .gh-post-primary-tag {
-    @apply bg-boxSet dark:bg-boxSet-dark px-2 py-1.5 flex flex-row gap-1 justify-start items-center rounded-lg
-    text-greySet dark:text-greySet-dark stroke-greySet dark:stroke-greySet-dark text-body3
+    @apply
+    bg-boxSet dark:bg-boxSet-dark  rounded-lg
+    px-2 py-1.5 w-fit
+    flex flex-row gap-1 justify-start items-center
+    text-greySet dark:text-greySet-dark
+    stroke-greySet dark:stroke-greySet-dark
+    text-body3
 }
 
 .gh-card-title {
@@ -141,10 +144,6 @@ html,
 
 .gh-card-excerpt {
     @apply w-full text-greySet dark:text-greySet-dark text-body3 line-clamp-2 min-h-[32px]
-}
-
-.gh-card-meta {
-    @apply w-full text-greyLightSet dark:text-greyLightSet-dark text-body3 line-clamp-1
 }
 
 .gh-card-content {
@@ -184,28 +183,55 @@ html,
 /* Post
 /* ---------------------------------------------------------- */
 
-.gh-header {
-    padding: 0 0 8vmin 0;
-    text-align: center;
+.gh-title {
+    @apply
+    text-headline1Bold
+    text-blackSet dark:text-blackSet-dark
+    mt-4
+}
+
+.gh-post-content {
+    @apply
+    text-text1
+    text-greySet dark:text-greySet-dark
 }
 
 .gh-post-meta {
-    display: block;
-    margin: 0 0 1rem;
-    font-size: 1.4rem;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    opacity: 0.8;
+    @apply w-full
+    text-greyLightSet dark:text-greyLightSet-dark
+    text-body3 line-clamp-1
+}
+
+.gh-header {
+
+}
+
+.gh-article-container {
+    @apply
+    w-full flex flex-row
+    pt-16
+}
+
+.gh-article {
+    @apply
+    w-full flex flex-col grow
+    px-28
 }
 
 .gh-excerpt {
     margin: 1rem 0 0 0;
 }
 
-.gh-feature-image {
-    grid-column: wide-start / wide-end;
-    width: 100%;
-    margin: 8vmin 0 0;
+.gh-feature-image > img {
+    @apply
+    w-full aspect-video object-cover
+}
+
+/* TODO: Update font after the Design responds on the font */
+figcaption {
+    @apply
+    text-body1 text-greyLightSet dark:text-greyLightSet-dark
+    my-2
 }
 
 .gh-post-footer {
@@ -296,4 +322,21 @@ html,
     focus:border-orangeSet dark:focus:border-orangeSet-dark
     text-body1 text-greySet dark:text-greySet-dark
     no-underline transition motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.icon {
+    @apply
+    basis-14 flex items-center justify-center
+    h-14 min-w-[3.5rem] rounded-full
+    bg-transparent transition
+    hover:bg-greySet/10 dark:hover:bg-greySet-dark/10
+    active:bg-greySet/10 dark:active:bg-greySet-dark/10
+    focus:bg-greySet/10 dark:focus:bg-greySet-dark/10
+    -mt-3
+}
+
+.icon > svg {
+    @apply
+    fill-greySet dark:fill-greySet-dark
+    stroke-greySet dark:stroke-greySet-dark
 }
