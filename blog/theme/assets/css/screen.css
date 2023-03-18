@@ -202,14 +202,10 @@ html,
     text-body3 line-clamp-1
 }
 
-.gh-header {
-
-}
-
 .gh-article-container {
     @apply
     w-full flex flex-row
-    pt-16
+    my-16
 }
 
 .gh-article {
@@ -339,4 +335,19 @@ figcaption {
     @apply
     fill-greySet dark:fill-greySet-dark
     stroke-greySet dark:stroke-greySet-dark
+}
+
+
+/* Read More */
+
+.gh-more-posts {
+    @apply
+    w-full
+}
+
+.gh-more-posts > h2 {
+    @apply
+    text-headline1Bold
+    text-blackSet dark:text-blackSet-dark
+    mb-4 mt-8
 }

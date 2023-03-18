@@ -8,7 +8,7 @@
     </span>
     <div class="gh-article">
         <article>
-            <header class="gh-header">
+            <header>
                 {{#primary_tag}}
                     <span class="gh-post-primary-tag">
                     {{#match slug 'programming'}} {{> "icons/programming"}} {{else}} {{> "icons/photography"}}
@@ -42,31 +42,23 @@
                 {{content}}
             </div>
 
-            <footer class="gh-canvas">
-
-                <div class="gh-post-authors">
-                    Written by {{#foreach authors}}<a href="{{url}}">{{name}}</a>{{/foreach}}
-                </div>
-
-                {{!--
-                <section class="gh-post-comments">
-                    If you want to embed comments, this is a good place to do it!
-                </section>
-                --}}
+            <footer>
 
             </footer>
         </article>
-        <aside class="gh-readmore">
-            <div class="gh-readmore-inner gh-container">
-                <div class="gh-readmore-next">
-                    {{#next_post}}<a href="{{url}}">{{> "icons/arrow-left"}} <h4>{{title}}</h4></a>{{/next_post}}
-                </div>
-                <div class="gh-readmore-prev">
-                    {{#prev_post}}<a href="{{url}}">
-                        <h4>{{title}}</h4> {{> "icons/arrow-right"}}
-                    </a>{{/prev_post}}
-                </div>
-            </div>
+        <aside class="gh-more-posts">
+            {{#get "posts" filter="tags:[{{primary_tag.slug}}]+id:-{{id}}" limit="3" include="tags" as |more_posts|}}
+
+                {{#if more_posts}}
+                    <h2>Other Articles You Might Enjoy</h2>
+                    <div class="gh-postfeed">
+                        {{#foreach more_posts}}
+                            {{> "post-card"}}
+                        {{/foreach}}
+                    </div>
+                {{/if}}
+
+            {{/get}}
         </aside>
     </div>
     {{> "theme-switch"}}
