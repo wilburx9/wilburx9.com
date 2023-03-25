@@ -240,6 +240,48 @@ figcaption {
     my-2
 }
 
+.image-exif {
+    @apply
+    flex flex-row pt-4 pb-8
+    gap-x-8 items-center justify-center
+}
+
+.image-exif > span {
+    @apply
+    flex flex-col items-center justify-between gap-y-2
+    text-exif text-greySet dark:text-greySet-dark text-center
+}
+
+.image-exif > span#camera:before {
+    @apply
+    content-[url('../images/exif_camera.svg')]
+    dark:content-[url('../images/exif_camera_dark.svg')]
+}
+
+.image-exif > span#aperture:before {
+    @apply
+    content-[url('../images/exif_aperture.svg')]
+    dark:content-[url('../images/exif_aperture_dark.svg')]
+}
+
+.image-exif > span#shutter:before {
+    @apply
+    content-[url('../images/exif_shutter.svg')]
+    dark:content-[url('../images/exif_shutter_dark.svg')]
+}
+
+.image-exif > span#iso:before {
+    @apply
+    content-[url('../images/exif_iso.svg')]
+    dark:content-[url('../images/exif_iso_dark.svg')]
+}
+
+.image-exif > span#focal:before {
+    @apply
+    content-[url('../images/exif_focal.svg')]
+    dark:content-[url('../images/exif_focal_dark.svg')]
+}
+
 
 /* Author Archive
 /* ---------------------------------------------------------- */

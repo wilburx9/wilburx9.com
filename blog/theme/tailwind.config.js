@@ -72,6 +72,10 @@ module.exports = {
                 'lineHeight': '18px',
                 'fontWeight': '400',
             }],
+            'exif': ['14px', {
+                'lineHeight': '20px',
+                'fontWeight': '300',
+            }],
         }
     },
     plugins: [
