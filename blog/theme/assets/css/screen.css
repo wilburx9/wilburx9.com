@@ -202,6 +202,17 @@ html,
     text-body3 line-clamp-1
 }
 
+.gh-post-footer {
+    @apply
+    w-full mt-8
+}
+
+.gh-post-footer > h2 {
+    @apply
+    text-headline1Bold
+    text-blackSet dark:text-blackSet-dark
+}
+
 .gh-article-container {
     @apply
     w-full flex flex-row
@@ -223,15 +234,10 @@ html,
     w-full aspect-video object-cover
 }
 
-/* TODO: Update font after the Design responds on the font */
 figcaption {
     @apply
-    text-body1 text-greyLightSet dark:text-greyLightSet-dark
+    text-caption italic text-center text-greyLightSet dark:text-greyLightSet-dark
     my-2
-}
-
-.gh-post-footer {
-    margin: 2rem 0;
 }
 
 
@@ -320,6 +326,30 @@ figcaption {
     no-underline transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
+.secondary-button {
+    @apply
+    flex flex-row gap-x-2.5 justify-start items-center
+    py-4 px-6 cursor-pointer
+    text-blackSet dark:text-blackSet-dark text-button
+    border border-blackSet dark:border-blackSet-dark rounded-xl
+    hover:border-orangeSet dark:hover:border-orangeSet-dark
+    active:border-orangeSet dark:active:border-orangeSet-dark
+    focus:border-orangeSet dark:focus:border-orangeSet-dark
+    hover:bg-orangeSet dark:hover:bg-orangeSet-dark
+    active:bg-orangeSet dark:active:bg-orangeSet-dark
+    focus:bg-orangeSet dark:focus:bg-orangeSet-dark
+    hover:text-boxSet dark:hover:text-blackSet-dark
+    active:text-boxSet dark:active:text-blackSet-dark
+    focus:text-boxSet dark:focus:text-blackSet-dark
+    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.secondary-button svg {
+    @apply
+    stroke-blackSet dark:stroke-blackSet-dark
+    stroke-current
+}
+
 .icon {
     @apply
     basis-14 flex items-center justify-center
@@ -335,6 +365,12 @@ figcaption {
     @apply
     fill-greySet dark:fill-greySet-dark
     stroke-greySet dark:stroke-greySet-dark
+}
+
+hr {
+    @apply
+    w-full border opacity-10
+    border-blackSet dark:border-blackSet-dark
 }
 
 

@@ -33,7 +33,7 @@ module.exports = {
                     DEFAULT: '#DF7902',
                     dark: '#F59300',
                 }
-            }
+            },
         },
         fontFamily: {
             'sans': ['Poppins', ...defaultTheme.fontFamily.sans],
@@ -63,6 +63,14 @@ module.exports = {
             'headline1Bold': ['24px', {
                 'lineHeight': '28px',
                 'fontWeight': '700'
+            }],
+            'button': ['16px', {
+                'lineHeight': '20px',
+                'fontWeight': '500'
+            }],
+            'caption': ['12px', {
+                'lineHeight': '18px',
+                'fontWeight': '400',
             }],
         }
     },
