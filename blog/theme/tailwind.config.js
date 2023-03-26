@@ -4,6 +4,12 @@ module.exports = {
     content: ['./*.hbs', './**/*.hbs'],
     theme: {
         extend: {
+            width: {
+                'inherit': 'inherit',
+            },
+            maxWidth: {
+                'inherit': 'inherit',
+            },
             colors: {
                 'cardSet': {
                     DEFAULT: '#F6F6F6',

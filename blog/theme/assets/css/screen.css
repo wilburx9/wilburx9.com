@@ -42,7 +42,8 @@ html,
 }
 
 .gh-main {
-    @apply w-full
+    @apply
+    w-full max-w-inherit
 }
 
 .gh-page {
@@ -215,8 +216,16 @@ html,
 
 .gh-article-container {
     @apply
-    w-full flex flex-row
-    my-16
+    w-full my-16
+    max-w-inherit
+}
+
+.gh-article-container > nav{
+    @apply
+    w-inherit max-w-inherit fixed
+    flex flex-row
+    justify-between
+    mt-1.5
 }
 
 .gh-article {
@@ -243,6 +252,7 @@ figcaption {
 .kg-image-card {
     @apply
     w-full
+    mt-8
 }
 
 .kg-image-card > div {
@@ -466,7 +476,6 @@ figcaption {
     hover:bg-greySet/10 dark:hover:bg-greySet-dark/10
     active:bg-greySet/10 dark:active:bg-greySet-dark/10
     focus:bg-greySet/10 dark:focus:bg-greySet-dark/10
-    -mt-3
 }
 
 .icon > svg {

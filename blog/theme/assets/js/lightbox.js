@@ -8,6 +8,7 @@
         let container = image.parentElement
         let imgW = Number(image.getAttribute("width"))
         let imgH = Number(image.getAttribute("height"))
+        let maxH = `${imgH}px`;
         let imgAspectRatio = `${imgW}/${imgH}`
         let containerW = imgW;
 
@@ -16,10 +17,11 @@
         let maxSide = Math.max(containerW, imgH);
         let minSide = Math.min(containerW, imgH);
         container.style.aspectRatio = `${maxSide}/${minSide}`
-        container.style.maxHeight = `${imgH}px`
+        container.style.maxHeight = maxH
         image.style.aspectRatio = imgAspectRatio
         image.style.maxWidth = `${imgW}px`
-        image.style.maxHeight = `${imgH}px`
+        image.style.maxHeight = maxH
+        imgWrapper.style.maxHeight = maxH
 
 
         container.insertBefore(imgWrapper, image.parentElement.firstChild)
@@ -31,9 +33,10 @@
 
 function closeLightBox(id) {
     document.getElementById(id).style.display = "none"
+    document.body.style.overflow = 'visible'
 }
 
 function showLightBox(id) {
-    console.log(`Clicked :: ${id}`)
     document.getElementById(id).style.display = 'flex'
+    document.body.style.overflow = 'hidden'
 }

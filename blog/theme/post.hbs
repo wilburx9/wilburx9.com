@@ -3,9 +3,12 @@
 {{#post}}
 
 <div class="gh-article-container {{post_class}}">
-    <span class="icon -ml-3.5" onclick="history.back()">
-        {{> "icons/arrow-left"}}
-    </span>
+    <nav>
+        <span class="icon -ml-3.5" onclick="history.back()">
+            {{> "icons/arrow-left"}}
+        </span>
+        {{> "theme-switch"}}
+    </nav>
     <div class="gh-article">
         <article>
             <header>
@@ -77,7 +80,6 @@
             {{/get}}
         </aside>
     </div>
-    {{> "theme-switch"}}
 </div>
 <script src="{{asset "js/lightbox.js"}}"></script>
 
