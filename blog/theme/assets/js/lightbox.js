@@ -18,5 +18,6 @@
 
         container.insertBefore(imgWrapper, image.parentElement.firstChild)
         imgWrapper.append(image)
+        imgWrapper.insertAdjacentHTML("afterbegin", "<span id='zoom-handle'><svg width=\"20\" height=\"20\" fill=\"none\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"m19 19-4.35-4.35M9 6v6M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z\"/></svg></span>")
     })
 }();
