@@ -16,7 +16,10 @@
         let maxSide = Math.max(containerW, imgH);
         let minSide = Math.min(containerW, imgH);
         container.style.aspectRatio = `${maxSide}/${minSide}`
+        container.style.maxHeight = `${imgH}px`
         image.style.aspectRatio = imgAspectRatio
+        image.style.maxWidth = `${imgW}px`
+        image.style.maxHeight = `${imgH}px`
 
 
         container.insertBefore(imgWrapper, image.parentElement.firstChild)
