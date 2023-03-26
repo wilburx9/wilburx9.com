@@ -240,6 +240,37 @@ figcaption {
     my-2
 }
 
+.kg-image-card {
+    @apply
+    w-full
+}
+
+.kg-image-card > div {
+    @apply
+    w-full h-full relative
+    bg-no-repeat
+    bg-center
+    bg-cover
+    before:bg-black/60
+    before:content-[""]
+    before:absolute
+    before:left-0
+    before:top-0
+    before:h-full
+    before:w-full
+    before:z-10
+    before:backdrop-blur-md
+}
+
+
+.kg-image-card > div > img {
+    @apply
+    h-full w-auto
+    mx-auto
+    z-20
+    relative
+}
+
 .image-exif {
     @apply
     flex flex-row pt-4 pb-8
