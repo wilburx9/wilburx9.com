@@ -1,0 +1,123 @@
+/* PrismJS 1.29.0
+https://prismjs.com/download.html?ref=ghost.org#themes=prism-tomorrow&languages=markup+css+clike+javascript+dart+docker+go+java+kotlin+rust+typescript&plugins=line-numbers */
+/**
+ * prism.js tomorrow night eighties for JavaScript, CoffeeScript, CSS and HTML
+ * Based on https://github.com/chriskempson/tomorrow-theme
+ * @author Rose Pritchard
+ */
+
+@tailwind base;
+
+code[class*="language-"],
+pre[class*="language-"] {
+    word-spacing: normal;
+    word-wrap: normal;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+    @apply
+    font-mono text-code text-greySet dark:text-greySet-dark
+    text-left whitespace-pre break-normal
+}
+
+/* Code blocks */
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+    @apply
+    p-6 w-full overflow-auto
+    bg-cardSet dark:bg-cardSet-dark
+    border-borderSet dark:border-borderSet-dark
+    border rounded-lg my-8
+    relative
+}
+
+/* Inline code */
+@layer base {
+    :not(pre) > code {
+        @apply
+        whitespace-normal rounded
+        bg-boxSet dark:bg-boxSet-dark
+        font-mono text-code px-0.5
+    }
+}
+
+.token.comment,
+.token.block-comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: #999;
+}
+
+.token.punctuation {
+    color: #ccc;
+}
+
+.token.tag,
+.token.attr-name,
+.token.namespace,
+.token.deleted {
+    color: #e2777a;
+}
+
+.token.function-name {
+    color: #6196cc;
+}
+
+.token.boolean,
+.token.number,
+.token.function {
+    color: #f08d49;
+}
+
+.token.property,
+.token.class-name,
+.token.constant,
+.token.symbol {
+    color: #f8c555;
+}
+
+.token.selector,
+.token.important,
+.token.atrule,
+.token.keyword,
+.token.builtin {
+    color: #cc99cd;
+}
+
+.token.string,
+.token.char,
+.token.attr-value,
+.token.regex,
+.token.variable {
+    color: #7ec699;
+}
+
+.token.operator,
+.token.entity,
+.token.url {
+    color: #67cdcc;
+}
+
+.token.important,
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}
+
+.token.inserted {
+    color: green;
+}

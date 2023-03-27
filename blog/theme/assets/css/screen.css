@@ -5,11 +5,6 @@ production stylesheet in assets/built/screen.css using: gulp dev
 
 */
 
-/* Tailwind */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Lib - Local component imports
 /* ---------------------------------------------------------- */
 
@@ -27,14 +22,23 @@ production stylesheet in assets/built/screen.css using: gulp dev
 @import "ghost/errors.css";
 @import "ghost/footer.css";
 @import "ghost/badge.css";
+@import "prism.css";
 
+
+/* Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Main - Your styles here! Edit below
 /* ---------------------------------------------------------- */
 
 html,
 .gh-body {
-    @apply h-screen w-screen bg-bgSet dark:bg-bgSet-dark
+    @apply
+    h-screen w-screen
+    bg-bgSet dark:bg-bgSet-dark
+    overflow-x-hidden overflow-y-auto
 }
 
 .gh-content {
@@ -220,7 +224,7 @@ html,
     max-w-inherit
 }
 
-.gh-article-container > nav{
+.gh-article-container > nav {
     @apply
     w-inherit max-w-inherit fixed
     flex flex-row
@@ -275,13 +279,14 @@ figcaption {
 .photo-zoom-handle {
     @apply
     top-4 right-4 absolute
-    z-30 h-12 w-12 stroke-blackSet dark:stroke-blackSet-dark
+    z-30 h-16 w-16 stroke-blackSet dark:stroke-blackSet-dark
     bg-bgSet/50 dark:bg-bgSet-dark/50 rounded-full
     flex justify-center items-center
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
     hover:bg-bgSet hover:dark:bg-bgSet-dark hover:scale-105
     active:bg-bgSet active:dark:bg-bgSet-dark active:scale-105
     focus:bg-bgSet focus:dark:bg-bgSet-dark focus:scale-105
+    cursor-pointer
 }
 
 /* Image lightbox*/
@@ -503,4 +508,31 @@ hr {
     text-headline1Bold
     text-blackSet dark:text-blackSet-dark
     mb-4 mt-8
+}
+
+.code-copy {
+    @apply
+    m-2.5 hidden group-hover:block group-focus:block
+    text-button text-blackSet dark:text-blackSet-dark
+    right-0 top-0 absolute
+}
+
+
+.code-copy > span {
+    @apply
+    flex flex-row gap-2.5 right-0 top-0 cursor-pointer
+    stroke-current absolute py-3.5 px-8
+    hover:bg-borderSet hover:bg-borderSet-dark
+    rounded-lg stroke-current duration-500
+    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.code-copy > span.fadeIn {
+    @apply
+    opacity-100
+}
+
+.code-copy > span.fadeOut {
+    @apply
+    opacity-0
 }

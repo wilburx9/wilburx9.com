@@ -38,6 +38,14 @@ module.exports = {
                 'orangeSet': {
                     DEFAULT: '#DF7902',
                     dark: '#F59300',
+                },
+                'borderSet': {
+                    DEFAULT: '#A3A3A3',
+                    dark: '#38567D',
+                },
+                'greenSet': {
+                    DEFAULT: '#0F8437',
+                    dark: '#15C35B',
                 }
             },
         },
@@ -81,6 +89,10 @@ module.exports = {
             'exif': ['14px', {
                 'lineHeight': '20px',
                 'fontWeight': '300',
+            }],
+            'code': ['20px', {
+                'lineHeight': '32px',
+                'fontWeight': '400',
             }],
         }
     },
