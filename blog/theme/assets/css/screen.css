@@ -281,7 +281,7 @@ figcaption {
     top-4 right-4 absolute
     z-30 h-16 w-16 stroke-blackSet dark:stroke-blackSet-dark
     bg-bgSet/50 dark:bg-bgSet-dark/50 rounded-full
-    flex justify-center items-center
+    hidden group-focus:flex group-hover:flex justify-center items-center
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
     hover:bg-bgSet hover:dark:bg-bgSet-dark hover:scale-105
     active:bg-bgSet active:dark:bg-bgSet-dark active:scale-105

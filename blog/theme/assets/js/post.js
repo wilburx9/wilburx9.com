@@ -5,6 +5,7 @@
         let lightBoxId = `lightbox__photo__${i}`
         let imgWrapper = document.createElement("div")
         imgWrapper.style.backgroundImage = `url("${image.currentSrc || image.src}")`
+        imgWrapper.classList.add("group")
         let container = image.parentElement
         let imgW = Number(image.getAttribute("width"))
         let imgH = Number(image.getAttribute("height"))
