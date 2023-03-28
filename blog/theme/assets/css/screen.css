@@ -39,6 +39,7 @@ html,
     h-screen w-screen
     bg-bgSet dark:bg-bgSet-dark
     overflow-x-hidden overflow-y-auto
+    transition-colors motion-reduce:transition-none
 }
 
 .gh-content {
@@ -98,8 +99,8 @@ html,
 .gh-tag-nav-container {
     @apply
     flex flex-col gap-x-0 items-center
-    bg-bgSet dark:bg-bgSet-dark
     no-underline
+    transition-colors motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .gh-tag-nav {
@@ -122,7 +123,9 @@ html,
 }
 
 .gh-card {
-    @apply rounded-lg overflow-hidden bg-cardSet dark:bg-cardSet-dark
+    @apply
+    rounded-lg overflow-hidden bg-cardSet dark:bg-cardSet-dark
+    transition-colors motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .gh-card-link {
@@ -477,7 +480,7 @@ figcaption {
     @apply
     basis-14 flex items-center justify-center
     h-14 min-w-[3.5rem] rounded-full
-    bg-transparent transition
+    bg-transparent transition opacity-100
     hover:bg-greySet/10 dark:hover:bg-greySet-dark/10
     active:bg-greySet/10 dark:active:bg-greySet-dark/10
     focus:bg-greySet/10 dark:focus:bg-greySet-dark/10
@@ -487,6 +490,17 @@ figcaption {
     @apply
     fill-greySet dark:fill-greySet-dark
     stroke-greySet dark:stroke-greySet-dark
+}
+
+.icon#theme-switch {
+    @apply
+    -mr-4
+}
+
+.icon#theme-switch > svg {
+    @apply
+    absolute
+    transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 hr {
@@ -527,12 +541,9 @@ hr {
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
-.code-copy > span.fadeIn {
-    @apply
-    opacity-100
-}
 
-.code-copy > span.fadeOut {
+.hide {
     @apply
     opacity-0
 }
+
