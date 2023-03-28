@@ -5,31 +5,16 @@ production stylesheet in assets/built/screen.css using: gulp dev
 
 */
 
-/* Lib - Local component imports
-/* ---------------------------------------------------------- */
-
-/* Base components */
-@import "vars.css";
-@import "components/global.css";
-@import "components/forms.css";
-@import "components/buttons.css";
-
-/* Ghost components */
-@import "ghost/header.css";
-@import "ghost/content.css";
-@import "ghost/readmore.css";
-@import "ghost/members.css";
-@import "ghost/errors.css";
-@import "ghost/footer.css";
-@import "ghost/badge.css";
 @import "prism.css";
+@import "ghost/content.css";
 
 /* Tailwind */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Main - Your styles here! Edit below
+
+/* Main
 /* ---------------------------------------------------------- */
 
 html,
