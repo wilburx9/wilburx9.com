@@ -48,6 +48,10 @@
     }
 }();
 
+!function () {
+   document.getElementById("back_icon").parentElement.href = `${window.location.origin}/blog`
+}();
+
 
 function closeLightBox(id) {
     document.getElementById(id).style.display = "none"

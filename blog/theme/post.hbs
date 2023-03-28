@@ -4,9 +4,11 @@
 
 <div class="gh-article-container {{post_class}}">
     <nav>
-        <span class="icon -ml-3.5" onclick="history.back()">
-            {{> "icons/arrow-left"}}
-        </span>
+        <a>
+            <span class="icon -ml-3.5" id="back_icon">
+                {{> "icons/arrow-left"}}
+            </span>
+        </a>
         {{> "theme-switch"}}
     </nav>
     <div class="gh-article">

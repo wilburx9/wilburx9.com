@@ -15,9 +15,11 @@ function handleDarkMode() {
         document.documentElement.classList.remove('dark')
     }
 
-    modeQueryList.addEventListener('change', function () {
-        if (!('theme' in localStorage)) changeMode(true, isDarkMode())
-    });
+    if (!('theme' in localStorage)) {
+        modeQueryList.addEventListener('change', function () {
+            if (!('theme' in localStorage)) changeMode(true, isDarkMode())
+        });
+    }
 
     document.addEventListener("DOMContentLoaded", () => {
         let wrapper = document.getElementById("theme-switch");
