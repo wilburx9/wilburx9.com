@@ -24,7 +24,6 @@ production stylesheet in assets/built/screen.css using: gulp dev
 @import "ghost/badge.css";
 @import "prism.css";
 
-
 /* Tailwind */
 @tailwind base;
 @tailwind components;
@@ -36,14 +35,13 @@ production stylesheet in assets/built/screen.css using: gulp dev
 html,
 .gh-body {
     @apply
-    h-screen w-screen
+    h-auto w-screen min-h-screen
     bg-bgSet dark:bg-bgSet-dark
-    overflow-x-hidden overflow-y-auto
     transition-colors motion-reduce:transition-none
 }
 
 .gh-content {
-    @apply max-w-screen-xl h-screen flex flex-col mx-auto px-4 md:px-20 xl:px-4 2xl:px-0
+    @apply max-w-screen-xl h-full flex flex-col mx-auto px-4 md:px-20 xl:px-4 2xl:px-0
 }
 
 .gh-main {
@@ -490,8 +488,8 @@ figcaption {
 
 .icon {
     @apply
-    basis-20 flex items-center justify-center
-    h-20 min-w-[5rem] rounded-full
+    basis-14 flex items-center justify-center
+    h-14 min-w-[3.5rem] rounded-full
     bg-transparent transition opacity-100
     hover:bg-greySet/10 dark:hover:bg-greySet-dark/10
     active:bg-greySet/10 dark:active:bg-greySet-dark/10
