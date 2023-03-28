@@ -431,9 +431,9 @@ figcaption {
     text-center md:text-left text-body3 text-blackSet dark:text-blackSet-dark py-4
 }
 
-.gh-footer > span > a {
+.gh-footer-icon {
     @apply
-    w-6 h-auto
+    w-8 h-auto
     fill-blackSet dark:fill-blackSet-dark
     transition hover:scale-125 motion-reduce:transition-none motion-reduce:hover:transform-none
 }
@@ -454,8 +454,7 @@ figcaption {
 
 .secondary-button {
     @apply
-    flex flex-row gap-x-2.5 justify-start items-center
-    py-4 px-6 cursor-pointer
+    py-4 px-6 cursor-pointer grid
     text-blackSet dark:text-blackSet-dark text-button
     border border-blackSet dark:border-blackSet-dark rounded-xl
     hover:border-orangeSet dark:hover:border-orangeSet-dark
@@ -466,7 +465,14 @@ figcaption {
     focus:bg-orangeSet dark:focus:bg-orangeSet-dark
     hover:text-boxSet dark:hover:text-blackSet-dark
     active:text-boxSet dark:active:text-blackSet-dark
-    focus:text-boxSet dark:focus:text-blackSet-dark
+    focus:text-boxSet dark:focus:text-blackSet-dark pointer-events-auto
+    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.secondary-button > span {
+    @apply
+    flex flex-row gap-x-2.5 justify-start items-center
+    row-start-1 row-end-2 col-start-1 col-end-2
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
@@ -474,6 +480,12 @@ figcaption {
     @apply
     stroke-blackSet dark:stroke-blackSet-dark
     stroke-current
+}
+
+.secondary-button.copied {
+    @apply
+    border-greenSet dark:border-greenSet-dark
+    pointer-events-none
 }
 
 .icon {
@@ -529,7 +541,7 @@ hr {
     @apply
     m-2.5 hidden group-hover:block group-focus:block
     text-button text-blackSet dark:text-blackSet-dark
-    right-0 top-0 absolute
+    right-0 top-0 absolute font-sans
 }
 
 

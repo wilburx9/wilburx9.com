@@ -42,14 +42,20 @@
         if (pre.tagName.toLowerCase() !== 'pre') continue
         pre.classList.add("group")
 
-        let copied = `<span class="hide">Copied<svg width="20" height="20" stroke="none" fill="none"><circle cx="10" cy="10" r="10" fill="#15C45B"/><g clip-path="url(#a)"><path fill="#fff" d="M8.438 12.188 6.25 10l-.73.73 2.918 2.916 6.25-6.25-.73-.73-5.52 5.521Z"/></g><defs><clipPath id="a"><path fill="#fff" d="M3.75 3.75h12.5v12.5H3.75z"/></clipPath></defs></svg></span>`
+        let copied = `<span class="hide">Copied<svg class="fill-greenSet dark:fill-greenSet-dark" width="20" height="20" stroke="none" fill="none"><circle cx="10" cy="10" r="10"/><g clip-path="url(#a)"><path fill="#fff" d="M8.438 12.188 6.25 10l-.73.73 2.918 2.916 6.25-6.25-.73-.73-5.52 5.521Z"/></g><defs><clipPath id="a"><path fill="#fff" d="M3.75 3.75h12.5v12.5H3.75z"/></clipPath></defs></svg></span>`
         let copy = `<span onclick='copyCode(this.parentElement)'>Copy<svg width="22" height="22" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 1.003c-.675.009-1.08.048-1.408.215a2 2 0 0 0-.874.874c-.167.328-.206.733-.215 1.408M18.5 1.003c.675.009 1.08.048 1.408.215a2 2 0 0 1 .874.874c.167.328.206.733.215 1.408m0 9c-.009.675-.048 1.08-.215 1.408a2 2 0 0 1-.874.874c-.328.167-.733.206-1.408.215M21 7v2m-8-8h2M4.2 21h7.6c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C15 19.48 15 18.92 15 17.8v-7.6c0-1.12 0-1.68-.218-2.108a2 2 0 0 0-.874-.874C13.48 7 12.92 7 11.8 7H4.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C1 8.52 1 9.08 1 10.2v7.6c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874C2.52 21 3.08 21 4.2 21Z"/></svg></span>`
         pre.insertAdjacentHTML("afterbegin", `<div' class="code-copy">${copied}${copy}</div>`)
     }
 }();
 
 !function () {
-   document.getElementById("back_icon").parentElement.href = `${window.location.origin}/blog`
+    document.getElementById("back_icon").parentElement.href = `${window.location.origin}/blog`
+    document.getElementById("post-link-copy").addEventListener("click", (event) => {
+        let e = event.currentTarget;
+        copy(e, window.location.href, () => {
+            e.classList.toggle("copied")
+        })
+    })
 }();
 
 
@@ -64,16 +70,21 @@ function showLightBox(id) {
 }
 
 function copyCode(e) {
-    if (e.children[0].className !== 'hide') return
-
     let code = e.parentElement.getElementsByTagName('code')[0]
     let text = code.innerText || code.textContent
+    copy(e, text)
+}
+
+function copy(element, text, toggle) {
+    if (element.children[0].className !== 'hide') return
     navigator.clipboard.writeText(text).then(function () {
-        e.children[0].classList.toggle("hide")
-        e.children[1].classList.toggle("hide")
+        element.children[0].classList.toggle("hide")
+        element.children[1].classList.toggle("hide")
+        if (typeof toggle === 'function') toggle()
         setTimeout(() => {
-            e.children[0].classList.toggle("hide")
-            e.children[1].classList.toggle("hide")
+            element.children[0].classList.toggle("hide")
+            element.children[1].classList.toggle("hide")
+            if (typeof toggle === 'function') toggle()
         }, 2000);
     });
 }
