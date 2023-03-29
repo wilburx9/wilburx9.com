@@ -1,16 +1,16 @@
 <div class="flex flex-row gap-x-1 items-center justify-center w-full lg:w-min">
-    <a href="/tag/photography" class="group gh-tag-nav-container">
+    <a href="/blog/photography" class="group gh-tag-nav-container">
                 <span class="gh-tag-nav">
                    {{> "icons/photography"}}
                     Photography
                 </span>
-        <span class="gh-tag-nav-indicator"></span>
+        <span class="gh-tag-nav-indicator" id="{{#is "tag"}}{{#tag}}{{#match slug 'photography'}}active{{/match}}{{/tag}}{{/is}}"></span>
     </a>
-    <a href="/tag/programming" class="group gh-tag-nav-container">
+    <a href="/blog/programming" class="group gh-tag-nav-container">
                 <span class="gh-tag-nav">
                     {{> "icons/programming"}}
                     Programming
                 </span>
-        <span class="gh-tag-nav-indicator"></span>
+        <span class="gh-tag-nav-indicator" id="{{#is "tag"}}{{#tag}}{{#match slug 'programming'}}active{{/match}}{{/tag}}{{/is}}"></span>
     </a>
 </div>

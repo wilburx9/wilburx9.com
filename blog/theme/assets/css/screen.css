@@ -105,6 +105,11 @@ html,
     group-focus:w-full group-focus:bg-orangeSet dark:group-focus:bg-orangeSet-dark group-focus:-translate-y-1
 }
 
+.gh-tag-nav-indicator#active {
+    @apply
+    w-full bg-orangeSet dark:bg-orangeSet-dark -translate-y-1
+}
+
 .gh-card {
     @apply
     rounded-lg overflow-hidden bg-cardSet dark:bg-cardSet-dark

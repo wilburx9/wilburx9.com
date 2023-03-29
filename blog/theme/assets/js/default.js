@@ -22,13 +22,7 @@ function handleDarkMode() {
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        let wrapper = document.getElementById("theme-switch");
-        if (isDarkMode()) {
-            document.getElementById("theme-switch-dark").classList.toggle("hide")
-        } else {
-            document.getElementById("theme-switch-light").classList.toggle("hide")
-        }
-        wrapper.addEventListener("click", () => {
+        document.getElementById("theme-switch").addEventListener("click", () => {
             changeMode(false, !isDarkMode())
         });
     });
@@ -41,7 +35,5 @@ function handleDarkMode() {
             if (!fromSystem) localStorage.theme = 'light'
             document.documentElement.classList.remove('dark')
         }
-        document.getElementById("theme-switch-dark").classList.toggle("hide")
-        document.getElementById("theme-switch-light").classList.toggle("hide")
     }
 }
