@@ -3,6 +3,7 @@
 
 !function () {
     handleDarkMode()
+    setAboutHref()
 }();
 
 function handleDarkMode() {
@@ -36,4 +37,10 @@ function handleDarkMode() {
             document.documentElement.classList.remove('dark')
         }
     }
+}
+
+function setAboutHref() {
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll('[id=about-me]').forEach(e => e.href = window.origin)
+    });
 }
