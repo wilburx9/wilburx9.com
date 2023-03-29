@@ -421,7 +421,7 @@ figcaption {
 
 .gh-footer-icon {
     @apply
-    w-8 h-auto
+    w-6 h-auto
     fill-blackSet dark:fill-blackSet-dark
     transition hover:scale-125 motion-reduce:transition-none motion-reduce:hover:transform-none
 }
