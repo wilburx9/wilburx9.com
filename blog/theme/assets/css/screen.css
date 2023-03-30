@@ -17,6 +17,10 @@ production stylesheet in assets/built/screen.css using: gulp dev
 /* Main
 /* ---------------------------------------------------------- */
 
+body {
+    @apply
+    overflow-x-clip
+}
 html,
 .gh-body {
     @apply
@@ -26,12 +30,15 @@ html,
 }
 
 .gh-content {
-    @apply max-w-screen-xl h-full flex flex-col mx-auto px-4 md:px-20 xl:px-4 2xl:px-0
+    @apply
+    max-w-screen-xl h-full
+    flex flex-col mx-auto
+    px-4 sm:px-16 md:px-20 xl:px-4 2xl:px-0
 }
 
 .gh-main {
     @apply
-    w-full max-w-inherit
+    w-full
 }
 
 .gh-page {
@@ -42,33 +49,6 @@ html,
     @apply grid
     grid-cols-1 md:grid-cols-2 lg:grid-cols-3
     gap-4 md:gap-6
-}
-
-/*TODO: Remove. .gh-page should be enough */
-.gh-container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.gh-head-actions a {
-    display: inline-flex;
-    align-items: center;
-    margin: 0;
-    padding: 10px;
-}
-
-.gh-head-actions a svg {
-    height: 1.8rem;
-    fill: currentcolor;
-}
-
-.gh-head-actions a:first-child svg {
-    margin-left: 20px;
-}
-
-.gh-head-actions a:last-child svg {
-    height: 2rem;
 }
 
 /* Index
@@ -147,41 +127,12 @@ html,
 }
 
 
-/* Page
-/* ---------------------------------------------------------- */
-
-.gh-page-head {
-    margin: 0 auto;
-    padding: 8vmin 0 4vmin;
-    text-align: center;
-}
-
-.gh-page-image {
-    margin: 4vmin 0 0 0;
-}
-
-.gh-page-head > p {
-    max-width: 720px;
-    margin: 0.3em auto 0;
-    padding: 0 6vmin;
-    font-size: 1.3em;
-    line-height: 1.4em;
-    opacity: 0.5;
-}
-
-@media (max-width: 700px) {
-    .gh-page-head > p {
-        font-size: 1.6rem;
-    }
-}
-
-
 /* Post
 /* ---------------------------------------------------------- */
 
 .gh-title {
     @apply
-    text-headline1Bold
+    text-headline2Bold sm:text-headline1Bold
     text-blackSet dark:text-blackSet-dark
     mt-4
 }
@@ -211,26 +162,32 @@ html,
 
 .gh-article-container {
     @apply
-    w-full my-16
-    max-w-inherit
+    w-full mb-8 md:mb-16
+    flex flex-col
+    md:block
 }
 
 .gh-article-container > nav {
     @apply
-    w-inherit max-w-inherit fixed
+    w-full sticky
     flex flex-row
     justify-between
-    mt-1.5
+    mt-0 md:mt-1.5
+    top-0 backdrop-blur md:backdrop-blur-0
+    py-0.5 md:pb-0 md:pt-10 z-[100] md:z-0
+    bg-bgSet/70 dark:bg-bgSet-dark/70
+    md:bg-transparent md:dark:bg-transparent
 }
 
 .gh-article {
     @apply
     w-full flex flex-col grow
-    px-28
+    md:px-28 md:-mt-12
 }
 
-.gh-excerpt {
-    margin: 1rem 0 0 0;
+.gh-feature-image {
+    @apply
+    mb-8
 }
 
 .gh-feature-image > img {
@@ -269,8 +226,8 @@ figcaption {
 
 .photo-zoom-handle {
     @apply
-    top-4 right-4 absolute
-    z-30 h-16 w-16 stroke-blackSet dark:stroke-blackSet-dark
+    top-2 right-2 sm:top-4 sm:right-4 absolute
+    z-30 w-9 h-9 sm:w-11 sm:h-11 md:w-14 md:h-14 stroke-blackSet dark:stroke-blackSet-dark
     bg-bgSet/50 dark:bg-bgSet-dark/50 rounded-full
     hidden group-focus:flex group-hover:flex justify-center items-center
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
@@ -314,8 +271,8 @@ figcaption {
 
 .image-exif {
     @apply
-    flex flex-row pt-4 pb-8
-    gap-x-8 items-center justify-center
+    flex flex-row pt-4 pb-8 flex-wrap
+    gap-8 items-center justify-center
 }
 
 .image-exif > span {
@@ -352,53 +309,6 @@ figcaption {
     @apply
     content-[url('../images/exif_focal.svg')]
     dark:content-[url('../images/exif_focal_dark.svg')]
-}
-
-
-/* Author Archive
-/* ---------------------------------------------------------- */
-
-.gh-author-image {
-    height: 12vmin;
-    width: 12vmin;
-    margin: 0 auto 1.5em;
-    border-radius: 100%;
-    overflow: hidden;
-    object-fit: cover;
-}
-
-.gh-author-meta {
-    margin: 2vmin 0 0 0;
-    font-size: 1.2em;
-}
-
-.gh-author-links {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.gh-author-links a {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    margin: 0 0.75vmin;
-}
-
-.gh-author-links a + a:before {
-    display: block;
-    content: "";
-    margin: 0 1.25vmin 0 0;
-    height: 1em;
-    width: 1px;
-    background: rgba(0, 0, 0, 0.3);
-    transform: rotate(20deg);
-}
-
-@media (max-width: 700px) {
-    .gh-author-meta {
-        font-size: 1.6rem;
-    }
 }
 
 /* Footer */

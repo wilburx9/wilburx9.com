@@ -5,12 +5,6 @@ module.exports = {
     content: ['./*.hbs', './**/*.hbs'],
     theme: {
         extend: {
-            width: {
-                'inherit': 'inherit',
-            },
-            maxWidth: {
-                'inherit': 'inherit',
-            },
             colors: {
                 'cardSet': {
                     DEFAULT: '#F6F6F6',
@@ -77,6 +71,10 @@ module.exports = {
             }],
             'headline1Bold': ['24px', {
                 'lineHeight': '28px',
+                'fontWeight': '700'
+            }],
+            'headline2Bold': ['20px', {
+                'lineHeight': '24px',
                 'fontWeight': '700'
             }],
             'button': ['16px', {

@@ -30,7 +30,7 @@
         container.insertBefore(imgWrapper, image.parentElement.firstChild)
         imgWrapper.append(image)
         imgWrapper.insertAdjacentHTML("afterbegin", `<span onclick='showLightBox("${lightBoxId}");' class='photo-zoom-handle'><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="m19 19-4.35-4.35M9 6v6M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/></svg></span>`)
-        container.insertAdjacentHTML("beforebegin", `<div class='photo-lightbox' id='${lightBoxId}'><div style="aspect-ratio: ${imgAspectRatio};"><span onclick='closeLightBox("${lightBoxId}");' class='photo-zoom-handle'><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/></svg></span><img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${imgAspectRatio}"/></div></div>`)
+        container.insertAdjacentHTML("beforebegin", `<div class='photo-lightbox' id='${lightBoxId}'><div class="group" style="aspect-ratio: ${imgAspectRatio};"><span onclick='closeLightBox("${lightBoxId}");' class='photo-zoom-handle'><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/></svg></span><img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${imgAspectRatio}"/></div></div>`)
     }
 }();
 
@@ -62,11 +62,13 @@
 function closeLightBox(id) {
     document.getElementById(id).style.display = "none"
     document.body.style.overflowY = 'auto'
+    document.body.style.overflowX = null
 }
 
 function showLightBox(id) {
     document.getElementById(id).style.display = 'flex'
     document.body.style.overflowY = 'hidden'
+    document.body.style.overflowX = 'unset'
 }
 
 function copyCode(e) {
