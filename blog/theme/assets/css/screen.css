@@ -169,11 +169,11 @@ html,
 
 .gh-article-container > nav {
     @apply
-    w-full sticky
+    w-full fixed md:sticky
     flex flex-row
     justify-between
     mt-0 md:mt-1.5
-    top-0 backdrop-blur md:backdrop-blur-0
+    top-0 right-0 left-0 backdrop-blur md:backdrop-blur-0
     py-0.5 md:pb-0 md:pt-10 z-[100] md:z-0
     bg-bgSet/70 dark:bg-bgSet-dark/70
     md:bg-transparent md:dark:bg-transparent
