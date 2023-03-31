@@ -23,18 +23,23 @@ pre[class*="language-"] {
     hyphens: none;
     @apply
     font-mono text-code text-greySet dark:text-greySet-dark
-    text-left whitespace-pre break-normal
+    text-left whitespace-pre break-normal overflow-auto
 }
 
 /* Code blocks */
 :not(pre) > code[class*="language-"],
 pre[class*="language-"] {
     @apply
-    p-6 w-full overflow-auto
+    w-full
     bg-cardSet dark:bg-cardSet-dark
     border-borderSet dark:border-borderSet-dark
-    border rounded-lg my-8
-    relative
+    border rounded-lg my-8 overflow-hidden
+    flex flex-col sm:flex-row-reverse gap-1 sm:gap-2.5
+}
+
+pre[class*="language-"] > code[class*="language-"] {
+    @apply
+    grow overflow-auto pr-6 sm:pr-0 pt-0 sm:pr-6 pl-6 pb-6
 }
 
 /* Inline code */

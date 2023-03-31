@@ -47,9 +47,9 @@ html,
 }
 
 .gh-postfeed {
-    @apply grid
+    @apply
+    grid  gap-4 md:gap-6
     grid-cols-1 md:grid-cols-2 lg:grid-cols-3
-    gap-4 md:gap-6
 }
 
 /* Index
@@ -438,21 +438,43 @@ hr {
 
 .code-copy {
     @apply
-    m-2.5 hidden group-hover:block group-focus:block
     text-button text-blackSet dark:text-blackSet-dark
-    right-0 top-0 absolute font-sans
+    font-sans
 }
 
-
-.code-copy > span {
+.code-copy > div {
     @apply
-    flex flex-row gap-2.5 right-0 top-0 cursor-pointer
-    stroke-current absolute py-3.5 px-8
-    hover:bg-borderSet hover:bg-borderSet-dark
-    rounded-lg stroke-current duration-500
+    grid pt-1 pr-1 sm:pt-3 sm:pr-3
+}
+
+.code-copy > div > span {
+    @apply
+    row-start-1 row-end-2 col-start-1 col-end-2
+    flex flex-row gap-2.5 cursor-pointer justify-self-end
+    duration-500 py-2.5 justify-center relative rounded-md
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
+.code-copy > div > span#copy {
+    @apply
+    cursor-pointer px-4
+    hover:bg-borderSet hover:bg-borderSet-dark
+    focus:bg-borderSet focus:bg-borderSet-dark
+    active:bg-borderSet active:bg-borderSet-dark
+    hover:bg-borderSet hover:bg-borderSet-dark
+    stroke-current z-20
+}
+
+.code-copy > div > span#copied {
+    @apply
+    cursor-default z-10
+    px-4 sm:px-2
+}
+
+.code-copy > div > span > span {
+    @apply
+    hidden sm:block
+}
 
 .hide {
     @apply
