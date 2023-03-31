@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&family=Poppins:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
     <title>{{meta_title}}</title>
     <script src="{{asset "built/default.js"}}"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 
     {{ghost_head}}
     {{!-- Outputs important meta data and settings, should always be in <head> --}}
@@ -33,7 +34,6 @@
 
 {{!-- <foot> --}}
 
-<script src="{{asset "built/jquery-3.4.1.min.js"}}"></script>
 <script src="{{asset "built/prism.js"}}"></script>
 
 {{#if pagination.pages}}

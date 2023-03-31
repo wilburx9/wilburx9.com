@@ -21,6 +21,7 @@ body {
     @apply
     overflow-x-clip
 }
+
 html,
 .gh-body {
     @apply
@@ -213,7 +214,7 @@ figcaption {
     bg-no-repeat
     bg-center
     bg-cover
-    before:bg-black/60
+    before:bg-black/75
     before:content-[""]
     before:absolute
     before:left-0
@@ -237,28 +238,28 @@ figcaption {
     cursor-pointer
 }
 
-/* Image lightbox*/
+/* Image lightbox */
 .photo-lightbox {
     @apply
     items-center justify-center
-    hidden fixed z-50
+    hidden fixed z-[150]
     top-0 left-0
     w-screen h-screen
+    max-w-full max-h-full
     overflow-auto
     bg-black/50
-    py-28
 }
 
 .photo-lightbox > div {
     @apply
     relative
     mx-auto
-    max-w-fit max-h-full
+    max-w-fit max-h-fit
 }
 
 .photo-lightbox > div > img {
     @apply
-    w-full h-full
+    w-screen
 }
 
 .kg-image-card > div > img {
