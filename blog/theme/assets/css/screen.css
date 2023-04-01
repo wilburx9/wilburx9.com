@@ -32,14 +32,20 @@ html,
 
 .gh-content {
     @apply
-    max-w-screen-xl h-full
-    flex flex-col mx-auto
+    h-full w-screen
+    flex flex-col overflow-y-auto
     px-4 sm:px-16 md:px-20 xl:px-4 2xl:px-0
 }
 
 .gh-main {
     @apply
-    w-full grow
+    w-screen max-w-screen-xl grow mx-auto
+    bg-bgSet dark:bg-bgSet-dark
+}
+.gh-footer {
+    @apply
+    w-screen max-w-screen-xl mx-auto
+    bg-bgSet dark:bg-bgSet-dark
 }
 
 .gh-page {
