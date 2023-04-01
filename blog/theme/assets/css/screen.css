@@ -26,7 +26,6 @@ html,
 .gh-body {
     @apply
     h-full w-screen min-h-screen
-    bg-bgSet dark:bg-bgSet-dark
     transition-colors motion-reduce:transition-none
 }
 
@@ -35,17 +34,18 @@ html,
     h-full w-screen
     flex flex-col overflow-y-auto
     px-4 sm:px-16 md:px-20 xl:px-4 2xl:px-0
+    bg-bgSet dark:bg-bgSet-dark
 }
 
 .gh-main {
     @apply
-    w-screen max-w-screen-xl grow mx-auto
+    w-full max-w-screen-xl grow mx-auto
     bg-bgSet dark:bg-bgSet-dark
 }
 
-.gh-footer {
+.gh-footer-container {
     @apply
-    w-screen max-w-screen-xl mx-auto
+    w-full max-w-screen-xl mx-auto
     bg-bgSet dark:bg-bgSet-dark
 }
 
@@ -324,7 +324,7 @@ figcaption {
     @apply
     w-full
     flex flex-col md:flex-row justify-between items-center
-    pb-8 md:pb-16
+    pb-4 sm:pb-8 md:pb-16 pt-8
 }
 
 .gh-footer > span {
@@ -358,9 +358,23 @@ figcaption {
     no-underline transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
+.primary-button {
+    @apply
+    py-4 px-6 cursor-pointer grid text-center
+    bg-blackSet dark:bg-blackSet-dark rounded-xl
+    text-bgSet dark:text-bgSet-dark text-button
+    hover:bg-orangeSet dark:hover:bg-orangeSet-dark
+    active:bg-orangeSet dark:active:bg-orangeSet-dark
+    focus:bg-orangeSet dark:focus:bg-orangeSet-dark
+    hover:text-boxSet dark:hover:text-blackSet-dark
+    active:text-boxSet dark:active:text-blackSet-dark
+    focus:text-boxSet dark:focus:text-blackSet-dark pointer-events-auto
+    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
 .secondary-button {
     @apply
-    py-4 px-6 cursor-pointer grid
+    py-4 px-6 cursor-pointer grid text-center
     text-blackSet dark:text-blackSet-dark text-button
     border border-blackSet dark:border-blackSet-dark rounded-xl
     hover:border-orangeSet dark:hover:border-orangeSet-dark
@@ -375,6 +389,7 @@ figcaption {
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
+.primary-button > span,
 .secondary-button > span {
     @apply
     flex flex-row gap-x-2.5 justify-start items-center
@@ -382,6 +397,7 @@ figcaption {
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
+.primary-button svg,
 .secondary-button svg {
     @apply
     stroke-blackSet dark:stroke-blackSet-dark
@@ -520,35 +536,35 @@ hr {
 
 .home-content > #left-content {
     @apply
-    grow basis-0 flex flex-col justify-center
+    grow-[4] basis-0 flex flex-col justify-center
     px-0 lg:px-20 xl:px-0
 }
 
 .home-content > #right-content {
     @apply
-    grow basis-0
+    grow-[3.5] basis-0
 }
 
 .home-content > #right-content > #pattern {
     @apply
     flex justify-center items-center w-full h-full bg-contain bg-no-repeat bg-center
-    bg-[url('../images/pattern_light.svg')]
-    dark:bg-[url('../images/pattern_dark.svg')]
-    hover:bg-[url('../images/pattern.svg')]
-    hover:dark:bg-[url('../images/pattern.svg')]
-    focus:bg-[url('../images/pattern.svg')]
-    focus:dark:bg-[url('../images/pattern.svg')]
+    bg-[url('../images/pattern_light.png')]
+    dark:bg-[url('../images/pattern_dark.png')]
+    hover:bg-[url('../images/pattern.png')]
+    hover:dark:bg-[url('../images/pattern.png')]
+    focus:bg-[url('../images/pattern.png')]
+    focus:dark:bg-[url('../images/pattern.png')]
 }
 
 .home-content > #right-content > #pattern > #yellow-wrapper {
     @apply
-    w-[31.5%] aspect-square bg-auto bg-no-repeat bg-center bg-contain mx-auto my-auto
+    h-[45%] aspect-square bg-auto bg-no-repeat bg-center bg-contain mx-auto my-auto
     bg-orangeSet dark:bg-orangeSet-dark rounded-full relative
 }
 
 .home-content > #right-content > #pattern > #yellow-wrapper > #white-circle {
     @apply
-    w-[63%] aspect-square bg-auto bg-no-repeat bg-center bg-contain
+    h-[63%] aspect-square bg-auto bg-no-repeat bg-center bg-contain
     bg-white rounded-full absolute
     top-1/2 left-1/2 translate-y-2/4 -translate-x-2/4 -translate-y-2/4
 
@@ -563,12 +579,13 @@ hr {
 
 .home-content h1 {
     @apply
-    text-center md:text-left  text-blackSet dark:text-blackSet-dark
-    text-largeTitle
+    text-center sm:text-left text-blackSet dark:text-blackSet-dark
+    text-headline1Bold sm:text-title md:text-largeTitle max-w-prose
 }
 
 .home-content h2 {
     @apply
-    text-center md:text-left pt-2 text-headline2
-    text-greySet dark:text-greySet-dark
+    text-center md:text-left pt-2
+    text-greySet dark:text-greySet-dark max-w-prose
+    text-body2  sm:text-body1 md:text-headline2
 }
