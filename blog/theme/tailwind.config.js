@@ -93,6 +93,10 @@ module.exports = {
                 'lineHeight': '32px',
                 'fontWeight': '400',
             }],
+            'title': ['58px', {
+                'lineHeight': '68px',
+                'fontWeight': '700',
+            }],
         }
     },
     plugins: [

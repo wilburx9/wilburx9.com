@@ -495,13 +495,13 @@ hr {
 
 .error-page-content h1 {
     @apply
-    text-headline1Bold text-center
+    text-headline1Bold md:text-title text-center
     mt-9 text-blackSet dark:text-blackSet-dark
 }
 
 .error-page-content p {
     @apply
-    text-body1 text-center
+    text-body1 text-center max-w-prose
     mt-2 mb-8 text-greyLightSet dark:text-greyLightSet-dark
 }
 
