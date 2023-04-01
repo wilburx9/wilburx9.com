@@ -77,6 +77,10 @@ module.exports = {
                 'lineHeight': '24px',
                 'fontWeight': '700'
             }],
+            'headline2': ['20px', {
+                'lineHeight': '24px',
+                'fontWeight': '400'
+            }],
             'button': ['16px', {
                 'lineHeight': '20px',
                 'fontWeight': '500'
@@ -95,6 +99,10 @@ module.exports = {
             }],
             'title': ['58px', {
                 'lineHeight': '68px',
+                'fontWeight': '700',
+            }],
+            'largeTitle': ['62px', {
+                'lineHeight': '72px',
                 'fontWeight': '700',
             }],
         }

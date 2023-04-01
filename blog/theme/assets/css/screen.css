@@ -42,6 +42,7 @@ html,
     w-screen max-w-screen-xl grow mx-auto
     bg-bgSet dark:bg-bgSet-dark
 }
+
 .gh-footer {
     @apply
     w-screen max-w-screen-xl mx-auto
@@ -511,3 +512,63 @@ hr {
     mt-2 mb-8 text-greyLightSet dark:text-greyLightSet-dark
 }
 
+.home-content {
+    @apply
+    grow flex flex-col-reverse xl:flex-row gap-x-6
+    justify-center gap-y-4 pt-3
+}
+
+.home-content > #left-content {
+    @apply
+    grow basis-0 flex flex-col justify-center
+    px-0 lg:px-20 xl:px-0
+}
+
+.home-content > #right-content {
+    @apply
+    grow basis-0
+}
+
+.home-content > #right-content > #pattern {
+    @apply
+    flex justify-center items-center w-full h-full bg-contain bg-no-repeat bg-center
+    bg-[url('../images/pattern_light.svg')]
+    dark:bg-[url('../images/pattern_dark.svg')]
+    hover:bg-[url('../images/pattern.svg')]
+    hover:dark:bg-[url('../images/pattern.svg')]
+    focus:bg-[url('../images/pattern.svg')]
+    focus:dark:bg-[url('../images/pattern.svg')]
+}
+
+.home-content > #right-content > #pattern > #yellow-wrapper {
+    @apply
+    w-[31.5%] aspect-square bg-auto bg-no-repeat bg-center bg-contain mx-auto my-auto
+    bg-orangeSet dark:bg-orangeSet-dark rounded-full relative
+}
+
+.home-content > #right-content > #pattern > #yellow-wrapper > #white-circle {
+    @apply
+    w-[63%] aspect-square bg-auto bg-no-repeat bg-center bg-contain
+    bg-white rounded-full absolute
+    top-1/2 left-1/2 translate-y-2/4 -translate-x-2/4 -translate-y-2/4
+
+}
+
+.home-content > #right-content > #pattern > #yellow-wrapper > #avatar {
+    @apply
+    w-full aspect-square bg-auto bg-no-repeat bg-center bg-contain
+    bg-[url('../images/me.png')] rounded-full
+    absolute left-0 right-0
+}
+
+.home-content h1 {
+    @apply
+    text-center md:text-left  text-blackSet dark:text-blackSet-dark
+    text-largeTitle
+}
+
+.home-content h2 {
+    @apply
+    text-center md:text-left pt-2 text-headline2
+    text-greySet dark:text-greySet-dark
+}
