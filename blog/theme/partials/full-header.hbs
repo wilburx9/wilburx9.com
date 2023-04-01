@@ -1,26 +1,31 @@
 <!-- Header for templates that list post articles -->
-<div class="gh-full-header">
+<div class="gh-full-header {{#is "home"}}justify-between{{/is}}">
 
-    <svg class="w-10 md:w-16" viewBox="0 0 66 65" fill="none">
-        <g stroke="#fff">
-            <g stroke-width=".2">
-                <circle cx="33" cy="33" r="23.1"/>
-                <circle cx="33" cy="33" r="31.9"/>
-                <circle cx="33" cy="33" r="16.1"/>
-                <path d="m1.07.93 64 64M64.93.93l-64 64"/>
+    <a href="{{#is "home"}}/{{else}}/blog{{/is}}">
+        <svg class="w-10 md:w-16" viewBox="0 0 66 65" fill="none">
+            <g stroke="#fff">
+                <g stroke-width=".2">
+                    <circle cx="33" cy="33" r="23.1"/>
+                    <circle cx="33" cy="33" r="31.9"/>
+                    <circle cx="33" cy="33" r="16.1"/>
+                    <path d="m1.07.93 64 64M64.93.93l-64 64"/>
+                </g>
+                <path stroke-width=".5" d="M1.25 1.25h63.5v63.5H1.25z"/>
             </g>
-            <path stroke-width=".5" d="M1.25 1.25h63.5v63.5H1.25z"/>
-        </g>
-    </svg>
-
-    <nav class="hidden lg:flex lg:grow lg:flex-row justify-between items-center">
-        {{> "header-nav"}}
-        <a href="/" id="about-me" class="chip">About Me</a>
-    </nav>
-    <span class="grow lg:hidden"></span>
-    <a href="/" id="about-me" class="chip lg:hidden">About Me</a>
+        </svg>
+    </a>
+    {{^is "home"}}
+        <nav class="hidden lg:flex lg:grow lg:flex-row justify-between items-center">
+            {{> "header-nav"}}
+            <a href="/" id="about-me" class="chip">About Me</a>
+        </nav>
+        <span class="grow lg:hidden"></span>
+        <a href="/" id="about-me" class="chip lg:hidden">About Me</a>
+    {{/is}}
     {{> "theme-switch"}}
 </div>
-<nav class="lg:hidden w-full flex flex-row justify-between items-center pb-6">
-    {{> "header-nav"}}
-</nav>
+{{^is "home"}}
+    <nav class="lg:hidden w-full flex flex-row justify-between items-center pb-6">
+        {{> "header-nav"}}
+    </nav>
+{{/is}}
