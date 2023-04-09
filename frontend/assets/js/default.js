@@ -3,7 +3,7 @@
 
 !function () {
     handleDarkMode()
-    setAboutHref()
+    setHrefs()
 }();
 
 function handleDarkMode() {
@@ -39,8 +39,10 @@ function handleDarkMode() {
     }
 }
 
-function setAboutHref() {
+function setHrefs() {
     document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll('[id=about-me]').forEach(e => e.href = window.origin)
+        document.querySelectorAll('[id=about-me]').forEach(e => e.href = window.location.origin)
+        let emailButton = document.querySelector('[id=email-me]')
+        if (emailButton != null) emailButton.href = `mailto: me@${window.location.hostname}`
     });
 }
