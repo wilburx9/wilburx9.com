@@ -19,10 +19,22 @@
             </div>
         </div>
         <div id="right-content">
-            <div class="group" id="pattern">
-                <div id="yellow-wrapper">
+            <div class="group">
+                <div id="pattern">
+                    <img class="dark:opacity-0 opacity-100 group-hover:opacity-0"
+                         src="{{asset "images/pattern_light.png"}}"
+                         alt="Avatar pattern"/>
+                    <img class="opacity-0 dark:opacity-100 group-hover:opacity-0"
+                         src="{{asset "images/pattern_dark.png"}}"
+                         alt="Avatar pattern"/>
+                    <img class="hide group-hover:opacity-100" src="{{asset "images/pattern.png"}}"
+                         alt="Avatar pattern"/>
+                </div>
+                <div id="avatar">
+                    <div id="yellow-circle"></div>
                     <div id="white-circle"></div>
-                    <div id="avatar" class="grayscale group-hover:grayscale-0 group-focus:grayscale-0"></div>
+                    <img class="grayscale group-hover:grayscale-0 group-focus:grayscale-0"
+                         src="{{asset "images/me.png"}}" alt="Me"/>
                 </div>
             </div>
         </div>

@@ -545,36 +545,51 @@ hr {
     grow-[3.5] basis-0
 }
 
-.home-content > #right-content > #pattern {
+.home-content > #right-content > div {
     @apply
-    flex justify-center items-center w-full h-full bg-contain bg-no-repeat bg-center
-    bg-[url('../images/pattern_light.png')]
-    dark:bg-[url('../images/pattern_dark.png')]
-    hover:bg-[url('../images/pattern.png')]
-    hover:dark:bg-[url('../images/pattern.png')]
-    focus:bg-[url('../images/pattern.png')]
-    focus:dark:bg-[url('../images/pattern.png')]
+    grid aspect-square w-full
 }
 
-.home-content > #right-content > #pattern > #yellow-wrapper {
+.home-content > #right-content #pattern {
     @apply
-    h-[45%] aspect-square bg-auto bg-no-repeat bg-center bg-contain mx-auto my-auto
-    bg-orangeSet dark:bg-orangeSet-dark rounded-full relative
+    grid h-full w-full
+    row-start-1 row-end-2 col-start-1 col-end-2
 }
 
-.home-content > #right-content > #pattern > #yellow-wrapper > #white-circle {
+.home-content > #right-content #pattern > img {
     @apply
-    h-[63%] aspect-square bg-auto bg-no-repeat bg-center bg-contain
-    bg-white rounded-full absolute
-    top-1/2 left-1/2 translate-y-2/4 -translate-x-2/4 -translate-y-2/4
-
+    row-start-1 row-end-2 col-start-1 col-end-2 duration-500
+    transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
-.home-content > #right-content > #pattern > #yellow-wrapper > #avatar {
+.home-content > #right-content #avatar {
     @apply
-    w-full aspect-square bg-auto bg-no-repeat bg-center bg-contain
-    bg-[url('../images/me.png')] rounded-full
-    absolute left-0 right-0
+    h-[43.5%] grid aspect-square
+    row-start-1 row-end-2 col-start-1 col-end-2
+    justify-self-center self-center z-10 relative
+}
+
+.home-content > #right-content #avatar > #yellow-circle {
+    @apply
+    h-full aspect-square bg-auto bg-no-repeat bg-center bg-contain
+    bg-orangeSet dark:bg-orangeSet-dark rounded-full
+    row-start-1 row-end-2 col-start-1 col-end-2
+}
+
+.home-content > #right-content #avatar > #white-circle {
+    @apply
+    row-start-1 row-end-2 col-start-1 col-end-2
+    h-[63%] aspect-square bg-no-repeat bg-center bg-contain
+    bg-white rounded-full justify-self-center self-center
+}
+
+.home-content > #right-content #avatar > img {
+    @apply
+    row-start-1 row-end-2 col-start-1 col-end-2
+    w-full aspect-square bg-no-repeat bg-center bg-contain
+    rounded-full justify-self-center self-center
+    shadow-[inset_0px_8px_7px_rgba(0,0,0,0.33)] duration-500
+    transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .home-content h1 {
@@ -585,7 +600,7 @@ hr {
 
 .home-content h2 {
     @apply
-    text-center md:text-left pt-2
+    text-center sm:text-left pt-2
     text-greySet dark:text-greySet-dark max-w-prose
-    text-body2  sm:text-body1 md:text-headline2
+    text-body2 sm:text-body1 md:text-headline2
 }
