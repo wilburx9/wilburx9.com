@@ -1,0 +1,35 @@
+.gh-full-header {
+    @apply flex flex-row w-full items-center gap-x-4
+    pt-6 lg:pt-11 pb-5 lg:pb-9
+}
+
+.gh-tag-nav-container {
+    @apply
+    flex flex-col gap-x-0 items-center
+    no-underline
+    transition-colors motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.gh-tag-nav {
+    @apply
+    flex flex-row gap-x-1 items-center
+    px-2.5 py-3.5
+    text-body1 text-greySet dark:text-greySet-dark
+    stroke-greySet dark:stroke-greySet-dark
+}
+
+.gh-tag-nav-indicator {
+    @apply
+    w-11/12 h-1
+    rounded-t-full
+    bg-transparent
+    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+    group-hover:w-full group-hover:bg-orangeSet dark:group-hover:bg-orangeSet-dark group-hover:-translate-y-1
+    group-active:w-full group-active:bg-orangeSet dark:group-active:bg-orangeSet-dark group-active:-translate-y-1
+    group-focus:w-full group-focus:bg-orangeSet dark:group-focus:bg-orangeSet-dark group-focus:-translate-y-1
+}
+
+.gh-tag-nav-indicator#active {
+    @apply
+    w-full bg-orangeSet dark:bg-orangeSet-dark -translate-y-1
+}
