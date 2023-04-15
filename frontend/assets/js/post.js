@@ -1,8 +1,21 @@
 // Script for processing html in post.hbs
 
+// Redirect if the post is just a reference to an external blog post
+!function () {
+    let container = document.querySelector('.gh-post-content');
+    let bookmark = container.querySelector(':scope > figure.kg-bookmark-card')
+    // A post which is just a reference to an external article
+    // will contain nothing but the bookmark card.
+    if (bookmark != null && container.children.length === 1) {
+        let url = bookmark.querySelector('a.kg-bookmark-container').href
+        if (url != null) window.location.replace(url);
+    }
+}()
+
+// Resize and add blur effect to images.
 !function () {
     const images = document.querySelectorAll(".kg-image-card img");
-    let wrapperMinAR = getMinAR()
+    let wrapperMinAR = getMinAspectRatio()
     for (let i = 0; i < images.length; i++) {
         let image = images[i]
         let lightBoxId = `lightbox__photo__${i}`
@@ -27,6 +40,7 @@
     }
 }();
 
+// Add Copy button to code blocks
 !function () {
     let codes = document.querySelectorAll('code[class*="language-"]')
     for (let i = 0; i < codes.length; i++) {
@@ -40,6 +54,7 @@
     }
 }();
 
+// Set click listeners for the back and share buttons.
 !function () {
     document.getElementById("back_icon").parentElement.href = `${window.location.origin}/blog`
     document.getElementById("post-link-copy").addEventListener("click", (event) => {
@@ -83,19 +98,19 @@ function copy(element, text, toggle) {
     });
 }
 
-function getMinAR() {
+function getMinAspectRatio() {
     // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
-    if ($( window ).width() > 768) return 1.5
+    if ($(window).width() > 768) return 1.5
     return 0.6
 }
 
 function getZoomImgWrapperStyle(imgW, imgH) {
-    let minW = Math.min(imgW, $( window ).width())
-    let minH = Math.min(imgH, $( window ).height())
+    let minW = Math.min(imgW, $(window).width())
+    let minH = Math.min(imgH, $(window).height())
     let style = `aspect-ratio: ${imgW / imgH}; `
     if (minH > minW) {
         style += `height: auto; max-height: 100%; width: ${minW}px;`
-    } else  {
+    } else {
         style += `width: auto; max-width: 100%; height: ${minH}px;`
     }
     return style

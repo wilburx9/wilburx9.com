@@ -1,6 +1,6 @@
 <!-- Individual post card -->
 <article class="gh-card {{post_class}}">
-    <a class="gh-card-link" href="{{url}}">
+    <a id="card-link-{{id}}" class="gh-card-link" href="{{url}}">
         {{#if feature_image}}
             <img class="gh-card-image"
                  srcset="{{img_url feature_image size="s"}} 300w,
@@ -12,7 +12,7 @@
                  alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
             />
         {{else}}
-            <img class="gh-card-image"
+            <img id="card-image-{{id}}" class="gh-card-image"
                  src="{{#match primary_tag.slug 'programming'}}{{asset "images/default_code.png"}}{{else}}{{asset
                      "images/default_photography.png"}}{{/match}}"
                  alt="{{title}}"/>
@@ -30,4 +30,6 @@
             <span class="gh-post-meta"><time datetime="{{date format="YYYY-MM-DD"}}">{{date format="D MMM YYYY"}}</time> &minus; {{reading_time}}</span>
         </div>
     </a>
+    <script src="{{asset "built/post-card.js"}}"></script>
+    <script>parseBookmark(`{{{content}}}`, `card-link-{{id}}`, `card-image-{{id}}`)</script>
 </article>
