@@ -106,7 +106,21 @@
 }
 
 .gh-card-image {
-    @apply w-full aspect-video object-cover
+    @apply
+    w-full aspect-video relative
+}
+
+.gh-card-image > * {
+    @apply
+    w-full h-full object-cover absolute
+}
+
+.gh-card-image > .gh-card-image-hover {
+    @apply
+    flex flex-row justify-center items-center gap-2
+    bg-black/60 text-body1Bold text-white backdrop-blur-[2px]
+    opacity-0 group-hover:opacity-100 group-focus:opacity-100
+    transition-opacity motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .gh-card-title {
