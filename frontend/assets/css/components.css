@@ -128,7 +128,9 @@
 }
 
 .gh-card-excerpt {
-    @apply w-full text-greySet dark:text-greySet-dark text-body3 line-clamp-2 min-h-[32px]
+    @apply w-full text-greySet
+    dark:text-greySet-dark text-body2
+    line-clamp-2 min-h-[32px]
 }
 
 .gh-card-content {

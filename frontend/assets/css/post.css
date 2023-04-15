@@ -17,6 +17,10 @@
     text-body3 line-clamp-1
 }
 
+.gh-article .gh-post-meta {
+    @apply text-body2
+}
+
 .gh-post-footer {
     @apply
     w-full mt-8
@@ -226,5 +230,5 @@ figcaption {
     flex flex-row gap-1 justify-start items-center
     text-greySet dark:text-greySet-dark
     stroke-greySet dark:stroke-greySet-dark
-    text-body3
+    text-body2
 }
