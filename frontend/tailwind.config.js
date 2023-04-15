@@ -69,6 +69,10 @@ module.exports = {
                 'lineHeight': '16px',
                 'fontWeight': '400'
             }],
+            'headlineBold': ['36px', {
+                'lineHeight': '54px',
+                'fontWeight': '700'
+            }],
             'headline1Bold': ['24px', {
                 'lineHeight': '28px',
                 'fontWeight': '700'

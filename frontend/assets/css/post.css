@@ -1,6 +1,6 @@
 .gh-title {
     @apply
-    text-headline2Bold sm:text-headline1Bold
+    text-headline2Bold sm:text-headlineBold
     text-blackSet dark:text-blackSet-dark
     mt-4
 }
@@ -47,10 +47,10 @@
     md:bg-transparent md:dark:bg-transparent
 }
 
-.gh-article {
+.gh-article-container > .gh-article {
     @apply
     w-full flex flex-col grow
-    md:px-28 md:-mt-12
+    mt-16 md:px-28 md:-mt-12
 }
 
 .gh-feature-image {
