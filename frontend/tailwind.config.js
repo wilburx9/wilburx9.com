@@ -51,39 +51,31 @@ module.exports = {
         fontSize: {
             'text1': ['20px', {
                 'lineHeight': '32px',
-                'fontWeight': '400'
+            }],
+            'text2': ['16px', {
+                'lineHeight': '28px',
+            }],
+            'text3': ['14px', {
+                'lineHeight': '22px',
             }],
             'body1': ['16px', {
                 'lineHeight': '20px',
-                'fontWeight': '400'
-            }],
-            'body1Bold': ['16px', {
-                'lineHeight': '20px',
-                'fontWeight': '700'
             }],
             'body2': ['14px', {
                 'lineHeight': '20px',
-                'fontWeight': '400'
             }],
             'body3': ['12px', {
                 'lineHeight': '16px',
-                'fontWeight': '400'
             }],
-            'headlineBold': ['36px', {
+            'headline': ['36px', {
                 'lineHeight': '54px',
                 'fontWeight': '700'
             }],
-            'headline1Bold': ['24px', {
+            'headline1': ['24px', {
                 'lineHeight': '28px',
-                'fontWeight': '700'
-            }],
-            'headline2Bold': ['20px', {
-                'lineHeight': '24px',
-                'fontWeight': '700'
             }],
             'headline2': ['20px', {
                 'lineHeight': '24px',
-                'fontWeight': '400'
             }],
             'button': ['16px', {
                 'lineHeight': '20px',

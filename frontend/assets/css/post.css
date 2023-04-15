@@ -1,24 +1,53 @@
 .gh-title {
     @apply
-    text-headline2Bold sm:text-headlineBold
+    text-headline2 sm:text-headline font-bold
     text-blackSet dark:text-blackSet-dark
     mt-4
 }
 
 .gh-post-content {
     @apply
-    text-text1
+    text-text3 md:text-text2 xl:text-text1 font-normal
     text-greySet dark:text-greySet-dark
+}
+
+.gh-post-content b,
+.gh-post-content strong {
+    @apply
+    font-bold
+}
+
+.gh-post-content a {
+    @apply
+    underline
+    hover:text-orangeSet hover:dark:text-orangeSet-dark
+    focus:text-orangeSet focus:dark:text-orangeSet-dark
+    active:text-orangeSet active:dark:text-orangeSet-dark
+}
+
+.gh-post-content em {
+    @apply
+    italic
+}
+
+.gh-post-content h2 {
+    @apply
+    text-text2 md:text-headline2 xl:text-headline1 font-bold
+}
+
+.gh-post-content h3 {
+    @apply
+    text-text3 md:text-text2 xl:text-text1 font-bold
 }
 
 .gh-post-meta {
     @apply w-full
     text-greyLightSet dark:text-greyLightSet-dark
-    text-body3 line-clamp-1
+    text-body3 font-normal line-clamp-1
 }
 
 .gh-article .gh-post-meta {
-    @apply text-body2
+    @apply text-body2 font-normal
 }
 
 .gh-post-footer {
@@ -28,7 +57,7 @@
 
 .gh-post-footer > h2 {
     @apply
-    text-headline1Bold
+    text-headline1 font-bold
     text-blackSet dark:text-blackSet-dark
 }
 
@@ -230,5 +259,5 @@ figcaption {
     flex flex-row gap-1 justify-start items-center
     text-greySet dark:text-greySet-dark
     stroke-greySet dark:stroke-greySet-dark
-    text-body2
+    text-body2 font-normal
 }

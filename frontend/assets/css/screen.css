@@ -81,7 +81,7 @@ hr {
 
 .gh-more-posts > h2 {
     @apply
-    text-headline1Bold
+    text-headline1 font-bold
     text-blackSet dark:text-blackSet-dark
     mb-4 mt-8
 }

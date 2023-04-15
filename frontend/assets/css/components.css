@@ -8,7 +8,7 @@
     hover:border-orangeSet dark:hover:border-orangeSet-dark
     active:border-orangeSet dark:active:border-orangeSet-dark
     focus:border-orangeSet dark:focus:border-orangeSet-dark
-    text-body1 text-greySet dark:text-greySet-dark
+    text-body1 font-normal text-greySet dark:text-greySet-dark
     no-underline transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
@@ -118,18 +118,18 @@
 .gh-card-image > .gh-card-image-hover {
     @apply
     flex flex-row justify-center items-center gap-2
-    bg-black/60 text-body1Bold text-white backdrop-blur-[2px]
+    bg-black/60 text-body1 font-bold text-white backdrop-blur-[2px]
     opacity-0 group-hover:opacity-100 group-focus:opacity-100
     transition-opacity motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .gh-card-title {
-    @apply w-full text-body1Bold text-blackSet dark:text-blackSet-dark line-clamp-3 min-h-[60px]
+    @apply w-full text-body1 font-bold text-blackSet dark:text-blackSet-dark line-clamp-3 min-h-[60px]
 }
 
 .gh-card-excerpt {
     @apply w-full text-greySet
-    dark:text-greySet-dark text-body2
+    dark:text-greySet-dark text-body2 font-normal
     line-clamp-2 min-h-[32px]
 }
 
