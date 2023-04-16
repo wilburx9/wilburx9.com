@@ -47,7 +47,7 @@
 }
 
 .gh-article .gh-post-meta {
-    @apply text-body2 font-normal
+    @apply text-body3 md:text-body2 font-normal
 }
 
 .gh-post-footer {

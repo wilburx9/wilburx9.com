@@ -13,7 +13,7 @@
 }()
 
 // Resize and add blur effect to images.
-!function () {
+function processImages(primaryTag) {
     const images = document.querySelectorAll(".kg-image-card img");
     let wrapperMinAR = getMinAspectRatio()
     for (let i = 0; i < images.length; i++) {
@@ -35,10 +35,12 @@
         let container = image.parentElement
         container.insertBefore(imgWrapper, image.parentElement.firstChild)
         imgWrapper.append(image)
-        imgWrapper.insertAdjacentHTML("afterbegin", `<span onclick='showLightBox("${lightBoxId}");' class='photo-zoom-handle'><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="m19 19-4.35-4.35M9 6v6M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/></svg></span>`)
-        container.insertAdjacentHTML("beforebegin", `<div class='photo-lightbox' id='${lightBoxId}'><div class="group" style="${getZoomImgWrapperStyle(imgW, imgH)}"><span onclick='closeLightBox("${lightBoxId}");' class='photo-zoom-handle'><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/></svg></span><img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${imgAR}"/></div></div>`)
+        if (primaryTag === 'photography') {
+            imgWrapper.insertAdjacentHTML("afterbegin", `<span onclick='showLightBox("${lightBoxId}");' class='photo-zoom-handle'><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="m19 19-4.35-4.35M9 6v6M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/></svg></span>`)
+            container.insertAdjacentHTML("beforebegin", `<div class='photo-lightbox' id='${lightBoxId}'><div class="group" style="${getZoomImgWrapperStyle(imgW, imgH)}"><span onclick='closeLightBox("${lightBoxId}");' class='photo-zoom-handle'><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/></svg></span><img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${imgAR}"/></div></div>`)
+        }
     }
-}();
+}
 
 // Add Copy button to code blocks
 !function () {
