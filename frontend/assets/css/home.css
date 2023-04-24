@@ -34,7 +34,7 @@
 
 .home-content > #right-content #avatar {
     @apply
-    h-[43.5%] grid aspect-square
+    h-[43.5%] relative aspect-square
     row-start-1 row-end-2 col-start-1 col-end-2
     justify-self-center self-center z-10 relative
 }
@@ -43,21 +43,20 @@
     @apply
     h-full aspect-square bg-auto bg-no-repeat bg-center bg-contain
     bg-orangeSet dark:bg-orangeSet-dark rounded-full
-    row-start-1 row-end-2 col-start-1 col-end-2
+    absolute top-0 bottom-0 left-0 right-0
 }
 
 .home-content > #right-content #avatar > #white-circle {
     @apply
-    row-start-1 row-end-2 col-start-1 col-end-2
+    absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4
     h-[63%] aspect-square bg-no-repeat bg-center bg-contain
-    bg-white rounded-full justify-self-center self-center
+    bg-white rounded-full
 }
 
 .home-content > #right-content #avatar > img {
     @apply
-    row-start-1 row-end-2 col-start-1 col-end-2
+    absolute top-0 bottom-0 left-0 right-0 rounded-full
     w-full aspect-square bg-no-repeat bg-center bg-contain
-    rounded-full justify-self-center self-center
     shadow-[inset_0px_8px_7px_rgba(0,0,0,0.33)] duration-500
     transition motion-reduce:transition-none motion-reduce:hover:transform-none
 }
