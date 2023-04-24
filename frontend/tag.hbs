@@ -3,13 +3,9 @@
 <div class="gh-page">
     {{> "full-header"}}
     <div class="gh-postfeed">
-        {{#tag}}
-            {{#get "posts" filter="primary_tag:{{slug}}" include="tags"}}
-                {{#foreach posts}}
-                    {{> "post-card"}}
-                {{/foreach}}
-            {{/get}}
-        {{/tag}}
+        {{#foreach posts}}
+            {{> "post-card"}}
+        {{/foreach}}
     </div>
     {{> "listing-footer"}}
 </div>

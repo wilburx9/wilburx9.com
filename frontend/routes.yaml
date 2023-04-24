@@ -5,19 +5,7 @@ collections:
   /blog/:
     permalink: /blog/{primary_tag}/{slug}/
     template: index
-
-  /blog/programming/:
-    permalink: /blog/programming/
-    template: tag
-    filter: primary_tag:programming
-    data: tag.programming
-
-  /blog/photography/:
-    permalink: /blog/photography/
-    template: tag
-    filter: primary_tag:photography
-    data: tag.photography
-
+    data: page.blog
 
 taxonomies:
-## Nothing but silence
+  tag: /blog/{slug}/
