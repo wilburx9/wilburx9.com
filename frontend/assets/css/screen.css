@@ -59,10 +59,41 @@ html,
     @apply w-full flex flex-col h-full
 }
 
-.gh-postfeed {
+.gh-post-feed {
     @apply
-    grid  gap-4 md:gap-6
+    grid gap-4 md:gap-6
     grid-cols-1 md:grid-cols-2 lg:grid-cols-3
+}
+
+.gh-post-loader {
+    @apply
+    w-full h-full
+    flex justify-center items-center
+}
+
+.gh-post-loader > div {
+    @apply
+    m-auto w-80 aspect-square hidden
+}
+
+.gh-post-feed-footer {
+    @apply
+    flex flex-col gap-x-1 pt-11 md:pt-20 pb-11 md:pb-24 items-center
+}
+
+.gh-post-feed-footer > img {
+    @apply
+    w-32 pb-3 rounded-full
+}
+
+.gh-post-feed-footer > h4 {
+    @apply
+    text-body1 font-bold text-blackSet dark:text-blackSet-dark
+}
+
+.gh-post-feed-footer > p {
+    @apply
+    text-body2 font-normal text-greyLightSet dark:text-greyLightSet-dark
 }
 
 hr {
@@ -90,4 +121,5 @@ hr {
     @apply
     opacity-0
 }
+
 

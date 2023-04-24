@@ -20,16 +20,15 @@
 
 .gh-tag-nav-indicator {
     @apply
-    w-11/12 h-1
-    rounded-t-full
-    bg-transparent
-    transition motion-reduce:transition-none motion-reduce:hover:transform-none
-    group-hover:w-full group-hover:bg-orangeSet dark:group-hover:bg-orangeSet-dark group-hover:-translate-y-1
-    group-active:w-full group-active:bg-orangeSet dark:group-active:bg-orangeSet-dark group-active:-translate-y-1
-    group-focus:w-full group-focus:bg-orangeSet dark:group-focus:bg-orangeSet-dark group-focus:-translate-y-1
+    w-6/12 h-1 opacity-0
+    rounded-t-full bg-orangeSet dark:bg-orangeSet-dark
+    transition-all ease-in-out duration-300 motion-reduce:transition-none motion-reduce:hover:transform-none
+    group-hover:w-full group-hover:opacity-100
+    group-active:w-full group-active:opacity-100
+    group-focus:w-full group-focus:opacity-100
 }
 
 .gh-tag-nav-indicator#active {
     @apply
-    w-full bg-orangeSet dark:bg-orangeSet-dark -translate-y-1
+    w-full opacity-100
 }

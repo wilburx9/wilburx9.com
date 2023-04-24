@@ -1,0 +1,18 @@
+<div class="gh-page">
+    {{> "full-header"}}
+    <div class="gh_post_container">
+        <div class="gh-post-feed">
+            {{#foreach posts}}
+                {{> "post-card"}}
+            {{/foreach}}
+        </div>
+        <div class="gh-post-feed-footer">
+            <img src="{{asset "images/resting_alien.png"}}" alt="An alien working on a computer"/>
+            <h4>Exciting updates in the works!</h4>
+            <p>Check back soon for the latest updates.</p>
+        </div>
+    </div>
+    <div class="gh-post-loader">
+        <div id="loader"></div>
+    </div>
+</div>

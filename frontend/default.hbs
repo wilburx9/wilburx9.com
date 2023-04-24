@@ -12,6 +12,7 @@
     <title>{{meta_title}}</title>
     <script src="{{asset "built/default.js"}}"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.11.0/lottie.min.js" integrity="sha512-XCthc/WzPfa+oa49Z3TI6MUK/zlqd67KwyRL9/R19z6uMqBNuv8iEnJ8FWHUFAjC6srr8w3FMZA91Tfn60T/9Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     {{ghost_head}}
     {{!-- Outputs important meta data and settings, should always be in <head> --}}
@@ -43,6 +44,7 @@
     <script src="{{asset "built/infinitescroll.js"}}"></script>
 {{/if}}
 
+<!--TODO: Do I need this?-->
 {{#is "post, page"}}
     <script src="{{asset "built/jquery.fitvids.js"}}"></script>
     <script>
