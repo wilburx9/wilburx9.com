@@ -1,5 +1,6 @@
 $(function () {
     let request = null
+
     function onRequestComplete(feed, footer, loader, anim) {
         feed.stop().fadeIn(300)
         footer.stop().fadeIn(300)
@@ -18,8 +19,15 @@ $(function () {
 
         if (request) request.abort()
 
-        // Handle active state for selected and unselected tags
-        $(this).children('.gh-tag-nav-indicator').attr('id', 'active')
+        let indicator = $(this).children('.gh-tag-nav-indicator')
+
+        // Check if the tag is already selected
+        if (indicator.attr('id')) {
+            indicator.removeAttr('id')
+            slug = "" // Empty the slug so the home page will be loaded
+        } else {
+            indicator.attr('id', 'active')
+        }
         $('.header-tag').not(this).children('.gh-tag-nav-indicator').removeAttr('id')
 
         let postFeed = $('.gh-post-feed')

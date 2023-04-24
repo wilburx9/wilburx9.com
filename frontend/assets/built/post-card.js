@@ -1,2 +1,0 @@
-function parseBookmark(e,r,n){var t=document.createElement("div"),e=(t.innerHTML=e,t.querySelector(":scope > figure.kg-bookmark-card"));null!=e&&1===t.children.length&&(t=e.querySelector("a.kg-bookmark-container").href,e=e.querySelector("div.kg-bookmark-thumbnail").getElementsByTagName("img")[0].src,null!=(n=document.getElementById(n))&&(n.src=e),document.getElementById(r).href=t)}
-//# sourceMappingURL=post-card.js.map

@@ -1,16 +1,18 @@
-<div class="flex flex-row gap-x-1 items-center justify-center w-full lg:w-min">
-    <a href="#" class="group gh-tag-nav-container header-tag" data-slug="photography">
-                <span class="gh-tag-nav">
-                   {{> "icons/photography"}}
-                    Photography
-                </span>
-        <span class="gh-tag-nav-indicator" id="{{#is "tag"}}{{#tag}}{{#match slug 'photography'}}active{{/match}}{{/tag}}{{/is}}"></span>
-    </a>
-    <a href="#" class="group gh-tag-nav-container header-tag" data-slug="programming">
-                <span class="gh-tag-nav">
-                    {{> "icons/programming"}}
-                    Programming
-                </span>
-        <span class="gh-tag-nav-indicator" id="{{#is "tag"}}{{#tag}}{{#match slug 'programming'}}active{{/match}}{{/tag}}{{/is}}"></span>
-    </a>
+<div class="gh-tag-nav-container">
+    <div class="group header-tag" data-slug="photography">
+        <span class="gh-tag-nav">
+            {{> "icons/photography"}}
+            Photography
+        </span>
+        <span class="gh-tag-nav-indicator"
+              id="{{#is "tag"}}{{#tag}}{{#match slug 'photography'}}active{{/match}}{{/tag}}{{/is}}"></span>
+    </div>
+    <div class="group header-tag" data-slug="programming">
+        <span class="gh-tag-nav">
+            {{> "icons/programming"}}
+            Programming
+        </span>
+        <span class="gh-tag-nav-indicator"
+              id="{{#is "tag"}}{{#tag}}{{#match slug 'programming'}}active{{/match}}{{/tag}}{{/is}}"></span>
+    </div>
 </div>
