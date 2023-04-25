@@ -76,22 +76,41 @@ html,
     m-auto w-80 aspect-square hidden
 }
 
-.gh-post-feed-footer {
+.gh-more-post-loader {
     @apply
-    flex flex-col gap-x-1 pt-11 md:pt-20 pb-11 md:pb-24 items-center
+    w-full row-start-1 row-end-2 col-start-1 col-end-2
+    flex justify-center items-center
 }
 
-.gh-post-feed-footer > img {
+.gh-more-post-loader > div {
+    @apply
+    m-auto w-80 px-4 hidden
+}
+
+.gh-post-feed-footer {
+    @apply
+    w-full grid
+}
+
+.gh-post-feed-footer-info {
+    @apply
+    flex flex-col gap-x-1
+    pt-11 md:pt-20 pb-11 md:pb-24 opacity-100
+    items-center row-start-1 row-end-2 col-start-1 col-end-2
+    transition-opacity ease-in-out duration-300 motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.gh-post-feed-footer-info > img {
     @apply
     w-32 pb-3 rounded-full
 }
 
-.gh-post-feed-footer > h4 {
+.gh-post-feed-footer-info > h4 {
     @apply
     text-body1 font-bold text-blackSet dark:text-blackSet-dark
 }
 
-.gh-post-feed-footer > p {
+.gh-post-feed-footer-info > p {
     @apply
     text-body2 font-normal text-greyLightSet dark:text-greyLightSet-dark
 }

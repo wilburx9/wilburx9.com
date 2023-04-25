@@ -1,10 +1,11 @@
 $(function () {
     let request = null
+    let currentSlug = ""
 
     function onRequestComplete(feed, footer, loader, anim) {
-        feed.stop().fadeIn(300)
-        footer.stop().fadeIn(300)
-        loader.stop().fadeOut(300, function () {
+        feed.stop().fadeIn(300, 'linear')
+        footer.stop().fadeIn(300, 'linear')
+        loader.stop().fadeOut(300, 'linear', function () {
             loader.children().empty()
         })
         anim.stop();
@@ -16,6 +17,7 @@ $(function () {
         event.preventDefault() // prevent the link from navigating to a new page
 
         let slug = $(this).data('slug')
+        currentSlug = slug
 
         if (request) request.abort()
 
@@ -30,16 +32,16 @@ $(function () {
         }
         $('.header-tag').not(this).children('.gh-tag-nav-indicator').removeAttr('id')
 
-        let postFeed = $('.gh-post-feed')
-        let postFeedFooter = $('.gh-post-feed-footer')
-        let postLoader = $('.gh-post-loader #loader')
+        let $postFeed = $('.gh-post-feed')
+        let $postFeedFooter = $('.gh-post-feed-footer')
+        let $postLoader = $('.gh-post-loader #loader')
 
-        postFeed.fadeOut(300)
-        postFeedFooter.fadeOut(300)
-        postLoader.fadeIn(300)
+        $postFeed.stop().fadeOut(300, 'linear')
+        $postFeedFooter.stop().fadeOut(300, 'linear')
+        $postLoader.stop().fadeIn(300, 'linear')
 
         let animation = bodymovin.loadAnimation({
-            container: postLoader[0],
+            container: $postLoader[0],
             renderer: 'svg',
             loop: true,
             autoplay: true,
@@ -51,12 +53,22 @@ $(function () {
             type: 'GET',
             dataType: 'html',
             success: function (data) {
-                $('.gh-post-feed').html($(data).find('.gh-post-feed').html())
-                onRequestComplete(postFeed, postFeedFooter, postLoader, animation)
+                if (currentSlug !==  slug) {
+                    console.log(`Not updating after success. ${currentSlug} :: ${slug}`)
+                    return
+                }
+                let html = $(data);
+                $('.gh-post-feed').html(html.find('.gh-post-feed').html())
+                onRequestComplete($postFeed, $postFeedFooter, $postLoader, animation)
+                setupInfiniteScroll(html.find('.total-page-count').text(), `${slug}/`)
 
             },
             error: function () {
-                onRequestComplete(postFeed, postFeedFooter, postLoader, animation)
+                if (currentSlug !==  slug) {
+                    console.log(`Not updating after error. ${currentSlug} :: ${slug}`)
+                    return
+                }
+                onRequestComplete($postFeed, $postFeedFooter, $postLoader, animation)
             }
         })
 

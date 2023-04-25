@@ -36,13 +36,6 @@
 {{!-- <foot> --}}
 
 <script src="{{asset "built/prism.js"}}"></script>
-
-{{#if pagination.pages}}
-    <script>
-        var maxPages = parseInt('{{pagination.pages}}');
-    </script>
-    <script src="{{asset "built/infinitescroll.js"}}"></script>
-{{/if}}
 {{ghost_foot}}
 {{!-- Outputs important scripts - should always be included before closing body tag --}}
 

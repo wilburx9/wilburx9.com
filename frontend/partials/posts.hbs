@@ -1,3 +1,5 @@
+<!-- Used by the index and tag page to render a grid of posts -->
+
 <div class="gh-page">
     {{> "full-header"}}
     <div class="gh_post_container">
@@ -7,12 +9,22 @@
             {{/foreach}}
         </div>
         <div class="gh-post-feed-footer">
-            <img src="{{asset "images/resting_alien.png"}}" alt="An alien working on a computer"/>
-            <h4>Exciting updates in the works!</h4>
-            <p>Check back soon for the latest updates.</p>
+            <div class="gh-post-feed-footer-info">
+                <img src="{{asset "images/resting_alien.png"}}" alt="An alien working on a computer"/>
+                <h4>Exciting updates in the works!</h4>
+                <p>Check back soon for the latest updates.</p>
+            </div>
+            <div class="gh-more-post-loader">
+                <div id="more-loader"></div>
+            </div>
         </div>
     </div>
     <div class="gh-post-loader">
         <div id="loader"></div>
     </div>
 </div>
+{{#if pagination.pages}}
+    <span class="total-page-count hidden">{{pagination.pages}}</span>
+    <script src="{{asset "built/load-more.js"}}"></script>
+    <script>setupInfiniteScroll({{pagination.pages}}, "")</script>
+{{/if}}
