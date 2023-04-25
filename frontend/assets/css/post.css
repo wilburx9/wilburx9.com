@@ -43,7 +43,7 @@
 .gh-post-meta {
     @apply w-full
     text-greyLightSet dark:text-greyLightSet-dark
-    text-body3 font-normal line-clamp-1
+    text-body3 font-normal line-clamp-1 mt-2
 }
 
 .gh-article .gh-post-meta {
@@ -252,6 +252,13 @@ figcaption {
     hidden sm:block
 }
 
+
+.gh-card-tags {
+    @apply
+    flex flex-row gap-2.5 flex-wrap
+    items-center justify-start content-start
+}
+
 .gh-post-primary-tag {
     @apply
     bg-boxSet dark:bg-boxSet-dark  rounded-lg
@@ -260,4 +267,9 @@ figcaption {
     text-greySet dark:text-greySet-dark
     stroke-greySet dark:stroke-greySet-dark
     text-body2 font-normal
+}
+
+.external-reading-time {
+    @apply
+    hidden
 }

@@ -134,5 +134,5 @@
 }
 
 .gh-card-content {
-    @apply flex flex-col gap-y-4 p-4 items-start
+    @apply flex flex-col gap-y-2 p-4 items-start
 }

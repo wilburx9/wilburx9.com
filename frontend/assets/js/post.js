@@ -2,13 +2,13 @@
 
 // Redirect if the post is just a reference to an external blog post
 !function () {
-    let container = document.querySelector('.gh-post-content');
-    let bookmark = container.querySelector(':scope > figure.kg-bookmark-card')
+    let container = $('.gh-post-content');
+    let bookmark = container.find(':first');
     // A post which is just a reference to an external article
-    // will contain nothing but the bookmark card.
-    if (bookmark != null && container.children.length === 1) {
-        let url = bookmark.querySelector('a.kg-bookmark-container').href
-        if (url != null) window.location.replace(url);
+    // will contain nothing but the bookmark card and the reading time.
+    if (bookmark.length > 0 && container.children.length === 2) {
+        let url = bookmark.find('a.kg-bookmark-container').attr('href');
+        if (url) window.location.replace(url);
     }
 }()
 

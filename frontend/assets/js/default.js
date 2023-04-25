@@ -1,6 +1,5 @@
 // Script for processing html in default.hbs
 
-
 !function () {
     handleDarkMode()
     setHrefs()
@@ -50,16 +49,25 @@ function setHrefs() {
 // Get the details from a bookmark card and set the url
 // and image to the post card url and featured image
 function parseBookmark(content, linkId, imageId) {
-    let c = document.createElement('div')
-    c.innerHTML = content
-    let bookmark = c.querySelector(':scope > figure.kg-bookmark-card')
+    let c = $('<div></div>').html(content)
+    let bookmark = $(c).find('figure.kg-bookmark-card')
+
     // A post which is just a reference to an external article
-    // will contain nothing but the bookmark card.
-    if (bookmark != null && c.children.length === 1) {
-        let url = bookmark.querySelector('a.kg-bookmark-container').href
-        let image = bookmark.querySelector('div.kg-bookmark-thumbnail').getElementsByTagName('img')[0].src
-        let imageElement = document.getElementById(imageId);
-        if (imageElement != null) imageElement.src = image
-        document.getElementById(linkId).href = url
-    }
+    // will contain nothing but the bookmark card and the reading time.
+    if (!bookmark || c.children().length !== 2) return
+
+    let url = bookmark.find('a.kg-bookmark-container').attr('href');
+    let image = bookmark.find('div.kg-bookmark-thumbnail img:first').attr('src');
+    let readingTime = $(c).find('.external-reading-time').text();
+
+
+    let anchor = $('#' + linkId);
+    let img = anchor.find('#' + imageId);
+    if (img.length) img.attr('src', image);
+
+    anchor.find('#external-tag').css('display', 'flex');
+    anchor.find('#reading-time').text(readingTime);
+    anchor.attr('href', url);
+    anchor.attr('target', '_blank');
+
 }

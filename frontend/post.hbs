@@ -15,14 +15,15 @@
                 <header>
                     {{#primary_tag}}
                         <span class="gh-post-primary-tag">
-                    {{#match slug 'programming'}} {{> "icons/programming"}} {{else}} {{> "icons/photography"}}
-                    {{/match}}
+                            {{#match slug 'programming'}} {{> "icons/programming"}} {{else}} {{> "icons/photography"}}
+                            {{/match}}
                             <span>{{name}}</span>
-                </span>
+                        </span>
                     {{/primary_tag}}
                     <h1 class="gh-title">{{title}}</h1>
                     <span class="gh-post-meta mt-4 mb-6"><time datetime="{{date format="YYYY-MM-DD"}}">{{date
-                        format="D MMM YYYY"}}</time> &minus; {{reading_time}}</span>
+                        format="D MMM YYYY"}}</time> &minus; {{reading_time}}
+                    </span>
 
                     {{#if feature_image}}
                         <figure class="gh-feature-image">
