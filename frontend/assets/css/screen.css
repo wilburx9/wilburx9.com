@@ -39,7 +39,7 @@ html,
     @apply
     h-full w-screen
     flex flex-col overflow-y-auto
-    px-4 sm:px-16 md:px-20 xl:px-4 2xl:px-0
+    px-4 sm:px-16 md:px-20 xl:px-8 2xl:px-0
     bg-bgSet dark:bg-bgSet-dark
 }
 
