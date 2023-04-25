@@ -131,7 +131,7 @@ figcaption {
     z-30 w-9 h-9 sm:w-11 sm:h-11 md:w-14 md:h-14 stroke-blackSet dark:stroke-blackSet-dark
     bg-bgSet/50 dark:bg-bgSet-dark/50 rounded-full
     hidden group-focus:flex group-hover:flex justify-center items-center
-    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+    transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
     hover:bg-bgSet hover:dark:bg-bgSet-dark hover:scale-105
     active:bg-bgSet active:dark:bg-bgSet-dark active:scale-105
     focus:bg-bgSet focus:dark:bg-bgSet-dark focus:scale-105
@@ -228,7 +228,7 @@ figcaption {
     row-start-1 row-end-2 col-start-1 col-end-2
     flex flex-row gap-2.5 cursor-pointer justify-self-end
     duration-500 py-2.5 justify-center relative rounded-md
-    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+    transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .code-copy > div > span#copy {

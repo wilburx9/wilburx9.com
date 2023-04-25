@@ -14,7 +14,6 @@ class LoadMore {
     disposed = false
 
     constructor(maxPages, pageTag) {
-        console.log(`${pageTag} :: Instantiated with ${maxPages} pages`)
         this.maxPages = maxPages
         this.pageTag = pageTag || ""
         this.baseUrl = `${document.location.origin}/blog/${pageTag}`
@@ -34,34 +33,24 @@ class LoadMore {
     }
 
     setEventListeners() {
-        console.log(`${this.pageTag} :: setEventListeners`)
         this.$scrollingContent.on('scroll', this.handleScroll)
         $(window).on('resize', this.handleResize)
     }
 
     removeEventListeners() {
-        console.log(`${this.pageTag} :: removeEventListeners`)
         this.$scrollingContent.off('scroll', this.handleScroll)
         $(window).off('resize', this.handleResize)
     }
 
     loadMorePosts() {
-        if (this.rafId) {
-            cancelAnimationFrame(this.rafId)
-        }
+        if (this.rafId) cancelAnimationFrame(this.rafId) // Using this to debounce the scroll event
 
-        if (this.loading) {
-            console.log(`${this.pageTag} :: loadMorePosts :: loading Returning`)
-            return
-        }
+        // Don't fetch more posts if a request is in progress or if all posts has been loaded
+        if (this.loading || this.currentPage >= this.maxPages) return
 
         this.rafId = window.requestAnimationFrame(() => {
             const bottom = this.$scrollingContent[0].scrollHeight - this.$scrollingContent.innerHeight() - this.offset
-            if (this.$scrollingContent.scrollTop() >= bottom) {
-                this.fetchPosts()
-            } else {
-                console.log(`${this.pageTag} :: loadMorePosts :: Not at the bottom`)
-            }
+            if (this.$scrollingContent.scrollTop() >= bottom) this.fetchPosts()
         })
 
     }
@@ -70,38 +59,26 @@ class LoadMore {
         this.loading = true
         this.showLoader()
         let nextPage = `page/${++this.currentPage}/`
-        console.log(`${this.pageTag} :: fetchPosts :: ${nextPage}`)
-        setTimeout(() => {
-            $.ajax({
-                url: this.baseUrl + nextPage,
-                type: 'GET',
-                success: data => {
-                    console.log(`${this.pageTag} :: fetchPosts :: success`)
-                    if (this.disposed) {
-                        console.log(`${this.pageTag} :: fetchPosts :: not updating after success`)
-                        return
-                    }
-                    const newPosts = $(data).find('.gh-card, .post');
-                    newPosts.hide()
-                    $('.gh-post-feed').append(newPosts)
-                    this.hideLoader(newPosts)
-                },
-                error: (jqXHR) => {
-                    if (this.disposed) {
-                        console.log(`${this.pageTag} :: fetchPosts :: not updating after error`)
-                        return
-                    }
-                    console.log(`${this.pageTag} :: fetchPosts :: error`)
-                    if (jqXHR.status === 404) this.removeEventListeners()
-                    this.hideLoader()
-                },
-                complete: () => {
-                    console.log(`${this.pageTag} :: fetchPosts :: complete`)
-                    if (this.currentPage >= this.maxPages) this.removeEventListeners()
-                    this.loading = false
-                }
-            })
-        }, 10000);
+        $.ajax({
+            url: this.baseUrl + nextPage,
+            type: 'GET',
+            success: data => {
+                if (this.disposed) return
+                const newPosts = $(data).find('.gh-card, .post');
+                newPosts.hide()
+                $('.gh-post-feed').append(newPosts)
+                this.hideLoader(newPosts)
+            },
+            error: (jqXHR) => {
+                if (this.disposed) return
+                if (jqXHR.status === 404) this.removeEventListeners()
+                this.hideLoader()
+            },
+            complete: () => {
+                if (this.currentPage >= this.maxPages) this.removeEventListeners()
+                this.loading = false
+            }
+        })
     }
 
     showLoader() {
@@ -119,10 +96,9 @@ class LoadMore {
 
     hideLoader(newPosts) {
         let $loader = $('.gh-more-post-loader #more-loader')
+
         $loader.stop().fadeOut(300, 'linear', () => {
-            if (newPosts) {
-                newPosts.fadeIn(300, 'linear')
-            }
+            if (newPosts) newPosts.fadeIn(300, 'linear')
             $('.gh-post-feed-footer-info').removeClass('hide')
             $loader.children().empty()
             if (this.animation) {

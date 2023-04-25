@@ -29,7 +29,7 @@
 .home-content > #right-content #pattern > img {
     @apply
     row-start-1 row-end-2 col-start-1 col-end-2 duration-500
-    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+    transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .home-content > #right-content #avatar {
@@ -58,7 +58,7 @@
     absolute top-0 bottom-0 left-0 right-0 rounded-full
     w-full aspect-square bg-no-repeat bg-center bg-contain
     shadow-[inset_0px_8px_7px_rgba(0,0,0,0.33)] duration-500
-    transition motion-reduce:transition-none motion-reduce:hover:transform-none
+    transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .home-content h1 {

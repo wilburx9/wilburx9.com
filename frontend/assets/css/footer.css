@@ -19,5 +19,5 @@
     @apply
     w-6 h-auto
     fill-blackSet dark:fill-blackSet-dark
-    transition hover:scale-125 motion-reduce:transition-none motion-reduce:hover:transform-none
+    transition ease-in-out hover:scale-125 motion-reduce:transition-none motion-reduce:hover:transform-none
 }

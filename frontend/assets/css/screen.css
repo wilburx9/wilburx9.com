@@ -32,7 +32,7 @@ html,
 .gh-body {
     @apply
     h-full w-screen min-h-screen
-    transition-colors motion-reduce:transition-none
+    transition-colors ease-in-out motion-reduce:transition-none
 }
 
 .gh-content {

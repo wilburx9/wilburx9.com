@@ -53,10 +53,7 @@ $(function () {
             type: 'GET',
             dataType: 'html',
             success: function (data) {
-                if (currentSlug !==  slug) {
-                    console.log(`Not updating after success. ${currentSlug} :: ${slug}`)
-                    return
-                }
+                if (currentSlug !==  slug) return
                 let html = $(data);
                 $('.gh-post-feed').html(html.find('.gh-post-feed').html())
                 onRequestComplete($postFeed, $postFeedFooter, $postLoader, animation)
@@ -64,10 +61,7 @@ $(function () {
 
             },
             error: function () {
-                if (currentSlug !==  slug) {
-                    console.log(`Not updating after error. ${currentSlug} :: ${slug}`)
-                    return
-                }
+                if (currentSlug !==  slug) return
                 onRequestComplete($postFeed, $postFeedFooter, $postLoader, animation)
             }
         })
