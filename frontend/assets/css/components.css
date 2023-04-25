@@ -136,3 +136,64 @@
 .gh-card-content {
     @apply flex flex-col gap-y-2 p-4 items-start
 }
+
+
+/* Bookmark card */
+figure.kg-bookmark-card {
+    @apply
+    w-full p-0 m-0 relative
+    bg-cardSet dark:bg-cardSet-dark rounded-lg
+}
+
+figure.kg-bookmark-card a.kg-bookmark-container {
+    @apply
+    w-full flex flex-row-reverse gap-4 p-4 border-none rounded-none items-stretch
+    bg-transparent hover:border-none active:border-none focus:border-none
+}
+
+figure.kg-bookmark-card .kg-bookmark-thumbnail {
+    @apply
+    flex grow min-w-[33%] relative
+}
+
+figure.kg-bookmark-card .kg-bookmark-thumbnail > img {
+    @apply
+    w-full h-full object-cover absolute rounded
+}
+
+figure.kg-bookmark-card .kg-bookmark-content {
+    @apply
+    flex flex-col gap-1 p-0 m-0 overflow-hidden
+    items-start justify-between grow basis-full
+}
+
+figure.kg-bookmark-card .kg-bookmark-title {
+    @apply
+    text-body1 font-bold text-blackSet dark:text-blackSet-dark
+}
+
+figure.kg-bookmark-card .kg-bookmark-description {
+    @apply
+    text-body2 font-normal text-greySet dark:text-greySet-dark
+    line-clamp-2 opacity-100 m-0 max-h-none
+}
+
+figure.kg-bookmark-card .kg-bookmark-metadata {
+    @apply
+    flex flex-row gap-0 m-0 mt-2 p-0
+}
+
+figure.kg-bookmark-card .kg-bookmark-icon {
+    @apply
+    hidden
+}
+
+figure.kg-bookmark-card .kg-bookmark-author {
+    @apply
+    text-text3 underline font-normal text-greySet dark:text-greySet-dark
+}
+
+figure.kg-bookmark-card .kg-bookmark-publisher {
+    @apply
+    hidden
+}
