@@ -12,6 +12,7 @@
 
 .home-content > #right-content {
     @apply
+    flex justify-center items-center
     grow-[3.5] basis-0
 }
 
