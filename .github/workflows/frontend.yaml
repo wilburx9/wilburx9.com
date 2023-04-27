@@ -1,0 +1,45 @@
+name: Deploy the Ghost theme
+
+on:
+  push:
+    tags:
+      - 'release-*'
+    paths:
+      - 'frontend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        uses: yarn install
+
+      - name: Set theme name
+        run: |
+          version=$(echo "${{ github.ref }}" | sed -n 's/.*\/release-\(v[0-9]*\.[0-9]*\.[0-9]*\)$/\1/p')
+          echo "::set-env name=THEME_NAME::Wilburx9-$version"
+
+      - name: Deploy Ghost Theme
+        uses: TryGhost/action-deploy-theme@v1
+        with:
+          api-url: ${{ secrets.GHOST_ADMIN_API_URL }}
+          api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
+          working-directory: frontend
+          exclude: "!**/*.map routes.yaml "
+          theme-name: ${{ env.THEME_NAME }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Clear Lightsail Distribution Cache
+        run: |
+          aws lightsail reset-distribution-cache --distribution-name ${{ secrets.LIGHTSAIL_DISTRIBUTION }}
+
