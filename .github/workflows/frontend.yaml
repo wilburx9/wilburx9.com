@@ -20,11 +20,6 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Set theme name
-        run: |
-          version=$(echo "${{ github.ref }}" | sed -n 's/.*\/release-\(v[0-9]*\.[0-9]*\.[0-9]*\)$/\1/p')
-          echo "::set-env name=THEME_NAME::Wilburx9-$version"
-
       - name: Deploy Ghost Theme
         uses: TryGhost/action-deploy-theme@v1
         with:
@@ -32,7 +27,7 @@ jobs:
           api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
           working-directory: frontend
           exclude: "!**/*.map routes.yaml "
-          theme-name: ${{ env.THEME_NAME }}
+          theme-name: Wilburx9-$(echo "${{ github.ref }}" | sed -n 's/.*\/release-\(v[0-9]*\.[0-9]*\.[0-9]*\)$/\1/p')
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
