@@ -141,30 +141,41 @@
 /* Bookmark card */
 figure.kg-bookmark-card {
     @apply
-    w-full p-0 m-0 relative
+    w-full p-0 my-3 mx-0 relative
     bg-cardSet dark:bg-cardSet-dark rounded-lg
+    group-hover:bg-transparent dark:group-hover:bg-transparent
 }
 
 figure.kg-bookmark-card a.kg-bookmark-container {
     @apply
-    w-full flex flex-row-reverse gap-4 p-4 border-none rounded-none items-stretch
+    w-full flex flex-row-reverse gap-4 p-4 border-none rounded-none items-start
     bg-transparent hover:border-none active:border-none focus:border-none
 }
 
 figure.kg-bookmark-card .kg-bookmark-thumbnail {
     @apply
-    flex grow min-w-[33%] relative
+    flex grow min-w-[22%] sm:min-w-[15%]  md:min-w-[10%] relative
+    aspect-square grid
 }
 
 figure.kg-bookmark-card .kg-bookmark-thumbnail > img {
     @apply
     w-full h-full object-cover absolute rounded
+    row-start-1 row-end-2 col-start-1 col-end-2
+}
+
+figure.kg-bookmark-card .kg-bookmark-thumbnail > div {
+    @apply
+    w-full h-full absolute rounded row-start-1 row-end-2 col-start-1 col-end-2
+    opacity-0 bg-black/60 backdrop-blur-sm flex flex-row gap-x-1
+    justify-center items-center text-body1 font-bold text-white group-hover:opacity-100
+    transition-opacity ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 figure.kg-bookmark-card .kg-bookmark-content {
     @apply
     flex flex-col gap-1 p-0 m-0 overflow-hidden
-    items-start justify-between grow basis-full
+    items-start justify-start grow basis-full
 }
 
 figure.kg-bookmark-card .kg-bookmark-title {
