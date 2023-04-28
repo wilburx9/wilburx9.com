@@ -1,6 +1,6 @@
 .home-content {
     @apply
-    grow flex flex-col-reverse xl:flex-row gap-x-6
+    grow flex flex-col-reverse xl:flex-row gap-x-10
     justify-center gap-y-4 pt-3
 }
 

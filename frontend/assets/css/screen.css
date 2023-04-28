@@ -31,7 +31,7 @@ body {
 html,
 .gh-body {
     @apply
-    h-full w-screen min-h-screen
+    h-full w-screen min-h-screen min-h-[100dvh]
     transition-colors ease-in-out motion-reduce:transition-none
 }
 
