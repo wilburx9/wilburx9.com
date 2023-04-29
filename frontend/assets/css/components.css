@@ -208,3 +208,37 @@ figure.kg-bookmark-card .kg-bookmark-publisher {
     @apply
     hidden
 }
+
+/* Blockquotes */
+blockquote:not(.kg-blockquote-alt) {
+    border-image: linear-gradient(to bottom, #F69301, #C41CFF) 1 100%;
+    @apply
+    font-semibold italic
+    p-4 my-3 border-l-4 border-transparent
+}
+
+blockquote.kg-blockquote-alt {
+    font-size: inherit;
+    @apply
+    font-semibold text-[inherit] italic leading-[inherit] text-center
+    p-4 my-3 relative
+}
+
+blockquote.kg-blockquote-alt::before,
+blockquote.kg-blockquote-alt::after {
+    content: "";
+    border-image: linear-gradient(to right, #F69301, #C41CFF) 1;
+    @apply
+    absolute left-1/5 w-5/12 h-1
+}
+
+blockquote.kg-blockquote-alt::before {
+    @apply
+    top-0 border-t-0 border-b-4
+}
+
+blockquote.kg-blockquote-alt::after {
+    @apply
+    bottom-0 border-b-0 border-t-4
+}
+
