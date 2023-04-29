@@ -13,11 +13,44 @@
         return
     }
 
-    $('figure.kg-bookmark-card').each(function() {
+    $('figure.kg-bookmark-card').each(function () {
         $(this).find('.kg-bookmark-thumbnail').append('<div><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path stroke-width="2" class="stroke-orangeSet dark:stroke-orangeSet-dark" stroke-linecap="round" stroke-linejoin="round" d="M15.5 5.5v-5m0 0h-5m5 0L8.833 7.167m-2.5-5H4.5c-1.4 0-2.1 0-2.635.272A2.5 2.5 0 0 0 .772 3.532C.5 4.066.5 4.767.5 6.167V11.5c0 1.4 0 2.1.272 2.635a2.5 2.5 0 0 0 1.093 1.092C2.4 15.5 3.1 15.5 4.5 15.5h5.333c1.4 0 2.1 0 2.635-.273a2.5 2.5 0 0 0 1.093-1.092c.272-.535.272-1.235.272-2.635V9.667"/></svg><span>Open</span></div>');
         $(this).wrap('<div class="group"></div>');
     });
 }()
+
+function handlePrimaryTag(tag) {
+    processImages(tag)
+    setupSubscription(tag)
+}
+
+
+function setupSubscription(primaryTag) {
+
+    function closeModal() {
+        $(".subscription-content").css({
+            "transform": "translateY(50%) translateX(-50%)",
+            "opacity": 0.0
+        });
+        $('.subscription-modal').fadeOut()
+    }
+
+    $('#post-subscribe').click(function () {
+        $('.subscription-modal').fadeIn()
+        $(".subscription-content").css({
+            "transform": "translateY(0%) translateX(-50%)",
+            "opacity": 1
+        });
+    })
+
+    $(document).keyup(function(event) {
+        if (event.key === "Escape") closeModal()
+    });
+
+    $(".subscription-modal").click(function(event) {
+        if (event.target === this) closeModal()
+    })
+}
 
 // Resize and add blur effect to images.
 function processImages(primaryTag) {

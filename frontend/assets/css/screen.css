@@ -12,6 +12,7 @@ production stylesheet in assets/built/screen.css using: gulp dev
 @import "header.css";
 @import "home.css";
 @import "post.css";
+@import "subscription-modal.css";
 @import "ghost/content.css";
 
 /* Tailwind */

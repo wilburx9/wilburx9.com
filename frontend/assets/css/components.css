@@ -229,7 +229,7 @@ blockquote.kg-blockquote-alt::after {
     content: "";
     border-image: linear-gradient(to right, #F69301, #C41CFF) 1;
     @apply
-    absolute left-1/5 w-5/12 h-1
+    absolute left-1/4 w-2/4 h-1
 }
 
 blockquote.kg-blockquote-alt::before {
