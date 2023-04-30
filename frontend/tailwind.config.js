@@ -41,6 +41,10 @@ module.exports = {
                 'greenSet': {
                     DEFAULT: '#0F8437',
                     dark: '#15C35B',
+                },
+                'redSet': {
+                    DEFAULT: '#AA3B3B',
+                    dark: '#DC4A4A',
                 }
             },
         },

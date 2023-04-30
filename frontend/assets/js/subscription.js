@@ -1,4 +1,46 @@
 $(function () {
+    handleOnFocus()
+    handleFormSubmission()
+})
+
+function handleFormSubmission() {
+    $('.subscription-content form').on('submit', function (event) {
+        event.preventDefault();
+        if (!validateForm()) return
+
+    });
+}
+
+function validateForm() {
+    let $emailField = $('.subscription-modal input[type="email"]')
+    let email = $emailField.val()
+
+    if (email === '' || !/\S+@\S+/.test(email)) {
+        handleFormError($emailField)
+    } else {
+        $emailField.removeClass('error');
+        $emailField.closest('.subscription-modal').find('.subscription-error').stop().fadeOut(300, 'linear')
+        $emailField.removeData('input-listener');
+        $emailField.off('input');
+    }
+}
+
+function handleFormError($emailField) {
+    $emailField.addClass('error');
+
+    let $errorField = $emailField.closest('.subscription-modal').find('.subscription-error');
+    $errorField.text("Please enter a valid email address")
+    $errorField.stop().fadeIn(300, 'linear')
+
+    if ($emailField.data('input-listener')) return
+
+    $emailField.data('input-listener', true);
+    $emailField.on('input', function () {
+        validateForm()
+    });
+}
+
+function handleOnFocus() {
     $('.subscription-modal input[type="email"]').on('blur', function () {
         let label = $(this).next('label');
         if ($(this).val().trim() === '') {
@@ -7,7 +49,7 @@ $(function () {
             label.addClass('active');
         }
     });
-})
+}
 
 function setupSubscription(primaryTag) {
 
@@ -27,11 +69,11 @@ function setupSubscription(primaryTag) {
         });
     })
 
-    $(document).keyup(function(event) {
+    $(document).keyup(function (event) {
         if (event.key === "Escape") closeModal()
     });
 
-    $(".subscription-modal").click(function(event) {
+    $(".subscription-modal").click(function (event) {
         if (event.target === this) closeModal()
     })
 
@@ -46,8 +88,4 @@ function setupSubscription(primaryTag) {
         "transform": "translateY(0%) translateX(-50%)",
         "opacity": 1
     });
-}
-
-function validateForm() {
-    
 }

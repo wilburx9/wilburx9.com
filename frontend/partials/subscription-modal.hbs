@@ -1,6 +1,6 @@
 <div class="subscription-modal">
     <div class="subscription-content">
-        <form name="subscription-form">
+        <form name="subscription-form" novalidate>
             <img class="subscription-icon" src="{{asset "images/mailbox.png"}}" alt="Mailbox">
             <div class="subscription-title">Stay Tuned!</div>
             <div class="subscription-desc">Just pick your favourite topics and share your email to subscribe.</div>
@@ -16,9 +16,10 @@
             </div>
             <div class="subscription-subheader">Enter your Email</div>
             <div class="subscription-email">
-                <input type="email" id="email" name="email" required pattern="S+@\S+">
+                <input type="email" id="email" name="email">
                 <label for="email">Enter your email here</label>
             </div>
+            <p class="subscription-error"></p>
             <button type="submit" class="primary-button">Continue</button>
         </form>
     </div>

@@ -18,7 +18,7 @@
 .subscription-modal > div.subscription-content > form {
     @apply
     w-[47%] text-white mx-auto
-    flex flex-col items-center gap-y-2
+    flex flex-col items-center
     text-blackSet dark:text-blackSet-dark
     overflow-x-hidden
 }
@@ -30,23 +30,24 @@
 
 .subscription-modal .subscription-title {
     @apply
-    text-headline2 font-bold w-full mt-2
+    text-headline2 font-bold w-full mt-4
 }
 
 .subscription-modal .subscription-desc {
     @apply
-    text-body2 font-normal text-greySet dark:text-greySet-dark w-full
+    text-body2 font-normal mt-2
+    text-greySet dark:text-greySet-dark w-full
 }
 
 .subscription-modal .subscription-subheader {
     @apply
-    text-body1 font-bold w-full mt-6
+    text-body1 font-bold w-full mt-8
 }
 
 .subscription-modal .subscription-tags {
     @apply
     w-full flex flex-row justify-between items-stretch
-    gap-2 flex-wrap
+    gap-2 flex-wrap mt-2
 }
 
 .subscription-modal input[type="checkbox"] {
@@ -68,7 +69,7 @@
 
 .subscription-email {
     @apply
-    relative w-full
+    relative w-full mt-2
 }
 
 .subscription-modal input[type="email"] {
@@ -89,8 +90,8 @@
     -webkit-text-fill-color: white !important;
 }
 
-.subscription-modal input[type="email"]:focus-visible,
-.subscription-modal input[type="email"]:focus-visible:focus {
+.subscription-modal input[type="email"]:not(.error):focus-visible,
+.subscription-modal input[type="email"]:not(.error):focus-visible:focus {
     outline: none;
     @apply
     border-orangeSet dark:border-orangeSet-dark
@@ -112,5 +113,20 @@
 
 .subscription-modal button[type="submit"] {
     @apply
-    w-full mt-6 mb-3
+    w-full mt-8 mb-5
+}
+
+.subscription-modal input[type="email"].error:focus-visible,
+.subscription-modal input[type="email"].error:focus-visible:focus,
+.subscription-modal input[type="email"].error {
+    outline: none;
+    @apply
+    border-redSet dark:border-redSet-dark
+    shadow-[none] outline-0 outline-[none]
+}
+
+.subscription-error {
+    @apply
+    w-full text-body3 font-normal mt-1 hidden
+    text-redSet dark:text-redSet-dark
 }
