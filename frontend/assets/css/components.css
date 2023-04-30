@@ -5,11 +5,13 @@
     px-4 py-2
     bg-bgSet dark:bg-bgSet-dark
     border rounded-full border-blackSet dark:border-blackSet-dark
+    stroke-greySet dark:stroke-greySet-dark
     hover:border-orangeSet dark:hover:border-orangeSet-dark
     active:border-orangeSet dark:active:border-orangeSet-dark
     focus:border-orangeSet dark:focus:border-orangeSet-dark
+    checked:border-orangeSet dark:focus:border-orangeSet-dark
     text-body1 font-normal text-greySet dark:text-greySet-dark
-    no-underline transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
+    no-underline transition duration-300 ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .primary-button {
@@ -113,6 +115,7 @@
 .gh-card-image > * {
     @apply
     w-full h-full object-cover absolute
+    rounded-t-lg
 }
 
 .gh-card-image > .gh-card-image-hover {

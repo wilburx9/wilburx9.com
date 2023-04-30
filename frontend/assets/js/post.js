@@ -24,34 +24,6 @@ function handlePrimaryTag(tag) {
     setupSubscription(tag)
 }
 
-
-function setupSubscription(primaryTag) {
-
-    function closeModal() {
-        $(".subscription-content").css({
-            "transform": "translateY(50%) translateX(-50%)",
-            "opacity": 0.0
-        });
-        $('.subscription-modal').fadeOut()
-    }
-
-    $('#post-subscribe').click(function () {
-        $('.subscription-modal').fadeIn()
-        $(".subscription-content").css({
-            "transform": "translateY(0%) translateX(-50%)",
-            "opacity": 1
-        });
-    })
-
-    $(document).keyup(function(event) {
-        if (event.key === "Escape") closeModal()
-    });
-
-    $(".subscription-modal").click(function(event) {
-        if (event.target === this) closeModal()
-    })
-}
-
 // Resize and add blur effect to images.
 function processImages(primaryTag) {
     const images = document.querySelectorAll(".kg-image-card img");

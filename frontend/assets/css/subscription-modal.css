@@ -4,18 +4,113 @@
     w-full h-full bg-black/50
     z-[150]
 }
+
 .subscription-modal > div.subscription-content {
     @apply
     opacity-0 fixed bottom-0 left-2/4
-    w-2/5 max-h-[90%] overflow-y-auto
+    w-2/5 max-h-[90%] overflow-y-auto max-w-[720px]
     bg-cardSet dark:bg-cardSet-dark mt-10
     py-4 -translate-x-2/4 translate-y-2/4 rounded-t-3xl
     transition-all ease-in-out duration-300
     motion-reduce:transition-none
 }
 
-.subscription-modal > div.subscription-content > div{
+.subscription-modal > div.subscription-content > form {
     @apply
-    w-2/4 text-white
-    mx-auto
+    w-[47%] text-white mx-auto
+    flex flex-col items-center gap-y-2
+    text-blackSet dark:text-blackSet-dark
+    overflow-x-hidden
+}
+
+.subscription-modal .subscription-icon {
+    @apply
+    w-2/5
+}
+
+.subscription-modal .subscription-title {
+    @apply
+    text-headline2 font-bold w-full mt-2
+}
+
+.subscription-modal .subscription-desc {
+    @apply
+    text-body2 font-normal text-greySet dark:text-greySet-dark w-full
+}
+
+.subscription-modal .subscription-subheader {
+    @apply
+    text-body1 font-bold w-full mt-6
+}
+
+.subscription-modal .subscription-tags {
+    @apply
+    w-full flex flex-row justify-between items-stretch
+    gap-2 flex-wrap
+}
+
+.subscription-modal input[type="checkbox"] {
+    @apply
+    hidden
+}
+
+.subscription-modal input[type="checkbox"]:checked + label {
+    @apply
+    border-orangeSet border-orangeSet-dark
+    text-greySet dark:text-greySet-dark
+}
+
+.subscription-modal input[type="checkbox"] + label {
+    @apply
+    text-greyLightSet dark:text-greyLightSet-dark
+    stroke-current border-current
+}
+
+.subscription-email {
+    @apply
+    relative w-full
+}
+
+.subscription-modal input[type="email"] {
+    @apply
+    w-full border border-greyLightSet dark:border-greyLightSet-dark
+    bg-bgSet dark:bg-bgSet-dark px-4 pt-[6.3%] pb-[2%] rounded-xl
+    caret-orangeSet dark:caret-orangeSet-dark
+    text-body2 font-normal relative
+}
+
+.subscription-modal input[type="email"]:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: black !important;
+}
+
+.dark .subscription-modal input[type="email"]:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px #0A1018 inset !important;
+    -webkit-text-fill-color: white !important;
+}
+
+.subscription-modal input[type="email"]:focus-visible,
+.subscription-modal input[type="email"]:focus-visible:focus {
+    outline: none;
+    @apply
+    border-orangeSet dark:border-orangeSet-dark
+    shadow-[none] outline-0 outline-[none]
+}
+
+.subscription-modal input[type="email"] + label {
+    @apply
+    text-body2 font-normal top-2/4 left-4 absolute -translate-y-2/4
+    text-greyLightSet dark:text-greyLightSet-dark
+    transition-all duration-300 ease-in-out motion-reduce:transition-none
+}
+
+.subscription-modal input[type="email"] + label.active,
+.subscription-modal input[type="email"]:focus + label {
+    @apply
+    text-body3 top-[27%]
+}
+
+.subscription-modal button[type="submit"] {
+    @apply
+    w-full mt-6 mb-3
 }
