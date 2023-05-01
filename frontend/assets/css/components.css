@@ -25,6 +25,9 @@
     hover:text-boxSet dark:hover:text-blackSet-dark
     active:text-boxSet dark:active:text-blackSet-dark
     focus:text-boxSet dark:focus:text-blackSet-dark pointer-events-auto
+    disabled:opacity-40 disabled:cursor-default
+    disabled:hover:bg-blackSet dark:disabled:hover:bg-blackSet-dark
+    disabled:hover:text-bgSet dark:disabled:hover:text-bgSet-dark
     transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 

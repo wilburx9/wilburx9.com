@@ -20,7 +20,12 @@
                 <label for="email">Enter your email here</label>
             </div>
             <p class="subscription-error"></p>
-            <button type="submit" class="primary-button">Continue</button>
+            <div class="subscriptions-actions">
+                <div class="captcha-container"></div>
+                <div class="button-container">
+                    <button type="submit" class="primary-button">Continue</button>
+                </div>
+            </div>
         </form>
     </div>
     <script src="{{asset "built/subscription.js"}}"></script>

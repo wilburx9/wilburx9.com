@@ -8,16 +8,16 @@
 .subscription-modal > div.subscription-content {
     @apply
     opacity-0 fixed bottom-0 left-2/4
-    w-2/5 max-h-[90%] overflow-y-auto max-w-[720px]
-    bg-cardSet dark:bg-cardSet-dark mt-10
-    py-4 -translate-x-2/4 translate-y-2/4 rounded-t-3xl
+    w-full sm:w-[70%] md:w-[65%] lg:w-[50%] xl:w-[45%] 2xl:w-2/5 max-w-[720px] max-h-[90%] overflow-y-auto
+    bg-cardSet dark:bg-cardSet-dark
+    pt-4 pb-8 -translate-x-2/4 translate-y-2/4 rounded-t-3xl
     transition-all ease-in-out duration-300
     motion-reduce:transition-none
 }
 
 .subscription-modal > div.subscription-content > form {
     @apply
-    w-[47%] text-white mx-auto
+    w-[90%] sm:w-[75%] md:w-[70%] lg:w-[67%] xl:w-[65%] 2xl:w-[47%] text-white mx-auto
     flex flex-col items-center
     text-blackSet dark:text-blackSet-dark
     overflow-x-hidden
@@ -46,7 +46,7 @@
 
 .subscription-modal .subscription-tags {
     @apply
-    w-full flex flex-row justify-between items-stretch
+    w-full flex flex-row justify-start items-stretch
     gap-2 flex-wrap mt-2
 }
 
@@ -98,6 +98,15 @@
     shadow-[none] outline-0 outline-[none]
 }
 
+.subscription-modal input[type="email"].error:focus-visible,
+.subscription-modal input[type="email"].error:focus-visible:focus,
+.subscription-modal input[type="email"].error {
+    outline: none;
+    @apply
+    border-redSet dark:border-redSet-dark
+    shadow-[none] outline-0 outline-[none]
+}
+
 .subscription-modal input[type="email"] + label {
     @apply
     text-body2 font-normal top-2/4 left-4 absolute -translate-y-2/4
@@ -111,22 +120,40 @@
     text-body3 top-[27%]
 }
 
-.subscription-modal button[type="submit"] {
-    @apply
-    w-full mt-8 mb-5
-}
-
-.subscription-modal input[type="email"].error:focus-visible,
-.subscription-modal input[type="email"].error:focus-visible:focus,
-.subscription-modal input[type="email"].error {
-    outline: none;
-    @apply
-    border-redSet dark:border-redSet-dark
-    shadow-[none] outline-0 outline-[none]
-}
-
 .subscription-error {
     @apply
     w-full text-body3 font-normal mt-1 hidden
     text-redSet dark:text-redSet-dark
+}
+
+.subscription-modal .button-container {
+    @apply
+    w-full row-start-1 row-end-2 col-start-1 col-end-2
+    flex flex-row items-center
+}
+
+.subscription-modal button[type="submit"] {
+    @apply
+    w-full
+}
+
+.subscription-modal button[type="submit"]:not(:hover):not(:active):not(:focus) {
+    @apply
+    bg-blackSet dark:bg-blackSet-dark
+}
+
+.subscription-modal .captcha-container {
+    @apply
+    row-start-1 row-end-2 col-start-1 col-end-2 hidden
+    w-full
+}
+
+.captcha-container > iframe {
+    @apply
+    mx-auto
+}
+
+.subscription-modal .subscriptions-actions {
+    @apply
+    w-full grid mt-8 h-[65px]
 }

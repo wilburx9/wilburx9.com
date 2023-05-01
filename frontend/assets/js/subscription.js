@@ -3,11 +3,29 @@ $(function () {
     handleFormSubmission()
 })
 
+function renderCaptcha() {
+    let isDarkTheme = $('html').hasClass('dark');
+    turnstile.ready(function () {
+        turnstile.render('.captcha-container', {
+            sitekey: '3x00000000000000000000FF',
+            action: 'email-subscription',
+            theme: isDarkTheme ? 'dark' : 'light',
+            'response-field-name': 'captcha',
+            'callback': token => {
+
+            },
+        });
+    });
+
+    $('.subscription-content .button-container').stop().fadeOut(300, 'linear')
+    $('.subscription-content .captcha-container').stop().fadeIn(300, 'linear')
+
+}
+
 function handleFormSubmission() {
     $('.subscription-content form').on('submit', function (event) {
         event.preventDefault();
-        if (!validateForm()) return
-
+        if (validateForm()) renderCaptcha()
     });
 }
 
@@ -17,11 +35,13 @@ function validateForm() {
 
     if (email === '' || !/\S+@\S+/.test(email)) {
         handleFormError($emailField)
+        return false
     } else {
         $emailField.removeClass('error');
         $emailField.closest('.subscription-modal').find('.subscription-error').stop().fadeOut(300, 'linear')
         $emailField.removeData('input-listener');
         $emailField.off('input');
+        return true
     }
 }
 
