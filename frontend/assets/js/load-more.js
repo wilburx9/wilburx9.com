@@ -84,13 +84,7 @@ class LoadMore {
     showLoader() {
         $('.gh-post-feed-footer-info').addClass('hide')
         let $loader = $('.gh-more-post-loader #more-loader')
-        this.animation = bodymovin.loadAnimation({
-            container: $loader[0],
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: '/assets/lottie/loading.json'
-        })
+        this.animation = getProgressAnimation($loader)
         $loader.stop().fadeIn(300, 'linear')
     }
 

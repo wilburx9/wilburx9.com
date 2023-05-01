@@ -10,41 +10,48 @@
     opacity-0 fixed bottom-0 left-2/4
     w-full sm:w-[70%] md:w-[65%] lg:w-[50%] xl:w-[45%] 2xl:w-2/5 max-w-[720px] max-h-[90%] overflow-y-auto
     bg-cardSet dark:bg-cardSet-dark
-    pt-4 pb-8 -translate-x-2/4 translate-y-2/4 rounded-t-3xl
+    py-6 -translate-x-2/4 translate-y-2/4 rounded-t-3xl
     transition-all ease-in-out duration-300
     motion-reduce:transition-none
 }
 
-.subscription-modal > div.subscription-content > form {
+.subscription-modal .subscription-inner {
     @apply
-    w-[90%] sm:w-[75%] md:w-[70%] lg:w-[67%] xl:w-[65%] 2xl:w-[47%] text-white mx-auto
-    flex flex-col items-center
+    w-[90%] sm:w-[75%] md:w-[70%] lg:w-[67%] xl:w-[65%] 2xl:w-[50%] text-white mx-auto
     text-blackSet dark:text-blackSet-dark
-    overflow-x-hidden
+    overflow-x-hidden grid
 }
 
-.subscription-modal .subscription-icon {
+.subscription-modal form {
+    @apply
+    w-full flex flex-col items-center
+    row-start-1 row-end-2 col-start-1 col-end-2
+    transition-all ease-in-out duration-300
+    motion-reduce:transition-none
+}
+
+.subscription-form .form-icon {
     @apply
     w-2/5
 }
 
-.subscription-modal .subscription-title {
+.subscription-form .form-title {
     @apply
     text-headline2 font-bold w-full mt-4
 }
 
-.subscription-modal .subscription-desc {
+.subscription-form .form-desc {
     @apply
     text-body2 font-normal mt-2
     text-greySet dark:text-greySet-dark w-full
 }
 
-.subscription-modal .subscription-subheader {
+.subscription-form .form-subheader {
     @apply
     text-body1 font-bold w-full mt-8
 }
 
-.subscription-modal .subscription-tags {
+.subscription-form .form-tags {
     @apply
     w-full flex flex-row justify-start items-stretch
     gap-2 flex-wrap mt-2
@@ -67,7 +74,7 @@
     stroke-current border-current
 }
 
-.subscription-email {
+.form-email {
     @apply
     relative w-full mt-2
 }
@@ -120,13 +127,13 @@
     text-body3 top-[27%]
 }
 
-.subscription-error {
+.subscription-form .form-error {
     @apply
     w-full text-body3 font-normal mt-1 hidden
     text-redSet dark:text-redSet-dark
 }
 
-.subscription-modal .button-container {
+.subscription-form .form-cta-container {
     @apply
     w-full row-start-1 row-end-2 col-start-1 col-end-2
     flex flex-row items-center
@@ -142,18 +149,67 @@
     bg-blackSet dark:bg-blackSet-dark
 }
 
-.subscription-modal .captcha-container {
+.subscription-form .form-captcha-container {
     @apply
     row-start-1 row-end-2 col-start-1 col-end-2 hidden
     w-full
 }
 
-.captcha-container > iframe {
+.form-captcha-container > iframe {
     @apply
     mx-auto
 }
 
-.subscription-modal .subscriptions-actions {
+.subscription-form .form-actions {
     @apply
     w-full grid mt-8 h-[65px]
+}
+
+.subscription-modal .subscription-loader {
+    @apply
+    w-full row-start-1 row-end-2 col-start-1 col-end-2
+    flex justify-center items-center
+    transition-all ease-in-out duration-300
+    motion-reduce:transition-none
+}
+
+.subscription-modal .subscription-loader > div {
+    @apply
+    m-auto w-80 px-4
+}
+
+.subscription-modal .subscription-success {
+    @apply
+    w-full flex flex-col items-center justify-center
+    row-start-1 row-end-2 col-start-1 col-end-2
+    transition-all ease-in-out duration-300
+    motion-reduce:transition-none
+}
+
+.subscription-modal #success-icon {
+    @apply
+    w-2/4 aspect-square
+}
+
+.subscription-modal .success-title {
+    @apply
+    text-headline2 font-bold mt-10
+}
+
+.subscription-modal .success-desc {
+    @apply
+    text-body2 font-normal mt-1.5
+    text-greyLightSet dark:text-greyLightSet-dark
+    text-center
+}
+
+.subscription-modal .success-cta {
+    @apply
+    w-full mt-6
+}
+
+.subscription-modal .hide {
+    @apply
+    invisible
+    opacity-0
 }

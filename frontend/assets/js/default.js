@@ -71,3 +71,17 @@ function parseBookmark(content, linkId, imageId) {
     anchor.attr('target', '_blank');
 
 }
+
+function getProgressAnimation(container) {
+    return getLottieAnimation(container, 'loading')
+}
+
+function getLottieAnimation(container, name) {
+    return bodymovin.loadAnimation({
+        container:container[0],
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: `/assets/lottie/${name}.json`
+    })
+}

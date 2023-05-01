@@ -40,13 +40,7 @@ $(function () {
         $postFeedFooter.stop().fadeOut(300, 'linear')
         $postLoader.stop().fadeIn(300, 'linear')
 
-        let animation = bodymovin.loadAnimation({
-            container: $postLoader[0],
-            renderer: 'svg',
-            loop: true,
-            autoplay: true,
-            path: '/assets/lottie/loading.json'
-        })
+        let animation = getProgressAnimation($postLoader)
 
         request = $.ajax({
             url: `/blog/${slug}`,
