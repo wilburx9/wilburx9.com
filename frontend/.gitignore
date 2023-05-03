@@ -104,3 +104,5 @@ fabric.properties
 *.js.map
 *.css.map
 
+/assets/built/
+
