@@ -119,7 +119,7 @@ function setupSubscription(primaryTag) {
 
 
     // TODO: Remove after implementing subscription UI
-    showSubscription(primaryTag)
+    // showSubscription(primaryTag)
 }
 
 function showSubscription(primaryTag) {
