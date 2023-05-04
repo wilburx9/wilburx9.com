@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/wilburt/wilburx9.com/backend"
 	"net/http"
 	"net/url"
+	"os"
 	"sort"
 	"strings"
 )
@@ -26,36 +28,38 @@ func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, e
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusBadRequest,
-			Body:       "Invalid Form Data",
+			Body:       GetResponseBody(false, err.Error()),
 		}, nil
 	}
 
-	if validateCaptcha(data.captcha) != nil {
+	err = validateCaptcha(data.captcha)
+	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusUnprocessableEntity,
-			Body:       "Unable to complete subscription",
+			Body:       GetResponseBody(false, "Unable to complete subscription"),
 		}, nil
 	}
 
-	if subscribe(data) != nil {
+	err = subscribe(data)
+	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusBadGateway,
-			Body:       "Something went wrong",
+			Body:       GetResponseBody(false, "Something went wrong"),
 		}, nil
 	}
 
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusCreated,
-		Body:       "Successfully created",
+		Body:       GetResponseBody(true, "Successfully created"),
 	}, nil
 }
 
 func subscribe(data formData) error {
-	return nil
+	return errors.New("Not implemented yet")
 }
 
 func validateCaptcha(captcha string) error {
-	data := fmt.Sprintf("secret=%v&response=%v", "", captcha)
+	data := fmt.Sprintf("secret=%v&response=%v", os.Getenv(""), captcha)
 
 	u := "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 	req, err := http.NewRequest(http.MethodPost, u, strings.NewReader(data))
@@ -69,17 +73,17 @@ func validateCaptcha(captcha string) error {
 
 	defer res.Body.Close()
 
-	var body captchaResponse
-	err = json.NewDecoder(res.Body).Decode(&body)
+	var t turnstile
+	err = json.NewDecoder(res.Body).Decode(&t)
 	if err != nil {
 		return err
 	}
 
-	if body.Success && body.Hostname == "wilburx9.com" {
+	if t.Success && t.Hostname == "wilburx9.com" {
 		return nil
 	}
 
-	return errors.New("invalid response")
+	return fmt.Errorf("invalid response: %+v\\n", t)
 
 }
 
@@ -133,7 +137,7 @@ type formData struct {
 	tags    []string
 }
 
-type captchaResponse struct {
+type turnstile struct {
 	Success    bool          `json:"success"`
 	Hostname   string        `json:"hostname"`
 	ErrorCodes []interface{} `json:"error-codes"` // TODO: Remove
