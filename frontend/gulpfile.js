@@ -71,9 +71,14 @@ function zipper(done) {
     pump([
         src([
             '**',
-            '!node_modules', '!node_modules/**',
-            '!dist', '!dist/**',
+            '!node_modules',
+            '!node_modules/**',
+            '!dist',
+            '!dist/**',
             '!**/*.map',
+            '!assets/css/**',
+            '!assets/js/**',
+            '!assets/screenshot-desktop.jpg'
         ]),
         zip(filename),
         dest(targetDir)

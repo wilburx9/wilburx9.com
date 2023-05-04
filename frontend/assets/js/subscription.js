@@ -1,3 +1,5 @@
+let turnstileWidgetId
+
 $(function () {
     handleOnFocus()
     handleFormSubmission()
@@ -6,7 +8,7 @@ $(function () {
 function renderCaptcha() {
     let isDarkTheme = $('html').hasClass('dark');
     turnstile.ready(function () {
-        turnstile.render('.form-captcha-container', {
+        turnstileWidgetId = turnstile.render('.form-captcha-container', {
             sitekey: '1x00000000000000000000AA',
             action: 'email-subscription',
             theme: isDarkTheme ? 'dark' : 'light',
@@ -155,8 +157,9 @@ function closeSubscriptionModal() {
     $form[0].reset() // Reset all inputs in the form to their default values
 
     $('.subscription-modal input[type="email"]').next('label').removeClass('active') // Reset the email active state
-    $('.form-captcha-container iframe').remove() // Remove the captcha
     $('.subscription-content .form-cta-container').stop().fadeIn(0) // Un-hide the form CTA button
     $('.subscription-success').addClass('hide') // Hide the success UIs
     $(progressLoader).addClass('hide') // Hide the progress UI
+    if (turnstileWidgetId) turnstile.remove(turnstileWidgetId)// Remove the captcha
+    turnstileWidgetId = null
 }
