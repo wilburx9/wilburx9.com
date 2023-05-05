@@ -30,14 +30,25 @@
             </form>
             <div class="subscription-success hide">
                 <div id="success-icon"></div>
-                <p class="success-title">Great!</p>
-                <p class="success-desc">We will ensure that you stay informed about our latest blog posts.</p>
+                <p class="success-title">Thank you for subscribing!</p>
+                <p class="success-desc">Head over to your inbox (or spam) and confirm your subscription.<br>We will
+                    ensure that you stay informed about our latest blog posts.</p>
                 <div class="secondary-button success-cta">Close</div>
+            </div>
+            <div class="subscription-error hide">
+                <img id="error-icon" src="{{asset "images/warning.png"}}" alt="Warning icon"/>
+                <p class="error-title">Something went Wrong!</p>
+                <p class="error-desc">Sorry, we were unable to subscribe you to our newsletter at this time. Please
+                    check your internet connection and try again.</p>
+                <div class="primary-button error-cta">Retry</div>
             </div>
             <div class="subscription-loader hide">
                 <div id="loader"></div>
             </div>
         </div>
     </div>
-    <script src="{{asset "built/subscription.js"}}"></script>
+    {{#if @custom.turnstile_site_key}}
+        <script src="{{asset "built/subscription.js"}}"></script>
+        <script>setupSubscriptionForm(`{{@custom.turnstile_site_key}}`)</script>
+    {{/if}}
 </div>

@@ -178,7 +178,8 @@
     m-auto w-80 px-4
 }
 
-.subscription-modal .subscription-success {
+.subscription-modal .subscription-success,
+.subscription-modal .subscription-error {
     @apply
     w-full flex flex-col items-center justify-center
     row-start-1 row-end-2 col-start-1 col-end-2
@@ -186,24 +187,28 @@
     motion-reduce:transition-none
 }
 
-.subscription-modal #success-icon {
+.subscription-error #success-icon,
+.subscription-modal #error-icon {
     @apply
-    w-2/4 aspect-square
+    w-5/12 aspect-square
 }
 
-.subscription-modal .success-title {
+.subscription-modal .success-title,
+.subscription-modal .error-title {
     @apply
     text-headline2 font-bold mt-10
 }
 
-.subscription-modal .success-desc {
+.subscription-modal .success-desc,
+.subscription-modal .error-desc {
     @apply
     text-body2 font-normal mt-1.5
     text-greyLightSet dark:text-greyLightSet-dark
     text-center
 }
 
-.subscription-modal .success-cta {
+.subscription-modal .success-cta,
+.subscription-modal .error-cta {
     @apply
     w-full mt-6
 }

@@ -93,6 +93,12 @@
             "xl": {
                 "width": 2000
             }
+        },
+        "custom": {
+            "turnstile_site_key": {
+                "type": "text",
+                "group": "post"
+            }
         }
     },
     "dependencies": {

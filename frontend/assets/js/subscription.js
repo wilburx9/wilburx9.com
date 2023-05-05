@@ -1,15 +1,10 @@
 let turnstileWidgetId
 
-$(function () {
-    handleOnFocus()
-    handleFormSubmission()
-})
-
-function renderCaptcha() {
+function renderCaptcha(siteKey) {
     let isDarkTheme = $('html').hasClass('dark');
     turnstile.ready(function () {
         turnstileWidgetId = turnstile.render('.form-captcha-container', {
-            sitekey: '1x00000000000000000000AA',
+            sitekey: siteKey,
             action: 'email-subscription',
             theme: isDarkTheme ? 'dark' : 'light',
             'response-field-name': 'captcha',
@@ -32,7 +27,7 @@ function submitForm() {
 
     // TODO: Replace this timeout with an API request to submit the form. If the request succeeds, call handleSubmitSuccess()
     setTimeout(function () {
-        handleSubmitSuccess($progressDiv, animation)
+        handleSubmitError($progressDiv, animation)
     }, 3000)
 }
 
@@ -47,17 +42,33 @@ function handleSubmitSuccess(progressDiv, progressAnim) {
         closeSubscriptionModal();
     });
 
-    progressDiv.parent().addClass('hide')
-    $successContainer.removeClass('hide')
+    hideProgressUi(progressDiv, progressAnim, $successContainer)
+}
+
+function handleSubmitError(progressDiv, progressAnim) {
+    $('.subscription-error .error-cta').off('click').on('click', function () {
+        unHideForm()
+    });
+
+    let errorContainer = $('.subscription-error')
+    hideProgressUi(progressDiv, progressAnim, errorContainer)
+}
+
+function hideProgressUi(progressDiv, progressAnim, showUI) {
+    progressDiv.parent().addClass('hide') // Hide progress UI
+    showUI.removeClass('hide') // Show error/success UI
+
+    // Cleanup progress animation and its container
     progressAnim.stop()
     progressAnim.destroy()
     progressDiv.children().empty()
 }
 
-function handleFormSubmission() {
+function setupSubscriptionForm(turnstileSiteKey) {
+    handleOnFocus()
     $('.subscription-content form').on('submit', function (event) {
         event.preventDefault();
-        if (validateForm()) renderCaptcha()
+        if (validateForm()) renderCaptcha(turnstileSiteKey)
     });
 }
 
@@ -121,7 +132,7 @@ function setupSubscription(primaryTag) {
 
 
     // TODO: Remove after implementing subscription UI
-    // showSubscription(primaryTag)
+    showSubscription(primaryTag)
 }
 
 function showSubscription(primaryTag) {
@@ -157,9 +168,18 @@ function closeSubscriptionModal() {
     $form[0].reset() // Reset all inputs in the form to their default values
 
     $('.subscription-modal input[type="email"]').next('label').removeClass('active') // Reset the email active state
+    $(progressLoader).addClass('hide') // Hide the progress UI
+    unHideForm()
+}
+
+function unHideForm() {
+    removeCaptcha()
     $('.subscription-content .form-cta-container').stop().fadeIn(0) // Un-hide the form CTA button
     $('.subscription-success').addClass('hide') // Hide the success UIs
-    $(progressLoader).addClass('hide') // Hide the progress UI
-    if (turnstileWidgetId) turnstile.remove(turnstileWidgetId)// Remove the captcha
+    $('.subscription-error').addClass('hide') // Hide the error UIs
+}
+
+function removeCaptcha() {
+    if (turnstileWidgetId) turnstile.remove(turnstileWidgetId)
     turnstileWidgetId = null
 }
