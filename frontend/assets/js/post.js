@@ -21,7 +21,6 @@
 
 function handlePrimaryTag(tag) {
     processImages(tag)
-    setupSubscription(tag)
 }
 
 // Resize and add blur effect to images.
