@@ -32,14 +32,18 @@ func main() {
 // start is called when the Lambda receivers a request.
 // nil errors are returned because I want return custom http errors as opposed to Lambdas default 500.
 func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	data, msg := validateForm(req.Body)
-	if msg != "" {
+	data, msg, err := validateForm(req.Body)
+	if msg != "" || err != nil {
+		logger.Errorw("Failed to validate request body",
+			"error", fmt.Sprintf("%v", err),
+			"message", msg,
+		)
 		return MakeResponse(http.StatusBadRequest, msg), nil
 	}
 
-	err := validateCaptcha(data.Captcha)
+	err = validateCaptcha(data.Captcha)
 	if err != nil {
-		logger.Errorw("Failed to validate request body",
+		logger.Errorw("Failed to validate captcha",
 			"error", err.Error(),
 		)
 		return MakeResponse(http.StatusUnprocessableEntity, "Unable to complete subscription"), nil
@@ -124,30 +128,30 @@ func validateCaptcha(captcha string) error {
 }
 
 // validateForm confirms that the request body contains the required data in the valid formats.
-func validateForm(body string) (requestData, string) {
+func validateForm(body string) (requestData, string, error) {
 	var data requestData
 	err := json.Unmarshal([]byte(body), &data)
 	if err != nil {
-		return requestData{}, "Bad Request"
+		return requestData{}, "Bad Request", err
 	}
 
 	address, err := mail.ParseAddress(data.Email)
 	if err != nil {
-		return requestData{}, "Invalid email"
+		return requestData{}, "Invalid email", err
 	}
 
 	if strings.TrimSpace(data.Captcha) == "" {
-		return requestData{}, "Captcha is required"
+		return requestData{}, "Captcha is required", nil
 	}
 
 	if len(data.Tags) > 2 {
-		return requestData{}, "Invalid tags"
+		return requestData{}, "Invalid tags", nil
 	}
 
 	data.Email = address.Address
 	data.Tags = cleanTags(data.Tags)
 
-	return data, ""
+	return data, "", nil
 }
 
 // cleanTags ensures the tags in the request are valid. Also, adds default tags
