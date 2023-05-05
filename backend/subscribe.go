@@ -1,65 +1,95 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/wilburt/wilburx9.com/backend"
+	. "github.com/wilburt/wilburx9.com/backend/common"
+	"log"
 	"net/http"
-	"net/url"
+	"net/mail"
 	"os"
-	"sort"
 	"strings"
 )
 
 const (
 	photography = "photography"
 	programming = "programming"
+	blog        = "blog"
 )
 
 func main() {
 	lambda.Start(start)
 }
 
+// start is called when the Lambda receivers a request
 func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	data, err := validateForm(req.Body)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadRequest,
-			Body:       GetResponseBody(false, err.Error()),
-		}, nil
+	data, msg := validateForm(req.Body)
+	if msg != "" {
+		return MakeResponse(http.StatusBadRequest, msg), nil
 	}
 
-	err = validateCaptcha(data.captcha)
+	err := validateCaptcha(data.Captcha)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusUnprocessableEntity,
-			Body:       GetResponseBody(false, "Unable to complete subscription"),
-		}, nil
+		log.Println(err)
+		return MakeResponse(http.StatusUnprocessableEntity, "Unable to complete subscription"), nil
 	}
 
 	err = subscribe(data)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadGateway,
-			Body:       GetResponseBody(false, "Something went wrong"),
-		}, nil
+		log.Println(err)
+		return MakeResponse(http.StatusBadGateway, "Something went wrong"), nil
 	}
 
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusCreated,
-		Body:       GetResponseBody(true, "Successfully created"),
-	}, nil
+	return MakeResponse(
+		http.StatusCreated,
+		"Successfully created",
+	), nil
 }
 
-func subscribe(data formData) error {
-	return errors.New("Not implemented yet")
+// subscribe forwards the request to MailChimp to subscribe the user
+func subscribe(data requestData) error {
+	log.Printf("tryig to subscribe with %+v\n", data)
+	dc := os.Getenv("MAILCHIMP_DC")
+	token := os.Getenv("MAILCHIMP_TOKEN")
+	listId := os.Getenv("MAILCHIMP_LIST_ID")
+	member := map[string]interface{}{"email_address": data.Email, "status": "pending", "tags": data.Tags}
+	u := fmt.Sprintf("https://%s.api.mailchimp.com/3.0/lists/%s/members", dc, listId)
+
+	log.Printf("tryig to subscribe with member %+v\n", member)
+
+	reqBody, err := json.Marshal(member)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, u, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+	if err == nil && res.StatusCode == http.StatusOK {
+		return nil
+	}
+
+	return fmt.Errorf("subscription request returneed an error or non-200 status code. %v :: %w", res.StatusCode, err)
 }
 
+// validateCaptcha ensures this is not a spam request
 func validateCaptcha(captcha string) error {
-	data := fmt.Sprintf("secret=%v&response=%v", os.Getenv(""), captcha)
+	secret := os.Getenv("TURNSTILE_SECRET")
+	data := fmt.Sprintf("secret=%v&response=%v", secret, captcha)
 
 	u := "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 	req, err := http.NewRequest(http.MethodPost, u, strings.NewReader(data))
@@ -68,8 +98,7 @@ func validateCaptcha(captcha string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	client := &http.Client{}
-	res, err := client.Do(req)
+	res, err := HttpClient.Do(req)
 
 	defer res.Body.Close()
 
@@ -83,47 +112,58 @@ func validateCaptcha(captcha string) error {
 		return nil
 	}
 
-	return fmt.Errorf("invalid response: %+v\\n", t)
+	return fmt.Errorf("invalid response: %+v\n", t)
 
 }
 
-func validateForm(body string) (formData, error) {
-	form, err := url.ParseQuery(body)
+// validateForm confirms that the request body contains the required data in the valid formats.
+func validateForm(body string) (requestData, string) {
+	var data requestData
+	err := json.Unmarshal([]byte(body), &data)
 	if err != nil {
-		return formData{}, err
+		return requestData{}, "Bad Request"
 	}
 
-	email := form.Get("email")
-	rawTags := form["tags"]
-	captcha := form.Get("captcha")
-
-	if strings.TrimSpace(email) == "" {
-		return formData{}, errors.New("email is required")
+	address, err := mail.ParseAddress(data.Email)
+	if err != nil {
+		return requestData{}, "Invalid email"
 	}
 
-	if strings.TrimSpace(captcha) == "" {
-		return formData{}, errors.New("captcha is required")
+	if strings.TrimSpace(data.Captcha) == "" {
+		return requestData{}, "Captcha is required"
 	}
 
-	return formData{
-		email:   email,
-		captcha: captcha,
-		tags:    getTags(rawTags),
-	}, nil
+	if len(data.Tags) > 2 {
+		return requestData{}, "Invalid tags"
+	}
+
+	data.Email = address.Address
+	data.Tags = cleanTags(data.Tags)
+
+	return data, ""
 }
 
-func getTags(rawTags []string) []string {
-	sort.Strings(rawTags)
-	var tags = make([]string, 2)
-	if strings.ToLower(strings.TrimSpace(rawTags[0])) == photography {
-		tags = append(tags, photography)
+// cleanTags ensures the tags in the request are valid. Also, adds default tags
+func cleanTags(rawTags []string) []string {
+	var tapsMap = make(map[string]bool, 0) // Use a map to prevent duplicates
+
+	for _, tag := range rawTags {
+		trimmed := strings.ToLower(strings.TrimSpace(tag))
+		// Only take the tag if it's valid
+		if trimmed == photography || trimmed == programming {
+			tapsMap[trimmed] = true
+		}
 	}
 
-	if strings.ToLower(strings.TrimSpace(rawTags[1])) == programming {
-		tags = append(tags, programming)
+	var tags = []string{blog} // Every subscriber belongs to the "blog" tag
+
+	// Convert the map to a list
+	for v := range tapsMap {
+		tags = append(tags, v)
 	}
 
-	if len(tags) == 0 {
+	// If tags wasn't sent in the request, add all supported tags
+	if len(tags) == 1 {
 		tags = append(tags, photography, programming)
 	}
 
@@ -131,15 +171,14 @@ func getTags(rawTags []string) []string {
 
 }
 
-type formData struct {
-	email   string
-	captcha string
-	tags    []string
+type requestData struct {
+	Email   string   `json:"email"`
+	Captcha string   `json:"captcha"`
+	Tags    []string `json:"tags"`
 }
 
 type turnstile struct {
-	Success    bool          `json:"success"`
-	Hostname   string        `json:"hostname"`
-	ErrorCodes []interface{} `json:"error-codes"` // TODO: Remove
-	Action     string        `json:"action"`
+	Success  bool   `json:"success"`
+	Hostname string `json:"hostname"`
+	Action   string `json:"action"`
 }
