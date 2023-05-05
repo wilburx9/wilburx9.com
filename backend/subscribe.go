@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	. "github.com/wilburt/wilburx9.com/backend/common"
-	"log"
+	"go.uber.org/zap"
 	"net/http"
 	"net/mail"
 	"os"
@@ -20,11 +20,17 @@ const (
 	blog        = "blog"
 )
 
+var logger *zap.SugaredLogger
+
 func main() {
+	l, _ := zap.NewProduction()
+	defer l.Sync()
+	logger = l.Sugar()
 	lambda.Start(start)
 }
 
-// start is called when the Lambda receivers a request
+// start is called when the Lambda receivers a request.
+// nil errors are returned because I want return custom http errors as opposed to Lambdas default 500.
 func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	data, msg := validateForm(req.Body)
 	if msg != "" {
@@ -33,13 +39,17 @@ func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, e
 
 	err := validateCaptcha(data.Captcha)
 	if err != nil {
-		log.Println(err)
+		logger.Errorw("Failed to validate request body",
+			"error", err.Error(),
+		)
 		return MakeResponse(http.StatusUnprocessableEntity, "Unable to complete subscription"), nil
 	}
 
 	err = subscribe(data)
 	if err != nil {
-		log.Println(err)
+		logger.Errorw("Subscription request failed",
+			"error", err.Error(),
+		)
 		return MakeResponse(http.StatusBadGateway, "Something went wrong"), nil
 	}
 
@@ -51,14 +61,11 @@ func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, e
 
 // subscribe forwards the request to MailChimp to subscribe the user
 func subscribe(data requestData) error {
-	log.Printf("tryig to subscribe with %+v\n", data)
 	dc := os.Getenv("MAILCHIMP_DC")
 	token := os.Getenv("MAILCHIMP_TOKEN")
 	listId := os.Getenv("MAILCHIMP_LIST_ID")
 	member := map[string]interface{}{"email_address": data.Email, "status": "pending", "tags": data.Tags}
 	u := fmt.Sprintf("https://%s.api.mailchimp.com/3.0/lists/%s/members", dc, listId)
-
-	log.Printf("tryig to subscribe with member %+v\n", member)
 
 	reqBody, err := json.Marshal(member)
 	if err != nil {
