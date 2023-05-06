@@ -97,7 +97,11 @@
         "custom": {
             "turnstile_site_key": {
                 "type": "text",
-                "group": "post"
+                "group": "homepage"
+            },
+            "api_url": {
+                "type": "text",
+                "group": "homepage"
             }
         }
     },

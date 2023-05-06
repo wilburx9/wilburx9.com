@@ -94,7 +94,7 @@ func subscribe(data requestData) error {
 		return nil
 	}
 
-	return fmt.Errorf("subscription request returneed an error or non-200 status code. %v :: %w", res.StatusCode, err)
+	return fmt.Errorf("subscription request returneed an error or non-200 status code. %v :: %v", res.StatusCode, err)
 }
 
 // validateCaptcha ensures this is not a spam request
@@ -119,7 +119,7 @@ func validateCaptcha(captcha string) error {
 		return err
 	}
 
-	if t.Success && t.Hostname == "wilburx9.com" {
+	if t.Success && t.Hostname == os.Getenv("TURNSTILE_HOSTNAME") {
 		return nil
 	}
 

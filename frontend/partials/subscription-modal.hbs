@@ -30,8 +30,8 @@
             </form>
             <div class="subscription-success hide">
                 <div id="success-icon"></div>
-                <p class="success-title">Thank you for subscribing!</p>
-                <p class="success-desc">Head over to your inbox (or spam) and confirm your subscription.</p>
+                <p class="success-title">Great!</p>
+                <p class="success-desc">We will ensure that you stay informed about our latest blog posts.</p>
                 <div class="secondary-button success-cta">Close</div>
             </div>
             <div class="subscription-error hide">
@@ -47,9 +47,11 @@
         </div>
     </div>
     {{#if @custom.turnstile_site_key}}
-        <script src="{{asset "built/subscription.js"}}"></script>
-        {{#primary_tag}}
-            <script>new Subscription(`{{@custom.turnstile_site_key}}`, `{{slug}}`)</script>
-        {{/primary_tag}}
+        {{#if @custom.api_url}}
+            <script src="{{asset "built/subscription.js"}}"></script>
+            {{#primary_tag}}
+                <script>new Subscription(`{{@custom.turnstile_site_key}}`, `{{@custom.api_url}}`, `{{slug}}`)</script>
+            {{/primary_tag}}
+        {{/if}}
     {{/if}}
 </div>

@@ -28,7 +28,7 @@ func MakeResponse(code int, data interface{}) events.APIGatewayProxyResponse {
 		success = true
 	}
 	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusBadRequest,
+		StatusCode: code,
 		Body:       getResponseBody(success, data),
 		Headers: map[string]string{
 			"Content-Type": "application/json",

@@ -1,7 +1,8 @@
 class Subscription {
     turnstileWidgetId
 
-    constructor(turnstileSiteKey, primaryTag) {
+    constructor(turnstileSiteKey, baseApiUrl, primaryTag) {
+        this.apiUrl = baseApiUrl
         this.setupSubscriptionForm(turnstileSiteKey)
         this.setupSubscription(primaryTag)
     }
@@ -28,13 +29,32 @@ class Subscription {
         let $progressDiv = $('.subscription-loader #loader')
         let animation = getProgressAnimation($progressDiv)
 
-        $('.subscription-modal form').addClass('hide')
+        const $form = $('.subscription-modal form');
+        $form.addClass('hide')
         $progressDiv.parent().removeClass('hide')
 
-        // TODO: Replace this timeout with an API request to submit the form. If the request succeeds, call handleSubmitSuccess()
-        setTimeout(() => {
-            this.handleSubmitSuccess($progressDiv, animation)
-        }, 3000)
+        // Convert the form data to JSON
+        let formData = new FormData($form[0])
+        let jsonData = Object.fromEntries(
+            Array.from(formData.keys()).map(key => [
+                key, key === "tags" ? formData.getAll(key) : formData.get(key)
+            ])
+        )
+
+        $.ajax({
+            url: `${this.apiUrl}/subscribe`,
+            type: 'POST',
+            data: JSON.stringify(jsonData),
+            contentType: 'application/json',
+            complete: (xhr) => {
+                if (xhr.status >= 200 && xhr.status <= 299) {
+                    this.handleSubmitSuccess($progressDiv, animation)
+                } else {
+                    this.handleSubmitError($progressDiv, animation)
+                }
+            }
+        })
+
     }
 
     handleSubmitSuccess(progressDiv, progressAnim) {
