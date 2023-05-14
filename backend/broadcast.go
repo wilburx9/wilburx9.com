@@ -3,13 +3,15 @@ package main
 import (
 	"backend/common"
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 	"golang.org/x/net/html"
-	"io"
-	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"regexp"
@@ -24,94 +26,81 @@ const (
 )
 
 func main() {
-	http.HandleFunc("/broadcast", handleBroadcast)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	lambda.Start(handleBroadcast)
 }
 
-func handleBroadcast(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Handling webhook ============ ")
-	// Print the request headers
-	headers := make(map[string]string)
-	for name, values := range r.Header {
-		headers[name] = strings.Join(values, ", ")
+// handleBroadcast creates a campaign and schedules to be sent.
+func handleBroadcast(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	campaignId, err := processRequest(ctx, req.Body)
+
+	// The broadcast was successfully created and scheduled
+	if err == nil {
+		return common.MakeResponse(
+			http.StatusOK,
+			fmt.Sprintf("Scheduled broadcast %v", campaignId),
+		), nil
 	}
 
-	// Read the request body
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	// The broadcast was created but not scheduled successfully
+	if campaignId != "" {
+		return common.MakeResponse(
+			http.StatusCreated,
+			fmt.Sprintf("Scheduled broadcast %v", campaignId),
+		), nil
 	}
 
-	// Close the request body
-	defer r.Body.Close()
-
-	// Parse the request body as JSON
-	var requestBody interface{}
-	err = json.Unmarshal(body, &requestBody)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	// Convert the request body to JSON
-	requestBodyJSON, err := json.MarshalIndent(requestBody, "", "  ")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	campaignId, err := handlePublishEvent(string(requestBodyJSON))
-	if err != nil {
-		fmt.Println(fmt.Sprintf("%v :: %v", campaignId, err))
-		// Respond with an error if the campaign has not been created. This is so Ghost can retry
-		if campaignId == "" {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
-
-	// Respond with a success message
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, "Request received successfully!")
+	// The campaign was neither created nor scheduled. Return non 2XX so Ghost will retry.
+	return common.MakeResponse(
+		http.StatusInternalServerError,
+		err.Error(),
+	), nil
 }
 
-// handlePublishEvent schedules an email campaign about an hour form now.
-// For this to work, increase Ghost's webhook timeout. See https://forum.ghost.org/t/webhook-getting-triggered-multiple-times/16503/3
-func handlePublishEvent(body string) (string, error) {
-	fmt.Println("Handling publication event")
-	var event publishEvent
-	err := json.Unmarshal([]byte(body), &event)
+// processRequest schedules an email campaign about an hour form now.
+// For Ghost not to retry the request because of short timeout, update webhook timeout. See https://forum.ghost.org/t/webhook-getting-triggered-multiple-times/16503/3
+func processRequest(ctx context.Context, body string) (string, error) {
+	var reqData lambdaReqBody
+	err := json.Unmarshal([]byte(body), &reqData)
 	if err != nil {
 		return "", fmt.Errorf("request body parse error: %w", err)
 	}
 
-	// Confirm that event.Status == "published" before publishing
-	// Also check that the difference publication and updated dates is not more than 5 mins,
-	//this is so we don't send emails for posts that was unpublished and republished
-	post, err := event.toPost()
+	// 1. To prevent sending notification for drafts, confirm this post is published.
+	// 2. To prevent sending emails for unpublished and republished posts, ensure
+	//	  that the diff b/w publication and updated dates is not more than 30 minutes.
+
+	postData := reqData.Post.Current
+	if postData.Status != "published" || math.Abs(postData.PublishedAt.Sub(postData.UpdatedAt).Minutes()) > 30 {
+		log.Println(
+			"this post is too old to be rescheduled. It was created at ",
+			postData.PublishedAt,
+			" and updated at ",
+			postData.UpdatedAt,
+		)
+		return "", nil
+	}
+
+	post, err := reqData.toPost()
 	if err != nil {
 		return "", fmt.Errorf("request body to post mapping error: %w", err)
 	}
-
-	fmt.Println(fmt.Sprintf("Post data %+v\n", post))
 
 	content, err := parseEmailTemplate(post, "newsletter.html")
 	if err != nil {
 		return "", fmt.Errorf("parse template error: %w", err)
 	}
 
-	campaignId, err := createCampaign(post)
+	campaignId, err := createCampaign(ctx, post)
 	if err != nil {
 		return campaignId, fmt.Errorf("campaign creation error: %w", err)
 	}
 
-	err = setCampaignContent(campaignId, content)
+	err = setCampaignContent(ctx, campaignId, content)
 	if err != nil {
 		return campaignId, fmt.Errorf("campaign update error: %w", err)
 	}
 
-	err = scheduleCampaign(campaignId)
+	err = scheduleCampaign(ctx, campaignId)
 	if err != nil {
 		return campaignId, fmt.Errorf("campaign schedule error: %w", err)
 	}
@@ -119,81 +108,54 @@ func handlePublishEvent(body string) (string, error) {
 	return campaignId, nil
 }
 
-func scheduleCampaign(campaignId string) error {
-	fmt.Println("Scheduling", "::", campaignId)
-	dc := os.Getenv("MAILCHIMP_DC")
-	token := os.Getenv("MAILCHIMP_TOKEN")
-	u := fmt.Sprintf("https://%s.api.mailchimp.com/3.0/campaigns/%v/actions/schedule", dc, campaignId)
-
+func scheduleCampaign(ctx context.Context, campaignId string) error {
 	when := time.Now().Add(time.Hour)
-	reqData := map[string]interface{}{"schedule_time": when.Format(iso8601)}
+	reqBody := map[string]interface{}{"schedule_time": when.Format(iso8601)}
 
-	reqBody, err := json.Marshal(reqData)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, u, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	req.Header.Set("Content-Type", "application/json")
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	defer res.Body.Close()
-	if res.StatusCode == http.StatusNoContent {
-		return nil
-	}
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-	return fmt.Errorf(string(body))
+	err := common.MakeMailChimpRequest(
+		ctx,
+		http.MethodPost,
+		fmt.Sprintf("campaigns/%v/actions/schedule", campaignId),
+		reqBody,
+		nil,
+	)
+	return err
 }
 
-func setCampaignContent(campaignId string, content string) error {
-	fmt.Println(fmt.Sprintf("Setting content :: %v", campaignId))
-	dc := os.Getenv("MAILCHIMP_DC")
-	token := os.Getenv("MAILCHIMP_TOKEN")
-	u := fmt.Sprintf("https://%s.api.mailchimp.com/3.0/campaigns/%v/content", dc, campaignId)
+func setCampaignContent(ctx context.Context, campaignId string, content string) error {
+	reqBody := map[string]interface{}{"html": content}
 
-	reqData := map[string]interface{}{"html": content}
+	err := common.MakeMailChimpRequest(
+		ctx,
+		http.MethodPut,
+		fmt.Sprintf("campaigns/%v/content", campaignId),
+		reqBody,
+		nil,
+	)
+	return err
+}
 
-	reqBody, err := json.Marshal(reqData)
+func createCampaign(ctx context.Context, post Post) (string, error) {
+	reqBody, err := post.toRequestBody()
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	req, err := http.NewRequest(http.MethodPut, u, bytes.NewBuffer(reqBody))
+	var campaign struct {
+		ID string `json:"id"`
+	}
+
+	err = common.MakeMailChimpRequest(
+		ctx,
+		"campaigns",
+		http.MethodPost,
+		reqBody,
+		&campaign,
+	)
 	if err != nil {
-		return err
+		return "", err
 	}
-
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	req.Header.Set("Content-Type", "application/json")
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	defer res.Body.Close()
-	if res.StatusCode == http.StatusOK {
-		return nil
-	}
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return err
-	}
-	return fmt.Errorf(string(body))
+	return campaign.ID, nil
 }
 
 func parseEmailTemplate(post Post, templateFile string) (string, error) {
@@ -214,52 +176,6 @@ func parseEmailTemplate(post Post, templateFile string) (string, error) {
 	}
 
 	return emailContent.String(), nil
-}
-
-func createCampaign(post Post) (string, error) {
-	fmt.Println("Creating campaign ")
-	dc := os.Getenv("MAILCHIMP_DC")
-	token := os.Getenv("MAILCHIMP_TOKEN")
-	u := fmt.Sprintf("https://%s.api.mailchimp.com/3.0/campaigns", dc)
-
-	reqBody, err := post.toRequestBody()
-	if err != nil {
-		return "", err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, u, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	req.Header.Set("Content-Type", "application/json")
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-
-	defer res.Body.Close()
-
-	if res.StatusCode != http.StatusOK {
-		body, err := io.ReadAll(res.Body)
-		if err != nil {
-			return "", err
-		}
-		return "", fmt.Errorf(string(body))
-	}
-
-	var campaign struct {
-		ID string `json:"id"`
-	}
-
-	err = json.NewDecoder(res.Body).Decode(&campaign)
-	if err != nil {
-		return "", err
-	}
-
-	return campaign.ID, nil
 }
 
 func (p Post) toRequestBody() ([]byte, error) {
@@ -293,13 +209,8 @@ func (p Post) toRequestBody() ([]byte, error) {
 	return json.Marshal(data)
 }
 
-func (e publishEvent) toPost() (Post, error) {
+func (e lambdaReqBody) toPost() (Post, error) {
 	p := e.Post.Current
-
-	pubDate, err := time.Parse(time.RFC3339, p.PublishedAt)
-	if err != nil {
-		return Post{}, err
-	}
 
 	featureImage := p.FeatureImage
 
@@ -330,7 +241,7 @@ func (e publishEvent) toPost() (Post, error) {
 	return Post{
 		Author:              p.PrimaryAuthor.Name,
 		Title:               p.Title,
-		PubDate:             pubDate.Format("02 Jan 2006"),
+		PubDate:             p.PublishedAt.Format("02 Jan 2006"),
 		FeatureImage:        featureImage,
 		FeatureImageCaption: featureImageCaption,
 		Excerpt:             p.Excerpt,
@@ -350,21 +261,21 @@ type Post struct {
 	Tag                 string
 }
 
-type publishEvent struct {
+type lambdaReqBody struct {
 	Post struct {
 		Current struct {
-			Excerpt             string `json:"excerpt"`
-			FeatureImage        string `json:"feature_image"`
-			FeatureImageCaption string `json:"feature_image_caption"`
-			ID                  string `json:"id"`
-			PublishedAt         string `json:"published_at"`
-			ReadingTime         int64  `json:"reading_time"`
-			Status              string `json:"status"`
-			Title               string `json:"title"`
-			UpdatedAt           string `json:"updated_at"`
-			URL                 string `json:"url"`
-			Visibility          string `json:"visibility"`
-			HTML                string `json:"html"`
+			Excerpt             string    `json:"excerpt"`
+			FeatureImage        string    `json:"feature_image"`
+			FeatureImageCaption string    `json:"feature_image_caption"`
+			ID                  string    `json:"id"`
+			PublishedAt         time.Time `json:"published_at"`
+			ReadingTime         int64     `json:"reading_time"`
+			Status              string    `json:"status"`
+			Title               string    `json:"title"`
+			UpdatedAt           time.Time `json:"updated_at"`
+			URL                 string    `json:"url"`
+			Visibility          string    `json:"visibility"`
+			HTML                string    `json:"html"`
 
 			PrimaryAuthor struct {
 				Name string `json:"name"`

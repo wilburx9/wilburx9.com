@@ -2,7 +2,7 @@ package main
 
 import (
 	"backend/common"
-	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
@@ -15,12 +15,12 @@ import (
 )
 
 func main() {
-	lambda.Start(start)
+	lambda.Start(handleSubscribe)
 }
 
-// start is called when the Lambda receivers a request.
-// nil errors are returned because I want return custom http errors as opposed to Lambdas default 500.
-func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+// handleSubscribe is called when the Lambda receivers a request.
+// nil errors are returned because I want return custom http errors as opposed to Lambda's default 500.
+func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	data, msg, err := validateForm(req.Body)
 	if msg != "" || err != nil {
 		log.Println("Failed to validate request body",
@@ -29,7 +29,7 @@ func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, e
 		return common.MakeResponse(http.StatusBadRequest, msg), nil
 	}
 
-	err = validateCaptcha(data.Captcha)
+	err = validateCaptcha(ctx, data.Captcha)
 	if err != nil {
 		log.Println("Failed to validate captcha",
 			"error: ", err.Error(),
@@ -37,7 +37,7 @@ func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, e
 		return common.MakeResponse(http.StatusUnprocessableEntity, "Unable to complete subscription"), nil
 	}
 
-	err = subscribe(data)
+	err = subscribe(ctx, data)
 	if err != nil {
 		log.Println("Subscription request failed",
 			"error: ", err.Error(),
@@ -52,46 +52,30 @@ func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, e
 }
 
 // subscribe forwards the request to MailChimp to subscribe the user
-func subscribe(data requestData) error {
-	dc := os.Getenv("MAILCHIMP_DC")
-	token := os.Getenv("MAILCHIMP_TOKEN")
+func subscribe(ctx context.Context, data requestData) error {
 	listId := os.Getenv("MAILCHIMP_LIST_ID")
 	member := map[string]interface{}{"email_address": data.Email, "status": "pending", "tags": data.Tags}
-	u := fmt.Sprintf("https://%s.api.mailchimp.com/3.0/lists/%s/members", dc, listId)
 
-	reqBody, err := json.Marshal(member)
+	err := common.MakeMailChimpRequest(
+		ctx,
+		http.MethodPost,
+		fmt.Sprintf("lists/%s/members", listId),
+		member,
+		nil,
+	)
 	if err != nil {
-		return err
+		return fmt.Errorf("subscription request returneed an error: %w", err)
 	}
-
-	req, err := http.NewRequest(http.MethodPost, u, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
-	req.Header.Set("Content-Type", "application/json")
-
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-
-	defer res.Body.Close()
-	if err == nil && res.StatusCode == http.StatusOK {
-		return nil
-	}
-
-	return fmt.Errorf("subscription request returneed an error or non-200 status code. %v :: %v", res.StatusCode, err)
+	return nil
 }
 
 // validateCaptcha ensures this is not a spam request
-func validateCaptcha(captcha string) error {
+func validateCaptcha(ctx context.Context, captcha string) error {
 	secret := os.Getenv("TURNSTILE_SECRET")
 	data := fmt.Sprintf("secret=%v&response=%v", secret, captcha)
 
 	u := "https://challenges.cloudflare.com/turnstile/v0/siteverify"
-	req, err := http.NewRequest(http.MethodPost, u, strings.NewReader(data))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, strings.NewReader(data))
 	if err != nil {
 		return err
 	}
