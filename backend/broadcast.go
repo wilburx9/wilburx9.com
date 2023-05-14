@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/aws/aws-lambda-go/events"
@@ -109,7 +110,18 @@ func processRequest(ctx context.Context, body string) (string, error) {
 }
 
 func scheduleCampaign(ctx context.Context, campaignId string) error {
-	when := time.Now().Add(time.Hour)
+	// Use a time an hour into the future, so I can manually cancel the campaign if I don't want it to be sent.
+	f := time.Now().Add(time.Hour)
+	// Round it to quarterly hour. See https://mailchimp.com/developer/marketing/api/campaigns/schedule-campaign
+	minutes := f.Minute()
+	remainder := minutes % 15
+	var when time.Time
+	if (remainder * 2) < 15 { // If the remainder is less than 7.5 (halfway between 0 and 15), round down; otherwise, round up
+		when = time.Date(f.Year(), f.Month(), f.Day(), f.Hour(), minutes-remainder, 0, 0, f.Location())
+	} else {
+		when = time.Date(f.Year(), f.Month(), f.Day(), f.Hour(), minutes+(15-remainder), 0, 0, f.Location())
+	}
+
 	reqBody := map[string]interface{}{"schedule_time": when.Format(iso8601)}
 
 	err := common.MakeMailChimpRequest(
@@ -187,6 +199,10 @@ func (p Post) toRequestBody() ([]byte, error) {
 		segment, _ = strconv.Atoi(os.Getenv("MAILCHIMP_PROGRAMMING_SEGMENT"))
 	case common.Photography:
 		segment, _ = strconv.Atoi(os.Getenv("MAILCHIMP_PHOTOGRAPHY_SEGMENT"))
+	}
+
+	if segment == 0 {
+		return nil, errors.New("won't send campaigns for non-(programming or photography) articles")
 	}
 
 	data := map[string]interface{}{
