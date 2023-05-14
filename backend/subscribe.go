@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"net/mail"
-	"os"
 	"strings"
 )
 
@@ -21,6 +20,9 @@ func main() {
 // handleSubscribe is called when the Lambda receivers a request.
 // nil errors are returned because I want return custom http errors as opposed to Lambda's default 500.
 func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	config := common.NewConfig()
+	ctx = context.WithValue(ctx, common.ConfigKey, config)
+
 	data, msg, err := validateForm(req.Body)
 	if msg != "" || err != nil {
 		log.Println("Failed to validate request body",
@@ -29,7 +31,7 @@ func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (ev
 		return common.MakeResponse(http.StatusBadRequest, msg), nil
 	}
 
-	err = validateCaptcha(ctx, data.Captcha)
+	err = validateCaptcha(ctx, config, data.Captcha)
 	if err != nil {
 		log.Println("Failed to validate captcha",
 			"error: ", err.Error(),
@@ -37,7 +39,7 @@ func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (ev
 		return common.MakeResponse(http.StatusUnprocessableEntity, "Unable to complete subscription"), nil
 	}
 
-	err = subscribe(ctx, data)
+	err = subscribe(ctx, config.NewsletterListId, data)
 	if err != nil {
 		log.Println("Subscription request failed",
 			"error: ", err.Error(),
@@ -52,8 +54,7 @@ func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (ev
 }
 
 // subscribe forwards the request to MailChimp to subscribe the user
-func subscribe(ctx context.Context, data requestData) error {
-	listId := os.Getenv("MAILCHIMP_LIST_ID")
+func subscribe(ctx context.Context, listId string, data requestData) error {
 	member := map[string]interface{}{"email_address": data.Email, "status": "pending", "tags": data.Tags}
 
 	err := common.MakeMailChimpRequest(
@@ -70,9 +71,8 @@ func subscribe(ctx context.Context, data requestData) error {
 }
 
 // validateCaptcha ensures this is not a spam request
-func validateCaptcha(ctx context.Context, captcha string) error {
-	secret := os.Getenv("TURNSTILE_SECRET")
-	data := fmt.Sprintf("secret=%v&response=%v", secret, captcha)
+func validateCaptcha(ctx context.Context, config *common.Config, captcha string) error {
+	data := fmt.Sprintf("secret=%v&response=%v", config.TurnstileSecret, captcha)
 
 	u := "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, strings.NewReader(data))
@@ -91,7 +91,7 @@ func validateCaptcha(ctx context.Context, captcha string) error {
 		return err
 	}
 
-	if t.Success && t.Hostname == os.Getenv("TURNSTILE_HOSTNAME") {
+	if t.Success && t.Hostname == config.TurnstileHostName {
 		return nil
 	}
 

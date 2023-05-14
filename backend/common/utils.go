@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"io"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -47,10 +46,10 @@ func MakeResponse(code int, data interface{}) events.APIGatewayProxyResponse {
 	}
 }
 
+// MakeMailChimpRequest makes http calls to MailChimp API
 func MakeMailChimpRequest(ctx context.Context, method string, path string, reqBody any, respBody any) error {
-	dc := os.Getenv("MAILCHIMP_DC")
-	token := os.Getenv("MAILCHIMP_TOKEN")
-	u := fmt.Sprintf("https://%s.api.mailchimp.com/3.0/%s", dc, path)
+	config := ConfigFromContext(&ctx)
+	u := fmt.Sprintf("https://%s.api.mailchimp.com/3.0/%s", config.MailChimpDC, path)
 
 	reqBuffer := new(bytes.Buffer)
 	err := json.NewEncoder(reqBuffer).Encode(reqBody)
@@ -63,7 +62,7 @@ func MakeMailChimpRequest(ctx context.Context, method string, path string, reqBo
 		return err
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", config.MailChimpToken))
 	req.Header.Set("Content-Type", "application/json")
 
 	res, err := http.DefaultClient.Do(req)

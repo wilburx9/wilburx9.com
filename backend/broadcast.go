@@ -32,6 +32,8 @@ func main() {
 
 // handleBroadcast creates a campaign and schedules to be sent.
 func handleBroadcast(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	ctx = context.WithValue(ctx, common.ConfigKey, common.NewConfig())
+
 	campaignId, err := processRequest(ctx, req.Body)
 
 	// The broadcast was successfully created and scheduled
@@ -148,7 +150,7 @@ func setCampaignContent(ctx context.Context, campaignId string, content string) 
 }
 
 func createCampaign(ctx context.Context, post Post) (string, error) {
-	reqBody, err := post.toRequestBody()
+	reqBody, err := post.toRequestBody(common.ConfigFromContext(&ctx))
 	if err != nil {
 		return "", err
 	}
@@ -190,15 +192,13 @@ func parseEmailTemplate(post Post, templateFile string) (string, error) {
 	return emailContent.String(), nil
 }
 
-func (p Post) toRequestBody() ([]byte, error) {
-	listId := os.Getenv("MAILCHIMP_LIST_ID")
-	replyTo := os.Getenv("MAILCHIMP_REPLY_TO")
+func (p Post) toRequestBody(config *common.Config) ([]byte, error) {
 	var segment int
 	switch p.Tag {
 	case common.Programming:
-		segment, _ = strconv.Atoi(os.Getenv("MAILCHIMP_PROGRAMMING_SEGMENT"))
+		segment, _ = strconv.Atoi(config.ProgrammingSegment)
 	case common.Photography:
-		segment, _ = strconv.Atoi(os.Getenv("MAILCHIMP_PHOTOGRAPHY_SEGMENT"))
+		segment, _ = strconv.Atoi(config.PhotographySegment)
 	}
 
 	if segment == 0 {
@@ -212,10 +212,10 @@ func (p Post) toRequestBody() ([]byte, error) {
 			"subject_line": p.Title,
 			"preview_text": p.Excerpt,
 			"from_name":    p.Author,
-			"reply_to":     replyTo,
+			"reply_to":     config.EmailSender,
 		},
 		"recipients": map[string]interface{}{
-			"list_id": listId,
+			"list_id": config.NewsletterListId,
 			"segment_opts": map[string]int{
 				"saved_segment_id": segment,
 			},
