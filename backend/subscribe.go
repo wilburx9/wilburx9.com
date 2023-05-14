@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"go.uber.org/zap"
+	"log"
 	"net/http"
 	"net/mail"
 	"os"
@@ -15,9 +15,6 @@ import (
 )
 
 func main() {
-	l, _ := zap.NewProduction()
-	defer l.Sync()
-	common.Logger = l.Sugar()
 	lambda.Start(start)
 }
 
@@ -26,25 +23,24 @@ func main() {
 func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	data, msg, err := validateForm(req.Body)
 	if msg != "" || err != nil {
-		common.Logger.Errorw("Failed to validate request body",
-			"error", fmt.Sprintf("%v", err),
-			"message", msg,
-		)
+		log.Println("Failed to validate request body",
+			"error: ", fmt.Sprintf("%v", err),
+			"message: ", msg)
 		return common.MakeResponse(http.StatusBadRequest, msg), nil
 	}
 
 	err = validateCaptcha(data.Captcha)
 	if err != nil {
-		common.Logger.Errorw("Failed to validate captcha",
-			"error", err.Error(),
+		log.Println("Failed to validate captcha",
+			"error: ", err.Error(),
 		)
 		return common.MakeResponse(http.StatusUnprocessableEntity, "Unable to complete subscription"), nil
 	}
 
 	err = subscribe(data)
 	if err != nil {
-		common.Logger.Errorw("Subscription request failed",
-			"error", err.Error(),
+		log.Println("Subscription request failed",
+			"error: ", err.Error(),
 		)
 		return common.MakeResponse(http.StatusBadGateway, "Something went wrong"), nil
 	}
