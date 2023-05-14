@@ -3,8 +3,17 @@ package common
 import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
+	"go.uber.org/zap"
 	"net/http"
 	"time"
+)
+
+var Logger *zap.SugaredLogger
+
+const (
+	Photography = "photography"
+	Programming = "programming"
+	Blog        = "blog"
 )
 
 func getResponseBody(success bool, data interface{}) string {

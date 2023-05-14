@@ -1,12 +1,12 @@
 package main
 
 import (
+	"backend/common"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	. "github.com/wilburt/wilburx9.com/backend/common"
 	"go.uber.org/zap"
 	"net/http"
 	"net/mail"
@@ -14,18 +14,10 @@ import (
 	"strings"
 )
 
-const (
-	photography = "photography"
-	programming = "programming"
-	blog        = "blog"
-)
-
-var logger *zap.SugaredLogger
-
 func main() {
 	l, _ := zap.NewProduction()
 	defer l.Sync()
-	logger = l.Sugar()
+	common.Logger = l.Sugar()
 	lambda.Start(start)
 }
 
@@ -34,30 +26,30 @@ func main() {
 func start(req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	data, msg, err := validateForm(req.Body)
 	if msg != "" || err != nil {
-		logger.Errorw("Failed to validate request body",
+		common.Logger.Errorw("Failed to validate request body",
 			"error", fmt.Sprintf("%v", err),
 			"message", msg,
 		)
-		return MakeResponse(http.StatusBadRequest, msg), nil
+		return common.MakeResponse(http.StatusBadRequest, msg), nil
 	}
 
 	err = validateCaptcha(data.Captcha)
 	if err != nil {
-		logger.Errorw("Failed to validate captcha",
+		common.Logger.Errorw("Failed to validate captcha",
 			"error", err.Error(),
 		)
-		return MakeResponse(http.StatusUnprocessableEntity, "Unable to complete subscription"), nil
+		return common.MakeResponse(http.StatusUnprocessableEntity, "Unable to complete subscription"), nil
 	}
 
 	err = subscribe(data)
 	if err != nil {
-		logger.Errorw("Subscription request failed",
+		common.Logger.Errorw("Subscription request failed",
 			"error", err.Error(),
 		)
-		return MakeResponse(http.StatusBadGateway, "Something went wrong"), nil
+		return common.MakeResponse(http.StatusBadGateway, "Something went wrong"), nil
 	}
 
-	return MakeResponse(
+	return common.MakeResponse(
 		http.StatusCreated,
 		"Successfully created",
 	), nil
@@ -109,7 +101,7 @@ func validateCaptcha(captcha string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	res, err := HttpClient.Do(req)
+	res, err := common.HttpClient.Do(req)
 
 	defer res.Body.Close()
 
@@ -161,12 +153,12 @@ func cleanTags(rawTags []string) []string {
 	for _, tag := range rawTags {
 		trimmed := strings.ToLower(strings.TrimSpace(tag))
 		// Only take the tag if it's valid
-		if trimmed == photography || trimmed == programming {
+		if trimmed == common.Photography || trimmed == common.Programming {
 			tapsMap[trimmed] = true
 		}
 	}
 
-	var tags = []string{blog} // Every subscriber belongs to the "blog" tag
+	var tags = []string{common.Blog} // Every subscriber belongs to the "blog" tag
 
 	// Convert the map to a list
 	for v := range tapsMap {
@@ -175,7 +167,7 @@ func cleanTags(rawTags []string) []string {
 
 	// If tags wasn't sent in the request, add all supported tags
 	if len(tags) == 1 {
-		tags = append(tags, photography, programming)
+		tags = append(tags, common.Photography, common.Programming)
 	}
 
 	return tags

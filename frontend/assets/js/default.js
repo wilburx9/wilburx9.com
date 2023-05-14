@@ -61,7 +61,9 @@ function parseBookmark(content, linkId, imageId) {
     let readingTime = $(c).find('.external-reading-time').text();
 
 
+    // The anchor tag wrapper of the post card
     let anchor = $('#' + linkId);
+    // This image will not be found if the post has a feature image
     let img = anchor.find('#' + imageId);
     if (img.length) img.attr('src', image);
 

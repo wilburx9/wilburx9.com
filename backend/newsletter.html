@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Wilberforce Uwadiegwu</title>
+    <!--[if gte mso 9]>
+    <xml>
+        <o:OfficeDocumentSettings>
+            <o:AllowPNG/>
+            <o:PixelsPerInch>96</o:PixelsPerInch>
+        </o:OfficeDocumentSettings>
+    </xml>
+    <![endif]-->
+    <style>
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100%;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body, td {
+                color: #fff;
+            }
+
+            .content-container {
+                background-color: #282828;
+            }
+
+            .description {
+                color: #bbb;
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            body, td {
+                color: #333;
+            }
+
+            .content-container {
+                background-color: #f8f8f8;
+            }
+
+            .description {
+                color: #666;
+            }
+        }
+
+        .content-container {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body style="font-family: 'Helvetica', sans-serif;">
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="email-container">
+    <tr>
+        <td class="content-container">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td style="padding: 20px;">
+                        <table>
+                            <tr>
+                                <td valign="middle" style="padding-right: 5px; line-height: 0; padding: 0;">
+                                    <img src="https://cdn.wilburx9.com/2023/04/logo.png" alt="Logo" style="max-width: 30px;"/>
+                                </td>
+                                <td valign="middle">
+                                    <span style="font-weight: 600; font-size:14px; text-transform: uppercase;">{{.Author}}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td align="right" style="padding: 20px; vertical-align: middle; font-size:12px;">
+                        {{.PubDate}}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="padding-left: 20px; padding-right: 20px">
+                        <img src="{{.FeatureImage}}"
+                             alt="feature image" style="width: 100%; border-radius: 5px;"/>
+                    </td>
+                </tr>
+                {{if .FeatureImageCaption}}
+                <tr>
+                    <td colspan="2"
+                        style="padding-left: 35px; padding-right: 35px; font-size: 14px; color: #888; font-style: italic; text-align: center">
+                        {{.FeatureImageCaption}}
+                    </td>
+                </tr>
+                {{end}}
+                <tr>
+                    <td colspan="2" style="padding: 20px; font-size: 25px; font-weight: bold;">
+                        {{.Title}}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="description"
+                        style="padding-left: 20px; padding-right: 20px; padding-bottom: 0; font-size: 18px;">
+                        {{.Excerpt}}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 20px;">
+                        <a href="{{.URL}}"
+                           style="display: inline-block; background: #f59300; color: white; padding: 13px 26px; text-decoration: none; border-radius: 12px; font-weight: 600">Start
+                            Reading</a>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
