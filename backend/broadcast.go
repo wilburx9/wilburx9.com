@@ -4,6 +4,7 @@ import (
 	"backend/common"
 	"bytes"
 	"context"
+	_ "embed"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,7 +15,6 @@ import (
 	"log"
 	"math"
 	"net/http"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -25,6 +25,9 @@ import (
 const (
 	iso8601 = "2006-01-02T15:04:05-0700"
 )
+
+//go:embed newsletter.html
+var newsletterFile string
 
 func main() {
 	lambda.Start(handleBroadcast)
@@ -88,7 +91,7 @@ func processRequest(ctx context.Context, body string) (string, error) {
 		return "", fmt.Errorf("request body to post mapping error: %w", err)
 	}
 
-	content, err := parseEmailTemplate(post, "newsletter.html")
+	content, err := parseEmailTemplate(post)
 	if err != nil {
 		return "", fmt.Errorf("parse template error: %w", err)
 	}
@@ -172,14 +175,9 @@ func createCampaign(ctx context.Context, post Post) (string, error) {
 	return campaign.ID, nil
 }
 
-func parseEmailTemplate(post Post, templateFile string) (string, error) {
-	fileBytes, err := os.ReadFile(templateFile)
-	if err != nil {
-		return "", err
-	}
-
+func parseEmailTemplate(post Post) (string, error) {
 	var emailContent bytes.Buffer
-	t, err := template.New("newsletter").Parse(string(fileBytes))
+	t, err := template.New("newsletter").Parse(newsletterFile)
 	if err != nil {
 		return "", err
 	}
