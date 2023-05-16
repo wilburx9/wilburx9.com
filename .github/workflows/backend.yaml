@@ -43,10 +43,10 @@ jobs:
       - name: Deploy subscribe function
         working-directory: backend
         run: |
-          aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_SUBSCRIBE }} --zip-file fileb://./subscribe.zip
+          aws lambda update-function-code --function-name ${{ env.LAMBDA_FUNCTION_SUBSCRIBE }} --zip-file fileb://./subscribe.zip
 
       - name: Deploy broadcast function
         working-directory: backend
         run: |
-          aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_BROADCAST }} --zip-file fileb://./broadcast.zip
+          aws lambda update-function-code --function-name ${{ env.LAMBDA_FUNCTION_BROADCAST }} --zip-file fileb://./broadcast.zip
 
