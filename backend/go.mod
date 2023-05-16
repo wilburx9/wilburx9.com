@@ -1,4 +1,4 @@
-module backend
+module github.com/wilburt/wilburx9.com/backend
 
 go 1.20
 

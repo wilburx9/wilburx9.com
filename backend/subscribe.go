@@ -1,12 +1,12 @@
 package main
 
 import (
-	"backend/common"
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/wilburt/wilburx9.com/backend/common"
 	"log"
 	"net/http"
 	"net/mail"
