@@ -55,17 +55,17 @@ func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (ev
 
 // subscribe forwards the request to MailChimp to subscribe the user
 func subscribe(ctx context.Context, listId string, data requestData) error {
-	member := map[string]interface{}{"email_address": data.Email, "status": "pending", "tags": data.Tags}
+	member := map[string]any{"email_address": data.Email, "status": "pending", "tags": data.Tags}
 
-	err := common.MakeMailChimpRequest(
+	success := common.MakeMailChimpRequest(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("lists/%s/members", listId),
 		member,
 		nil,
 	)
-	if err != nil {
-		return fmt.Errorf("subscription request returneed an error: %w", err)
+	if !success {
+		return fmt.Errorf("failed to subscribe %q", data.Email)
 	}
 	return nil
 }

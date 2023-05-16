@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"io"
+	"log"
 	"net/http"
 	"time"
 )
@@ -17,9 +18,9 @@ const (
 	Blog        = "blog"
 )
 
-func getResponseBody(success bool, data interface{}) string {
+func getResponseBody(success bool, data any) string {
 
-	res := map[string]interface{}{
+	res := map[string]any{
 		"success": success,
 		"data":    data,
 	}
@@ -32,7 +33,7 @@ func getResponseBody(success bool, data interface{}) string {
 }
 
 // MakeResponse returns an error or success lambda response
-func MakeResponse(code int, data interface{}) events.APIGatewayProxyResponse {
+func MakeResponse(code int, data any) events.APIGatewayProxyResponse {
 	success := false
 	if code <= 299 {
 		success = true
@@ -47,19 +48,21 @@ func MakeResponse(code int, data interface{}) events.APIGatewayProxyResponse {
 }
 
 // MakeMailChimpRequest makes http calls to MailChimp API
-func MakeMailChimpRequest(ctx context.Context, method string, path string, reqBody any, respBody any) error {
+func MakeMailChimpRequest(ctx context.Context, method string, path string, reqBody any, respBody any) bool {
 	config := ConfigFromContext(&ctx)
 	u := fmt.Sprintf("https://%s.api.mailchimp.com/3.0/%s", config.MailChimpDC, path)
 
 	reqBuffer := new(bytes.Buffer)
 	err := json.NewEncoder(reqBuffer).Encode(reqBody)
 	if err != nil {
-		return err
+		log.Println("error while encoding request body: ", err)
+		return false
 	}
 
 	req, err := http.NewRequestWithContext(ctx, method, u, reqBuffer)
 	if err != nil {
-		return err
+		log.Println("error while creating http request: ", err)
+		return false
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", config.MailChimpToken))
@@ -67,27 +70,33 @@ func MakeMailChimpRequest(ctx context.Context, method string, path string, reqBo
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		log.Println("request returned an error: ", err)
+		return false
 	}
+
+	defer res.Body.Close()
 
 	// Any non 2xx response code denotes an error. See https://mailchimp.com/developer/marketing/docs/errors/
 	if res.StatusCode < 200 || res.StatusCode > 299 {
 		body, err := io.ReadAll(res.Body)
 		if err != nil {
-			return fmt.Errorf("couldn't read response body %w", err)
+			log.Println(res.StatusCode, " response. Couldn't read response body: ", err)
+		} else {
+			log.Println(res.StatusCode, " response: ", string(body))
 		}
-		return fmt.Errorf(string(body))
+		return false
 	}
 
 	if respBody == nil { // Will be null if the caller doesn't need the response body
-		return nil
+		return true
 	}
 
 	err = json.NewDecoder(res.Body).Decode(respBody)
 	if err != nil {
-		return err
+		log.Println("error while decoding response body: ", err)
+		return false
 	}
-	return nil
+	return true
 }
 
 // HttpClient returns an instance of Http Client with custom config
