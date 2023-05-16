@@ -88,18 +88,25 @@ function zipper(done) {
 }
 
 async function deploy(done) {
-    let url = process.env.GHOST_API_URL
-    let apiKey = process.env.GHOST_API_KEY
-    let themeName = require('./package.json').name
-    let zipPath = `dist/${themeName}.zip`
-    let admin = new GhostAdminAPI({
-        url: url,
-        key: apiKey,
-        version: "v5"
-    })
-    await admin.themes.upload({file: zipPath})
-    await admin.themes.activate(themeName)
-    done()
+    try {
+        let url = process.env.GHOST_API_URL
+        let apiKey = process.env.GHOST_API_KEY
+        let themeName = require('./package.json').name
+        let zipPath = `dist/${themeName}.zip`
+        let admin = new GhostAdminAPI({
+            url: url,
+            key: apiKey,
+            version: "v5"
+        })
+        let upload = await admin.themes.upload({file: zipPath})
+        console.log(`Successfully uploaded: ${JSON.stringify(upload)}`)
+        let activate = await admin.themes.activate(themeName)
+        console.log(`Successfully activated: ${JSON.stringify(activate)}`)
+        done()
+    } catch (err) {
+        console.error(JSON.stringify(err));
+        process.exit(1);
+    }
 }
 
 const cssWatcher = () => watch('assets/css/**', css);
