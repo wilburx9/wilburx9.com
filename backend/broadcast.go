@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/common"
 	"bytes"
 	"context"
 	_ "embed"
@@ -11,7 +12,6 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/go-playground/validator/v10"
-	"github.com/wilburt/wilburx9.com/backend/common"
 	"html"
 	"log"
 	"math"
