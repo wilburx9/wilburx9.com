@@ -2,8 +2,8 @@ name: Deploy the AWS Lambdas
 
 on:
   push:
-#    tags:
-#      - 'release-v*'
+    tags:
+      - 'release-v*'
     paths:
       - 'backend/**'
 
@@ -25,13 +25,13 @@ jobs:
       - name: Build subscribe function
         working-directory: backend
         run: |
-          GOOS=linux GOARCH=amd64 go build subscribe.go
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build subscribe.go
           zip -j ./subscribe.zip ./subscribe
 
       - name: Build broadcast function
         working-directory: backend
         run: |
-          GOOS=linux GOARCH=amd64 go build broadcast.go
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build broadcast.go
           zip -j ./broadcast.zip ./broadcast
 
       - name: Configure AWS credentials

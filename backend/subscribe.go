@@ -36,7 +36,7 @@ func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (ev
 		log.Println("Failed to validate captcha",
 			"error: ", err.Error(),
 		)
-		return common.MakeResponse(http.StatusUnprocessableEntity, "Unable to complete subscription"), nil
+		return common.MakeResponse(http.StatusBadRequest, "Unable to complete subscription"), nil
 	}
 
 	err = subscribe(ctx, config.NewsletterListId, data)
@@ -104,20 +104,20 @@ func validateForm(body string) (requestData, string, error) {
 	var data requestData
 	err := json.Unmarshal([]byte(body), &data)
 	if err != nil {
-		return requestData{}, "Bad Request", err
+		return requestData{}, "invalid request body", err
 	}
 
 	address, err := mail.ParseAddress(data.Email)
 	if err != nil {
-		return requestData{}, "Invalid email", err
+		return requestData{}, "invalid email", err
 	}
 
 	if strings.TrimSpace(data.Captcha) == "" {
-		return requestData{}, "Captcha is required", nil
+		return requestData{}, "captcha is required", nil
 	}
 
 	if len(data.Tags) > 2 {
-		return requestData{}, "Invalid tags", nil
+		return requestData{}, "invalid tags", nil
 	}
 
 	data.Email = address.Address
