@@ -1,0 +1,52 @@
+name: Deploy the AWS Lambdas
+
+on:
+  push:
+#    tags:
+#      - 'release-v*'
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20
+
+      - name: Build subscribe function
+        working-directory: backend
+        run: |
+          GOOS=linux GOARCH=amd64 go build subscribe.go
+          zip -j ./subscribe.zip ./subscribe
+
+      - name: Build broadcast function
+        working-directory: backend
+        run: |
+          GOOS=linux GOARCH=amd64 go build broadcast.go
+          zip -j ./broadcast.zip ./broadcast
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy subscribe function
+        working-directory: backend
+        run: |
+          aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_SUBSCRIBE }} --zip-file fileb://./subscribe.zip
+
+      - name: Deploy broadcast function
+        working-directory: backend
+        run: |
+          aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNCTION_BROADCAST }} --zip-file fileb://./broadcast.zip
+

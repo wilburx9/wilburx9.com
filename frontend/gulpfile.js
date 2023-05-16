@@ -98,10 +98,8 @@ async function deploy(done) {
             key: apiKey,
             version: "v5"
         })
-        let upload = await admin.themes.upload({file: zipPath})
-        console.log(`Successfully uploaded: ${JSON.stringify(upload)}`)
-        let activate = await admin.themes.activate(themeName)
-        console.log(`Successfully activated: ${JSON.stringify(activate)}`)
+        await admin.themes.upload({file: zipPath})
+        await admin.themes.activate(themeName)
         done()
     } catch (err) {
         console.error(JSON.stringify(err));
