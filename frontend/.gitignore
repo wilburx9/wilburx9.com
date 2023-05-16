@@ -105,4 +105,5 @@ fabric.properties
 *.css.map
 
 /assets/built/
+/dist/
 

@@ -13,6 +13,7 @@
     "scripts": {
         "dev": "gulp",
         "zip": "gulp zip",
+        "deploy": "gulp deploy",
         "test": "gscan .",
         "test:ci": "gscan --fatal --verbose .",
         "pretest": "gulp build",
@@ -106,6 +107,7 @@
         }
     },
     "dependencies": {
+        "@tryghost/admin-api": "^1.13.6",
         "tailwindcss": "^3.2.7"
     }
 }

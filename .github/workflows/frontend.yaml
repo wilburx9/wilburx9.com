@@ -2,8 +2,8 @@ name: Deploy the Ghost theme
 
 on:
   push:
-    tags:
-      - 'release-v*'
+#    tags:
+#      - 'release-v*'
     paths:
       - 'frontend/**'
 
@@ -13,8 +13,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    env:
-      THEME_NAME: ""
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -27,19 +25,16 @@ jobs:
         working-directory: frontend
         run: yarn pretest
 
-      - name: Set theme name
-        run: |
-          version=$(echo "${{ github.ref }}" | sed -n 's/.*\/release-\(v[0-9]*\.[0-9]*\.[0-9]*\)$/\1/p')
-          echo "THEME_NAME=Wilburx9-$version" >> $GITHUB_ENV
+      - name: Package the theme into a zip file
+        working-directory: frontend
+        run: gulp zip
 
-      - name: Deploy Ghost Theme
-        uses: TryGhost/action-deploy-theme@v1
-        with:
-          api-url: ${{ secrets.GHOST_ADMIN_API_URL }}
-          api-key: ${{ secrets.GHOST_ADMIN_API_KEY }}
-          working-directory: frontend
-          exclude: "!**/*.map routes.yaml assets/js/* assets/css/* ./idea/* assets/screenshot-desktop.jpg"
-          theme-name: ${{ env.THEME_NAME }}
+      - name: Deploy and activate the theme
+        working-directory: frontend
+        env:
+          GHOST_API_URL: ${{ secrets.GHOST_ADMIN_API_URL }}
+          GHOST_API_KEY: ${{ secrets.GHOST_ADMIN_API_KEY }}
+        run: gulp deploy
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2

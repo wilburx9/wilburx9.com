@@ -1,6 +1,8 @@
 const {series, watch, src, dest, parallel} = require('gulp');
 const pump = require('pump');
 
+const GhostAdminAPI = require("@tryghost/admin-api");
+
 // gulp plugins and utils
 var livereload = require('gulp-livereload');
 var postcss = require('gulp-postcss');
@@ -85,6 +87,21 @@ function zipper(done) {
     ], handleError(done));
 }
 
+async function deploy(done) {
+    let url = process.env.GHOST_API_URL
+    let apiKey = process.env.GHOST_API_KEY
+    let themeName = require('./package.json').name
+    let zipPath = `dist/${themeName}.zip`
+    let admin = new GhostAdminAPI({
+        url: url,
+        key: apiKey,
+        version: "v5"
+    })
+    await admin.themes.upload({file: zipPath})
+    await admin.themes.activate(themeName)
+    done()
+}
+
 const cssWatcher = () => watch('assets/css/**', css);
 const jsWatcher = () => watch('assets/js/**', js);
 const hbsWatcher = () => watch(['*.hbs', '**/**/*.hbs', '!node_modules/**/*.hbs'], hbs);
@@ -95,3 +112,4 @@ const dev = series(build, serve, watcher);
 exports.build = build;
 exports.zip = series(build, zipper);
 exports.default = dev;
+exports.deploy = deploy
