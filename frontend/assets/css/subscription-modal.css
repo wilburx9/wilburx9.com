@@ -1,8 +1,9 @@
 .subscription-modal {
     @apply
     hidden fixed top-0 left-0
-    w-full h-full bg-black/50
-    z-[150]
+    bg-black/50 z-[150]
+    w-screen h-screen
+    max-w-full max-h-full
 }
 
 .subscription-modal > div.subscription-content {

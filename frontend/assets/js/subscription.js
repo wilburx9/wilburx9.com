@@ -142,7 +142,7 @@ class Subscription {
 
     setupSubscription(primaryTag) {
         $('#post-subscribe').click(() => {
-            this.showSubscription(primaryTag)
+            this.showSubscriptionModal(primaryTag)
         })
 
         // Listen for escape key
@@ -156,7 +156,7 @@ class Subscription {
         })
     }
 
-    showSubscription(primaryTag) {
+    showSubscriptionModal(primaryTag) {
         // Fade in the translucent background
         $('.subscription-modal').fadeIn()
         // Slide the modal content from the bottom

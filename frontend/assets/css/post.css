@@ -125,13 +125,14 @@ figcaption {
     before:backdrop-blur-md
 }
 
-.photo-zoom-handle {
+.photo-zoom-in-handle,
+.photo-zoom-out-handle {
     @apply
     top-2 right-2 sm:top-4 sm:right-4 absolute
     z-30 w-9 h-9 sm:w-11 sm:h-11 md:w-14 md:h-14 stroke-blackSet dark:stroke-blackSet-dark
     bg-bgSet/50 dark:bg-bgSet-dark/50 rounded-full
     hidden group-focus:flex group-hover:flex justify-center items-center
-    transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
+    transition ease-in-out duration-300 motion-reduce:transition-none motion-reduce:hover:transform-none
     hover:bg-bgSet hover:dark:bg-bgSet-dark hover:scale-105
     active:bg-bgSet active:dark:bg-bgSet-dark active:scale-105
     focus:bg-bgSet focus:dark:bg-bgSet-dark focus:scale-105
@@ -141,33 +142,40 @@ figcaption {
 /* Image lightbox */
 .photo-lightbox {
     @apply
-    items-center justify-center
-    hidden fixed z-[150]
-    top-0 left-0
+    hidden fixed top-0 left-0
+    bg-black/60 z-[150]
     w-screen h-screen
     max-w-full max-h-full
-    overflow-auto
-    bg-black/50
 }
 
-.photo-lightbox > div {
+.photo-lightbox-content {
+    @apply
+    items-center justify-center
+    w-full h-full flex
+}
+
+.photo-lightbox-content > div {
     @apply
     relative
     mx-auto
     max-w-fit max-h-fit
 }
 
-.photo-lightbox > div > img {
+.photo-lightbox-content> div > img {
     @apply
-    w-screen
+    w-screen scale-90
+    transition-transform ease-in-out duration-300 motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.photo-lightbox-content> div > img.scale-full {
+    @apply
+    scale-100
 }
 
 .kg-image-card > div > img {
     @apply
-    h-full w-auto
-    mx-auto
-    z-20
-    relative
+    h-full w-auto mx-auto
+    z-20 relative
 }
 
 .image-exif {

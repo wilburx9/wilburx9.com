@@ -25,33 +25,77 @@ function handlePrimaryTag(tag) {
 
 // Resize and add blur effect to images.
 function processImages(primaryTag) {
-    const images = document.querySelectorAll(".kg-image-card img");
-    let wrapperMinAR = getMinAspectRatio()
-    for (let i = 0; i < images.length; i++) {
-        let image = images[i]
-        let lightBoxId = `lightbox__photo__${i}`
-        let imgWrapper = document.createElement("div")
-        imgWrapper.style.backgroundImage = `url("${image.currentSrc || image.src}")`
-        imgWrapper.classList.add("group")
-        let imgW = Number(image.getAttribute("width"))
-        let imgH = Number(image.getAttribute("height"))
-        let imgAR = `${imgW}/${imgH}`
+    let wrapperMinAR = getMinAspectRatio();
+    $(".kg-image-card img").each(function (i, image) {
+        let lightBoxId = `lightbox__photo__${i}`;
+        let $imgWrapper = $("<div></div>");
+        let imgW = Number($(image).attr("width"));
+        let imgH = Number($(image).attr("height"));
+        let imgAR = `${imgW}/${imgH}`;
 
-        imgWrapper.style.aspectRatio = Math.max((imgW / imgH), wrapperMinAR).toString()
-        image.style.aspectRatio = `${imgW}/${imgH}`
-        imgWrapper.style.maxHeight = `${imgH}px`
-        image.style.maxWidth = `${imgW}px`
-        image.style.maxHeight = `${imgH}px`
 
-        let container = image.parentElement
-        container.insertBefore(imgWrapper, image.parentElement.firstChild)
-        imgWrapper.append(image)
+        // Ensure the container height is not larger than the image
+        $imgWrapper.css({
+            "background-image": `url("${image.currentSrc || image.src}")`,
+            "aspect-ratio": Math.max((imgW / imgH), wrapperMinAR).toString(),
+            "max-height": `${imgH}px`
+        }).addClass("group"); // Add group for Tailwind group hover
+
+
+        $(image).css({
+            "aspect-ratio": `${imgW}/${imgH}`,
+            "max-width": `${imgW}px`,
+            "max-height": `${imgH}px`
+        });
+
+        let $container = $(image).parent(); // The <figure> container of the image
+        $container.prepend($imgWrapper);
+        $imgWrapper.append(image);
+
         if (primaryTag === 'photography') {
-            imgWrapper.insertAdjacentHTML("afterbegin", `<span onclick='showLightBox("${lightBoxId}");' class='photo-zoom-handle'><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="m19 19-4.35-4.35M9 6v6M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/></svg></span>`)
-            container.insertAdjacentHTML("beforebegin", `<div class='photo-lightbox' id='${lightBoxId}'><div class="group" style="${getZoomImgWrapperStyle(imgW, imgH)}"><span onclick='closeLightBox("${lightBoxId}");' class='photo-zoom-handle'><svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/></svg></span><img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${imgAR}"/></div></div>`)
+            const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
+                <div class="photo-lightbox-content">
+                    <div class="group" style="${getZoomImgWrapperStyle(imgW, imgH)}">
+                    <span class='photo-zoom-out-handle'>
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
+                        </svg>
+                    </span>
+                        <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${imgAR}"/>
+                    </div>
+                </div>
+            </div>`;
+            const zoomInIcon = `<span class='photo-zoom-in-handle'>
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="m19 19-4.35-4.35M9 6v6M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
+                </svg>
+            </span>`;
+            // Add the zoom-in icon as the last child of the image wrapper.
+            $imgWrapper.prepend(zoomInIcon);
+            // Add the lightbox above the image figure. After this, the image figure and lightbox share the same parent.
+            $container.before(lightBox);
+
+            // Show the lightbox when the zoom-in icon on the image is clicked.
+            $container.find('.photo-zoom-in-handle').click(() => {
+                showLightBox(lightBoxId, $container)
+            })
+
+            // Close the lightbox when the zoom-out icon on the image is clicked.
+            $container.parent().find(`#${lightBoxId} .photo-zoom-out-handle`).click(() => {
+                closeLightBox(lightBoxId, $container)
+            })
+
+            // Listen for click events on the content background.
+            $(`#${lightBoxId} .photo-lightbox-content`).click(event => {
+                // Close the lightbox only if it was the content background that is clicked.
+                if (event.target === event.currentTarget) closeLightBox(lightBoxId, $container)
+            })
         }
-    }
+    });
 }
+
 
 // Add Copy button to code blocks
 !function () {
@@ -79,16 +123,21 @@ function processImages(primaryTag) {
 }();
 
 
-function closeLightBox(id) {
-    document.getElementById(id).style.display = "none"
-    document.body.style.overflowY = 'auto'
-    document.body.style.overflowX = null
+function closeLightBox(id, figure) {
+    $(document).off(`keyup.${id}`);
+    $(`#${id}`).fadeOut()
+    figure.find('img.kg-image').fadeIn()
+    $(`#${id} .photo-lightbox-content img`).removeClass('scale-full')
 }
 
-function showLightBox(id) {
-    document.getElementById(id).style.display = 'flex'
-    document.body.style.overflowY = 'hidden'
-    document.body.style.overflowX = 'unset'
+function showLightBox(id, figure) {
+    // Listen for escape key
+    $(document).on(`keyup.${id}`, event => {
+        if (event.key === "Escape") closeLightBox(id, figure);
+    });
+    figure.find('img.kg-image').fadeOut()
+    $(`#${id}`).fadeIn()
+    $(`#${id} .photo-lightbox-content img`).addClass('scale-full')
 }
 
 function copyCode(e) {
