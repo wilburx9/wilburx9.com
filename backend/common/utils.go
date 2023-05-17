@@ -15,21 +15,8 @@ const (
 	Blog        = "blog"
 )
 
+// AppConfig is a global container for app-wide config
 var AppConfig = NewConfig()
-
-func getResponseBody(success bool, data any) string {
-
-	res := map[string]any{
-		"success": success,
-		"data":    data,
-	}
-
-	b, err := json.Marshal(res)
-	if err != nil {
-		return "Something went wrong"
-	}
-	return string(b)
-}
 
 // MakeResponse returns an error or success lambda response
 func MakeResponse(origin string, code int, data any) events.APIGatewayProxyResponse {
@@ -61,4 +48,19 @@ var HttpClient = &http.Client{
 	Timeout: time.Second * 20,
 }
 
+// MailClient is the email marketing client
 var MailClient = mailerlite.NewClient(AppConfig.MailerLiteToken)
+
+func getResponseBody(success bool, data any) string {
+
+	res := map[string]any{
+		"success": success,
+		"data":    data,
+	}
+
+	b, err := json.Marshal(res)
+	if err != nil {
+		return "Something went wrong"
+	}
+	return string(b)
+}

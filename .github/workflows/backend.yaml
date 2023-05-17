@@ -2,8 +2,8 @@ name: Deploy the AWS Lambdas
 
 on:
   push:
-    tags:
-      - 'release-v*'
+#    tags:
+#      - 'release-v*'
     paths:
       - 'backend/**'
 

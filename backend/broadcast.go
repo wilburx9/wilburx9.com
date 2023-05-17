@@ -17,6 +17,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -101,13 +102,15 @@ func scheduleCampaign(ctx context.Context, campaignId string) error {
 	var timezoneId int
 	for _, tz := range list.Data {
 		if tz.Name == timezone {
-			log.Println(fmt.Sprintf("%+v", tz))
 			timezoneId, err = strconv.Atoi(tz.Id)
 			if err != nil {
 				return err
 			}
 			break
 		}
+	}
+	if timezoneId == 0 {
+		return fmt.Errorf("no valid timezone id found for %v. OS timezone: %v", timezone, os.Getenv("TZ"))
 	}
 
 	schedule := &mailerlite.ScheduleCampaign{
