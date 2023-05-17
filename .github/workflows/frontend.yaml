@@ -8,7 +8,7 @@ on:
       - 'frontend/**'
 
 jobs:
-  deploy:
+  deploy-frontend:
     runs-on: ubuntu-latest
     permissions:
       contents: read
