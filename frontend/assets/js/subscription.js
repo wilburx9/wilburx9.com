@@ -59,7 +59,7 @@ class Subscription {
     handleSubmitSuccess(progressDiv, progressAnim) {
         let $successContainer = $('.subscription-success')
         let $animationDiv = $successContainer.find('#success-icon')
-        let animation = getLottieAnimation($animationDiv, 'done')
+        let animation = getLottieAnimation($animationDiv, 'done', 1)
 
         $('.subscription-success .success-cta').off('click').on('click', () => {
             animation.stop()

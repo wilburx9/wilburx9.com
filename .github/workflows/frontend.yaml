@@ -2,8 +2,8 @@ name: Deploy the Ghost theme
 
 on:
   push:
-#    tags:
-#      - 'release-v*'
+    tags:
+      - 'release-v*'
     paths:
       - 'frontend/**'
 

@@ -80,14 +80,14 @@ function parseBookmark(content, linkId, imageId) {
 
 function getProgressAnimation(container) {
     let name = isDarkTheme() ? 'loading_dark' : 'loading_light'
-    return getLottieAnimation(container, name)
+    return getLottieAnimation(container, name, true)
 }
 
-function getLottieAnimation(container, name) {
+function getLottieAnimation(container, name, loop) {
     return bodymovin.loadAnimation({
         container: container[0],
         renderer: 'svg',
-        loop: true,
+        loop: loop,
         autoplay: true,
         path: `/assets/lottie/${name}.json`
     })

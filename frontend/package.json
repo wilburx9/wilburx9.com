@@ -2,7 +2,7 @@
     "name": "wilburx9",
     "description": "A custom ghost theme for wilburx9.com/blog",
     "demo": "https://wilburx9.com/blog",
-    "version": "1.0.8",
+    "version": "3.0.0",
     "engines": {
         "ghost": ">=4.0.0"
     },
