@@ -1,41 +1,29 @@
 package common
 
 import (
-	"context"
 	"os"
 )
 
 // Config is a container of environment variables
 type Config struct {
-	TurnstileSecret    string
-	TurnstileHostName  string
-	MailChimpToken     string
-	MailChimpDC        string
-	NewsletterListId   string
-	EmailSender        string
-	ProgrammingSegment string
-	PhotographySegment string
-	AllowedOrigins     []string
+	TurnstileSecret   string
+	TurnstileHostName string
+	NewsletterListId  string
+	EmailSender       string
+	AllowedOrigins    []string
+	MailerLiteToken   string
+	TimeZone          string
 }
 
 // NewConfig instantiates Config
 func NewConfig() *Config {
 	return &Config{
-		TurnstileSecret:    os.Getenv("TURNSTILE_SECRET"),
-		TurnstileHostName:  os.Getenv("TURNSTILE_HOSTNAME"),
-		MailChimpToken:     os.Getenv("MAILCHIMP_TOKEN"),
-		MailChimpDC:        os.Getenv("MAILCHIMP_DATA_CENTRE"),
-		NewsletterListId:   os.Getenv("NEWSLETTER_LIST_ID"),
-		EmailSender:        os.Getenv("EMAIL_SENDER"),
-		ProgrammingSegment: os.Getenv("PROGRAMMING_SEGMENT"),
-		PhotographySegment: os.Getenv("PHOTOGRAPHY_SEGMENT"),
-		AllowedOrigins:     []string{os.Getenv("PROD_FRONTEND_URL"), os.Getenv("DEV_FRONTEND_URL")},
+		TurnstileSecret:   os.Getenv("TURNSTILE_SECRET"),
+		TurnstileHostName: os.Getenv("TURNSTILE_HOSTNAME"),
+		NewsletterListId:  os.Getenv("NEWSLETTER_LIST_ID"),
+		EmailSender:       os.Getenv("EMAIL_SENDER"),
+		MailerLiteToken:   os.Getenv("MAILER_LITE_TOKEN"),
+		TimeZone:          os.Getenv("TZ"),
+		AllowedOrigins:    []string{os.Getenv("PROD_FRONTEND_URL"), os.Getenv("DEV_FRONTEND_URL")},
 	}
 }
-
-func ConfigFromContext(ctx *context.Context) *Config {
-	return (*ctx).Value(ConfigKey).(*Config)
-}
-
-// ConfigKey is the key for the config in the context
-var ConfigKey = "common.Config"

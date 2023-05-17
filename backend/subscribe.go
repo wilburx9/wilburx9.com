@@ -2,11 +2,13 @@ package main
 
 import (
 	"backend/common"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/mailerlite/mailerlite-go"
 	"log"
 	"net/http"
 	"net/mail"
@@ -20,16 +22,13 @@ func main() {
 // handleSubscribe is called when the Lambda receivers a request.
 // nil errors are returned because I want return custom http errors as opposed to Lambda's default 500.
 func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	config := common.NewConfig()
-	ctx = context.WithValue(ctx, common.ConfigKey, config)
-
-	status, msg := processSubscribeRequest(ctx, config, req.Body)
+	status, msg := processSubscribeRequest(ctx, req.Body)
 	origin := req.Headers["origin"]
 
-	return common.MakeResponse(origin, config.AllowedOrigins, status, msg), nil
+	return common.MakeResponse(origin, status, msg), nil
 }
 
-func processSubscribeRequest(ctx context.Context, config *common.Config, body string) (int, string) {
+func processSubscribeRequest(ctx context.Context, body string) (int, string) {
 	data, msg, err := validateForm(body)
 	if msg != "" || err != nil {
 		log.Println("Failed to validate request body",
@@ -38,7 +37,7 @@ func processSubscribeRequest(ctx context.Context, config *common.Config, body st
 		return http.StatusBadRequest, msg
 	}
 
-	err = validateCaptcha(ctx, config, data.Captcha)
+	err = validateCaptcha(ctx, data.Captcha)
 	if err != nil {
 		log.Println("Failed to validate captcha",
 			"error: ", err.Error(),
@@ -46,7 +45,7 @@ func processSubscribeRequest(ctx context.Context, config *common.Config, body st
 		return http.StatusBadRequest, "Unable to complete subscription"
 	}
 
-	err = subscribe(ctx, config.NewsletterListId, data)
+	err = subscribe(ctx, data.Email, data.Tags)
 	if err != nil {
 		log.Println("Subscription request failed",
 			"error: ", err.Error(),
@@ -57,26 +56,58 @@ func processSubscribeRequest(ctx context.Context, config *common.Config, body st
 	return http.StatusCreated, "Successfully created"
 }
 
-// subscribe forwards the request to MailChimp to subscribe the user
-func subscribe(ctx context.Context, listId string, data requestData) error {
-	member := map[string]any{"email_address": data.Email, "status": "pending", "tags": data.Tags}
+// subscribe forwards the request to the mail client to subscribe the user
+func subscribe(ctx context.Context, email string, tags []string) error {
 
-	success := common.MakeMailChimpRequest(
-		ctx,
-		http.MethodPost,
-		fmt.Sprintf("lists/%s/members", listId),
-		member,
-		nil,
-	)
-	if !success {
-		return fmt.Errorf("failed to subscribe %q", data.Email)
+	allGroups, _, err := common.MailClient.Group.List(ctx, &mailerlite.ListGroupOptions{})
+	if err != nil {
+		return err
 	}
-	return nil
+
+	var groups []string
+	// Filter out groups with same name as supported tags
+	for _, group := range allGroups.Data {
+		for _, tag := range tags {
+			if strings.EqualFold(group.Name, tag) {
+				groups = append(groups, group.ID)
+			}
+		}
+	}
+
+	u := "https://connect.mailerlite.com/api/subscribers"
+	subscriber := map[string]interface{}{"email": email, "groups": groups, "status": "unconfirmed"}
+	reqBody := new(bytes.Buffer)
+
+	err = json.NewEncoder(reqBody).Encode(subscriber)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, u, reqBody)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", common.MailClient.APIKey()))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+	if err == nil && (res.StatusCode == http.StatusOK || res.StatusCode == http.StatusCreated) {
+		return nil
+	}
+
+	return fmt.Errorf("subscription request failed. status code: %v, error: %v", res.StatusCode, err)
 }
 
 // validateCaptcha ensures this is not a spam request
-func validateCaptcha(ctx context.Context, config *common.Config, captcha string) error {
-	data := fmt.Sprintf("secret=%v&response=%v", config.TurnstileSecret, captcha)
+func validateCaptcha(ctx context.Context, captcha string) error {
+	data := fmt.Sprintf("secret=%v&response=%v", common.AppConfig.TurnstileSecret, captcha)
 
 	u := "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, strings.NewReader(data))
@@ -95,7 +126,7 @@ func validateCaptcha(ctx context.Context, config *common.Config, captcha string)
 		return err
 	}
 
-	if t.Success && t.Hostname == config.TurnstileHostName {
+	if t.Success && t.Hostname == common.AppConfig.TurnstileHostName {
 		return nil
 	}
 

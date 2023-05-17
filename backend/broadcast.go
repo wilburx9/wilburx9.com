@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/go-playground/validator/v10"
+	"github.com/mailerlite/mailerlite-go"
 	"html"
 	"log"
 	"math"
@@ -23,10 +24,6 @@ import (
 	"time"
 )
 
-const (
-	iso8601 = "2006-01-02T15:04:05-0700"
-)
-
 //go:embed newsletter.html
 var newsletterFile string
 
@@ -36,13 +33,10 @@ func main() {
 
 // handleBroadcast creates a campaign and schedules to be sent.
 func handleBroadcast(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	config := common.NewConfig()
-	ctx = context.WithValue(ctx, common.ConfigKey, config)
-
 	status, msg := processBroadcastRequest(ctx, req.Body)
 	origin := req.Headers["origin"]
 
-	return common.MakeResponse(origin, config.AllowedOrigins, status, msg), nil
+	return common.MakeResponse(origin, status, msg), nil
 }
 
 // processBroadcastRequest schedules an email campaign about an hour form now.
@@ -64,13 +58,11 @@ func processBroadcastRequest(ctx context.Context, body string) (int, string) {
 	// 1. To prevent sending notification for drafts, confirm this post is published.
 	// 2. To prevent sending emails for unpublished and republished posts, ensure
 	//	  that the diff b/w publication and updated dates is not more than 30 minutes.
-
-	postData := reqData.Post.Current
-	if postData.Status != "published" || math.Abs(postData.PublishedAt.Sub(postData.UpdatedAt).Minutes()) > 30 {
+	if !reqData.canBroadcast() {
 		return http.StatusBadRequest, fmt.Sprintf(
 			"this post is too old to be rescheduled. It was created at %v and updated at %v ",
-			postData.PublishedAt,
-			postData.UpdatedAt,
+			reqData.Post.Current.PublishedAt,
+			reqData.Post.Current.UpdatedAt,
 		)
 	}
 
@@ -82,89 +74,102 @@ func processBroadcastRequest(ctx context.Context, body string) (int, string) {
 		return http.StatusInternalServerError, "something went wrong"
 	}
 
-	campaignId, err := createCampaign(ctx, post)
+	campaignId, err := createCampaign(ctx, post, content)
 	if err != nil {
-		return http.StatusBadGateway, err.Error()
-	}
-
-	err = setCampaignContent(ctx, campaignId, content)
-	if err != nil {
-		return http.StatusBadGateway, err.Error()
+		log.Println("campaign creation error: ", err)
+		return http.StatusBadGateway, "something went wrong while creating campaign"
 	}
 
 	err = scheduleCampaign(ctx, campaignId)
 	if err != nil {
-		return http.StatusBadGateway, err.Error()
+		log.Println("campaign scheduling error: ", err)
+		return http.StatusBadGateway, "something went wrong while scheduling campaign"
 	}
 
 	return http.StatusOK, "Successfully scheduled"
 }
 
 func scheduleCampaign(ctx context.Context, campaignId string) error {
-	// Use a time an hour into the future, so I can manually cancel the campaign if I don't want it to be sent.
-	f := time.Now().Add(time.Hour)
-	// Round it to quarterly hour. See https://mailchimp.com/developer/marketing/api/campaigns/schedule-campaign
-	minutes := f.Minute()
-	remainder := minutes % 15
-	var when time.Time
-	if (remainder * 2) < 15 { // If the remainder is less than 7.5 (halfway between 0 and 15), round down; otherwise, round up
-		when = time.Date(f.Year(), f.Month(), f.Day(), f.Hour(), minutes-remainder, 0, 0, f.Location())
-	} else {
-		when = time.Date(f.Year(), f.Month(), f.Day(), f.Hour(), minutes+(15-remainder), 0, 0, f.Location())
-	}
+	timezone := common.AppConfig.TimeZone
+	when := time.Now().Add(time.Hour)
 
-	reqBody := map[string]any{"schedule_time": when.Format(iso8601)}
-
-	success := common.MakeMailChimpRequest(
-		ctx,
-		http.MethodPost,
-		fmt.Sprintf("campaigns/%v/actions/schedule", campaignId),
-		reqBody,
-		nil,
-	)
-	if !success {
-		return errors.New("failed to schedule newsletter")
-	}
-	return nil
-}
-
-func setCampaignContent(ctx context.Context, campaignId string, content string) error {
-	reqBody := map[string]any{"html": content}
-
-	success := common.MakeMailChimpRequest(
-		ctx,
-		http.MethodPut,
-		fmt.Sprintf("campaigns/%v/content", campaignId),
-		reqBody,
-		nil,
-	)
-	if !success {
-		return errors.New("failed to set newsletter content")
-	}
-	return nil
-}
-
-func createCampaign(ctx context.Context, post Post) (string, error) {
-	reqBody, err := post.toRequestBody(common.ConfigFromContext(&ctx))
+	list, _, err := common.MailClient.Timezone.List(ctx)
 	if err != nil {
-		return "", errors.New("failed to create campaign")
+		return err
 	}
 
-	var campaign struct {
-		ID string `json:"id"`
+	var timezoneId int
+	for _, tz := range list.Data {
+		if tz.Name == timezone {
+			log.Println(fmt.Sprintf("%+v", tz))
+			timezoneId, err = strconv.Atoi(tz.Id)
+			if err != nil {
+				return err
+			}
+			break
+		}
 	}
 
-	success := common.MakeMailChimpRequest(
-		ctx,
-		http.MethodPost,
-		"campaigns",
-		reqBody,
-		&campaign,
-	)
-	if !success {
-		return "", errors.New("failed to create campaign")
+	schedule := &mailerlite.ScheduleCampaign{
+		Delivery: mailerlite.CampaignScheduleTypeScheduled,
+		Schedule: &mailerlite.Schedule{
+			Date:       when.Format("2006-01-02"),
+			Hours:      fmt.Sprintf("%2d", when.Hour()),
+			Minutes:    fmt.Sprintf("%2d", when.Minute()),
+			TimezoneID: timezoneId,
+		},
 	}
-	return campaign.ID, nil
+
+	_, _, err = common.MailClient.Campaign.Schedule(ctx, campaignId, schedule)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func createCampaign(ctx context.Context, post Post, content string) (string, error) {
+	allSegments, _, err := common.MailClient.Segment.List(ctx, &mailerlite.ListSegmentOptions{})
+	if err != nil {
+		return "", err
+	}
+	supportedSegments := []string{
+		fmt.Sprintf("%v: %v", common.Blog, common.Photography),
+		fmt.Sprintf("%v: %v", common.Blog, common.Programming),
+	}
+
+	// Get the first Segment that matches any of the supported segments
+	var segment string
+	for _, s := range allSegments.Data {
+		for _, tag := range supportedSegments {
+			if strings.EqualFold(s.Name, tag) {
+				segment = s.ID
+			}
+		}
+	}
+	if segment == "" {
+		return "", errors.New("won't send campaigns for non-(programming or photography) articles")
+	}
+
+	sender := common.AppConfig.EmailSender
+	emails := &[]mailerlite.Emails{
+		{
+			Subject:  post.Title,
+			FromName: post.Author,
+			From:     sender,
+			Content:  content,
+		},
+	}
+	campaign := &mailerlite.CreateCampaign{
+		Name:     fmt.Sprintf("New Publication: %v", post.Title),
+		Type:     mailerlite.CampaignTypeRegular,
+		Emails:   *emails,
+		Segments: []string{segment},
+	}
+	c, _, err := common.MailClient.Campaign.Create(ctx, campaign)
+	if err != nil {
+		return "", err
+	}
+	return c.Data.ID, nil
 }
 
 func parseEmailTemplate(post Post) (string, error) {
@@ -182,39 +187,17 @@ func parseEmailTemplate(post Post) (string, error) {
 	return emailContent.String(), nil
 }
 
-func (p Post) toRequestBody(config *common.Config) (map[string]any, error) {
-	var segment int
-	switch p.Tag {
-	case common.Programming:
-		segment, _ = strconv.Atoi(config.ProgrammingSegment)
-	case common.Photography:
-		segment, _ = strconv.Atoi(config.PhotographySegment)
-	}
+func (l lambdaReqBody) canBroadcast() bool {
+	// 1. To prevent sending notification for drafts, confirm this post is published.
+	// 2. To prevent sending emails for a posts that are unpublished and  then republished, ensure
+	//	  that the diff b/w publication and updated dates is not more than 30 minutes.
 
-	if segment == 0 {
-		return nil, errors.New("won't send campaigns for non-(programming or photography) articles")
-	}
-
-	return map[string]any{
-		"type": "regular",
-		"settings": map[string]string{
-			"title":        fmt.Sprintf("New Publication: %v", p.Title),
-			"subject_line": p.Title,
-			"preview_text": p.Excerpt,
-			"from_name":    p.Author,
-			"reply_to":     config.EmailSender,
-		},
-		"recipients": map[string]any{
-			"list_id": config.NewsletterListId,
-			"segment_opts": map[string]int{
-				"saved_segment_id": segment,
-			},
-		},
-	}, nil
+	postData := l.Post.Current
+	return postData.Status == "published" && math.Abs(postData.PublishedAt.Sub(postData.UpdatedAt).Minutes()) <= 30
 }
 
-func (e lambdaReqBody) toPost() Post {
-	p := e.Post.Current
+func (l lambdaReqBody) toPost() Post {
+	p := l.Post.Current
 
 	featureImage := p.FeatureImage
 
