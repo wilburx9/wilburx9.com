@@ -1,0 +1,57 @@
+<div class="subscription-modal">
+    <div class="subscription-content">
+        <div class="subscription-inner">
+            <form class="subscription-form" name="subscription-form" novalidate>
+                <img class="form-icon" src="{{asset "images/mailbox.png"}}" alt="Mailbox">
+                <div class="form-title">Stay Tuned!</div>
+                <div class="form-desc">Just pick your favourite topics and share your email to subscribe.</div>
+                <div class="form-subheader">Pick your Topics</div>
+                <div class="form-tags">
+                    <input type="checkbox" id="photography" name="tags" value="photography"/>
+                    <label for="photography" class="chip">
+                        {{> "icons/photography"}} Photography</label>
+
+                    <input type="checkbox" id="programming" name="tags" value="programming"/>
+                    <label for="programming" class="chip">
+                        {{> "icons/programming"}} Programming</label>
+                </div>
+                <div class="form-subheader">Enter your Email</div>
+                <div class="form-email">
+                    <input type="email" id="email" name="email">
+                    <label for="email">Enter your email here</label>
+                </div>
+                <p class="form-error"></p>
+                <div class="form-actions">
+                    <div class="form-captcha-container"></div>
+                    <div class="form-cta-container">
+                        <button type="submit" class="primary-button">Continue</button>
+                    </div>
+                </div>
+            </form>
+            <div class="subscription-success hide">
+                <div id="success-icon"></div>
+                <p class="success-title">Great!</p>
+                <p class="success-desc">We will ensure that you stay informed about our latest blog posts.</p>
+                <div class="secondary-button success-cta">Close</div>
+            </div>
+            <div class="subscription-error hide">
+                <img id="error-icon" src="{{asset "images/warning.png"}}" alt="Warning icon"/>
+                <p class="error-title">Something went Wrong!</p>
+                <p class="error-desc">Sorry, we were unable to subscribe you to our newsletter at this time. Please
+                    check your internet connection and try again.</p>
+                <div class="primary-button error-cta">Retry</div>
+            </div>
+            <div class="subscription-loader hide">
+                <div id="loader"></div>
+            </div>
+        </div>
+    </div>
+    {{#if @custom.turnstile_site_key}}
+        {{#if @custom.api_url}}
+            <script src="{{asset "built/subscription.js"}}"></script>
+            {{#primary_tag}}
+                <script>new Subscription(`{{@custom.turnstile_site_key}}`, `{{@custom.api_url}}`, `{{slug}}`)</script>
+            {{/primary_tag}}
+        {{/if}}
+    {{/if}}
+</div>

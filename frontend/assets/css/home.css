@@ -1,0 +1,76 @@
+.home-content {
+    @apply
+    grow flex flex-col-reverse xl:flex-row gap-x-10
+    justify-center gap-y-4 pt-3
+}
+
+.home-content > #left-content {
+    @apply
+    grow-[4] basis-0 flex flex-col justify-center
+    px-0 lg:px-20 xl:px-0
+}
+
+.home-content > #right-content {
+    @apply
+    flex justify-center items-center
+    grow-[3.5] basis-0
+}
+
+.home-content > #right-content > div {
+    @apply
+    grid aspect-square w-full
+}
+
+.home-content > #right-content #pattern {
+    @apply
+    grid h-full w-full
+    row-start-1 row-end-2 col-start-1 col-end-2
+}
+
+.home-content > #right-content #pattern > img {
+    @apply
+    row-start-1 row-end-2 col-start-1 col-end-2 duration-500
+    transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.home-content > #right-content #avatar {
+    @apply
+    h-[43.5%] relative aspect-square
+    row-start-1 row-end-2 col-start-1 col-end-2
+    justify-self-center self-center z-10 relative
+}
+
+.home-content > #right-content #avatar > #yellow-circle {
+    @apply
+    h-full aspect-square bg-auto bg-no-repeat bg-center bg-contain
+    bg-orangeSet dark:bg-orangeSet-dark rounded-full
+    absolute top-0 bottom-0 left-0 right-0
+}
+
+.home-content > #right-content #avatar > #white-circle {
+    @apply
+    absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4
+    h-[63%] aspect-square bg-no-repeat bg-center bg-contain
+    bg-white rounded-full
+}
+
+.home-content > #right-content #avatar > img {
+    @apply
+    absolute top-0 bottom-0 left-0 right-0 rounded-full
+    w-full aspect-square bg-no-repeat bg-center bg-contain
+    shadow-[inset_0px_8px_7px_rgba(0,0,0,0.33)] duration-500
+    transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.home-content h1 {
+    @apply
+    text-center sm:text-left text-blackSet dark:text-blackSet-dark
+    text-headline1 font-bold sm:text-title md:text-largeTitle max-w-prose
+}
+
+.home-content h2 {
+    @apply
+    text-center sm:text-left pt-2
+    text-greySet dark:text-greySet-dark max-w-prose
+    text-body2 font-normal sm:text-body1 md:text-headline2
+}

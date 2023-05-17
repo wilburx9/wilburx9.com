@@ -1,0 +1,134 @@
+/* PrismJS 1.29.0
+https://prismjs.com/download.html?ref=ghost.org#themes=prism-tomorrow&languages=markup+css+clike+javascript+dart+docker+go+java+kotlin+rust+typescript&plugins=line-numbers */
+/**
+ * prism.js tomorrow night eighties for JavaScript, CoffeeScript, CSS and HTML
+ * Based on https://github.com/chriskempson/tomorrow-theme
+ * @author Rose Pritchard
+ */
+
+@tailwind base;
+
+code[class*="language-"],
+pre[class*="language-"] {
+    word-spacing: normal;
+    word-wrap: normal;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+    @apply
+    font-mono text-code text-greySet dark:text-greySet-dark
+    text-left whitespace-pre break-normal overflow-auto
+}
+
+/* Code blocks */
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+    @apply
+    w-full
+    bg-cardSet dark:bg-cardSet-dark
+    border-borderSet dark:border-borderSet-dark
+    border rounded-lg my-8 overflow-hidden
+    flex flex-col sm:flex-row-reverse gap-1 sm:gap-2.5
+}
+
+pre[class*="language-"] > code[class*="language-"] {
+    @apply
+    grow overflow-auto pr-6 sm:pr-0 pt-0 sm:pr-6 pl-6 pb-6
+}
+
+/* Inline code */
+@layer base {
+    :not(pre) > code {
+        @apply
+        whitespace-normal rounded
+        bg-boxSet dark:bg-boxSet-dark
+        font-mono text-code px-0.5
+    }
+}
+
+.token.comment,
+.token.block-comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: #999;
+}
+
+.token.punctuation {
+    @apply
+    text-lime-500 dark:text-lime-600
+}
+
+.token.tag,
+.token.attr-name,
+.token.namespace,
+.token.deleted {
+    color: #e2777a;
+}
+
+.token.function-name {
+    color: #6196cc;
+}
+
+.token.boolean,
+.token.number,
+.token.function {
+    @apply
+    text-orange-700 dark:text-[#f08d49]
+}
+
+.token.property,
+.token.class-name,
+.token.constant,
+.token.symbol {
+    @apply
+    text-sky-700 dark:text-[#268BD2]
+}
+
+.token.selector,
+.token.important,
+.token.atrule,
+.token.keyword,
+.token.builtin {
+    @apply
+    text-violet-400 dark:text-[#AB89B2]
+}
+
+.token.string,
+.token.char,
+.token.attr-value,
+.token.regex,
+.token.variable {
+    @apply
+    text-green-500 dark:text-green-700
+}
+
+.token.operator,
+.token.entity,
+.token.url {
+    @apply
+    text-teal-600 dark:text-teal-400
+}
+
+.token.important,
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}
+
+.token.inserted {
+    color: green;
+}

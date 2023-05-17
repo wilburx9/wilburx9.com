@@ -1,0 +1,23 @@
+.gh-footer {
+    @apply
+    w-full
+    flex flex-col md:flex-row justify-between items-center
+    pb-4 sm:pb-8 md:pb-16 pt-8
+}
+
+.gh-footer > span {
+    @apply
+    flex flex-row gap-x-6 items-center
+}
+
+.gh-footer p {
+    @apply
+    text-center md:text-left text-body3 font-normal text-blackSet dark:text-blackSet-dark py-4
+}
+
+.gh-footer-icon {
+    @apply
+    w-6 h-auto
+    fill-blackSet dark:fill-blackSet-dark
+    transition ease-in-out hover:scale-125 motion-reduce:transition-none motion-reduce:hover:transform-none
+}

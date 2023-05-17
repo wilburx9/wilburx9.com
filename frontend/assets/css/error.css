@@ -1,0 +1,23 @@
+.error-page-content {
+    @apply
+    flex flex-col grow
+    justify-center items-center
+    pb-7 md:pb-12 lg:pb-9
+}
+
+.error-page-content img {
+    @apply
+    rounded-full w-3/5 md:w-72
+}
+
+.error-page-content h1 {
+    @apply
+    text-headline1 font-bold md:text-title text-center
+    mt-9 text-blackSet dark:text-blackSet-dark
+}
+
+.error-page-content p {
+    @apply
+    text-body1 font-normal text-center max-w-prose
+    mt-2 mb-8 text-greyLightSet dark:text-greyLightSet-dark
+}

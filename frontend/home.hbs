@@ -1,0 +1,39 @@
+{{!< default}}
+<div class="gh-page">
+    {{> "full-header"}}
+    <div class="home-content">
+        <div id="left-content">
+            <h1>
+                I am <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#F59300] to-[#C41CFF]">Wilberforce</span>,
+                <br/>a Software Engineer and photography enthusiast.
+            </h1>
+            <h2>
+                I've been making meaningful contributions to the world of software for the past 6 years. And when I'm not doing that, I love to explore my creative side through photography. It's my way of capturing the beauty of the world and expressing myself in a different way.
+            </h2>
+            <div class="flex flex-row gap-x-4 pt-8">
+                <a href="/blog" class="primary-button w-full">Blog</a>
+                <a id="email-me" class="secondary-button w-full">Say Hello</a>
+            </div>
+        </div>
+        <div id="right-content">
+            <div class="group">
+                <div id="pattern">
+                    <img class="dark:opacity-0 opacity-100 group-hover:opacity-0"
+                         src="{{asset "images/pattern_light.png"}}"
+                         alt="Avatar pattern"/>
+                    <img class="opacity-0 dark:opacity-100 group-hover:opacity-0"
+                         src="{{asset "images/pattern_dark.png"}}"
+                         alt="Avatar pattern"/>
+                    <img class="hide group-hover:opacity-100" src="{{asset "images/pattern.png"}}"
+                         alt="Avatar pattern"/>
+                </div>
+                <div id="avatar">
+                    <div id="yellow-circle"></div>
+                    <div id="white-circle"></div>
+                    <img class="grayscale group-hover:grayscale-0 group-focus:grayscale-0"
+                         src="{{asset "images/me.png"}}" alt="Me"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

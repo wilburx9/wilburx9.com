@@ -1,42 +1,113 @@
 {
-  "name": "frontend",
-  "version": "2.0.0",
-  "private": true,
-  "dependencies": {
-    "@chakra-ui/react": "^2.3.5",
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
-    "@types/node": "^18.11.0",
-    "@types/react": "^18.0.21",
-    "@types/react-dom": "^18.0.6",
-    "axios": "^1.1.3",
-    "firebase": "^9.12.1",
-    "framer-motion": "^7.5.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-icons": "^4.6.0",
-    "react-scripts": "^5.0.1",
-    "typescript": "^4.8.4"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+    "name": "wilburx9",
+    "description": "A custom ghost theme for wilburx9.com/blog",
+    "demo": "https://wilburx9.com/blog",
+    "version": "3.0.0",
+    "engines": {
+        "ghost": ">=4.0.0"
+    },
+    "license": "MIT",
+    "screenshots": {
+        "desktop": "assets/screenshot-desktop.jpg"
+    },
+    "scripts": {
+        "dev": "gulp",
+        "zip": "gulp zip",
+        "deploy": "gulp deploy",
+        "test": "gscan .",
+        "test:ci": "gscan --fatal --verbose .",
+        "pretest": "gulp build",
+        "preship": "yarn test",
+        "ship": "STATUS=$(git status --porcelain); echo $STATUS; if [ -z \"$STATUS\" ]; then yarn version && git push --follow-tags; fi"
+    },
+    "author": {
+        "name": "Wilberforce Uwadiegwu",
+        "email": "me@wilbur.com",
+        "url": "https://wilburx9.com"
+    },
+    "gpm": {
+        "type": "theme",
+        "categories": [
+            "Wilburx9",
+            "Photography",
+            "Coding"
+        ]
+    },
+    "keywords": [
+        "ghost",
+        "theme",
+        "ghost-theme",
+        "wilburx9"
     ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/wilburt/wilburx9.com"
+    },
+    "bugs": "https://github.com/wilburt/wilburx9.com",
+    "contributors": [
+        {
+            "name": "Wilberforce Uwadiegwu",
+            "email": "me@wilbur.com",
+            "url": "https://wilburx9.com"
+        }
+    ],
+    "devDependencies": {
+        "@tailwindcss/line-clamp": "^0.4.2",
+        "autoprefixer": "10.4.14",
+        "beeper": "2.1.0",
+        "cssnano": "5.1.15",
+        "gscan": "4.36.1",
+        "gulp": "4.0.2",
+        "gulp-livereload": "4.0.2",
+        "gulp-postcss": "9.0.1",
+        "gulp-sourcemaps": "3.0.0",
+        "gulp-uglify": "3.0.2",
+        "gulp-util": "3.0.8",
+        "gulp-watch": "5.0.1",
+        "gulp-zip": "5.1.0",
+        "postcss": "8.4.21",
+        "postcss-color-mod-function": "3.0.3",
+        "postcss-easy-import": "4.0.0"
+    },
+    "browserslist": [
+        "defaults"
+    ],
+    "config": {
+        "card_assets": true,
+        "posts_per_page": 15,
+        "image_sizes": {
+            "xxs": {
+                "width": 30
+            },
+            "xs": {
+                "width": 100
+            },
+            "s": {
+                "width": 300
+            },
+            "m": {
+                "width": 600
+            },
+            "l": {
+                "width": 1200
+            },
+            "xl": {
+                "width": 2000
+            }
+        },
+        "custom": {
+            "turnstile_site_key": {
+                "type": "text",
+                "group": "homepage"
+            },
+            "api_url": {
+                "type": "text",
+                "group": "homepage"
+            }
+        }
+    },
+    "dependencies": {
+        "@tryghost/admin-api": "^1.13.6",
+        "tailwindcss": "^3.2.7"
+    }
 }

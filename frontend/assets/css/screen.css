@@ -1,0 +1,145 @@
+/*
+
+This is a development CSS file which is compiled to a minified
+production stylesheet in assets/built/screen.css using: gulp dev
+
+*/
+
+@import "prism.css";
+@import "components.css";
+@import "error.css";
+@import "footer.css";
+@import "header.css";
+@import "home.css";
+@import "post.css";
+@import "subscription-modal.css";
+@import "ghost/content.css";
+
+/* Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Main
+/* ---------------------------------------------------------- */
+
+body {
+    @apply
+    overflow-x-clip
+}
+
+html,
+.gh-body {
+    @apply
+    h-full w-screen min-h-screen min-h-[100dvh]
+    transition-colors ease-in-out motion-reduce:transition-none
+}
+
+.gh-content {
+    @apply
+    h-full w-screen
+    flex flex-col overflow-y-auto
+    px-4 sm:px-16 md:px-20 xl:px-8 2xl:px-0
+    bg-bgSet dark:bg-bgSet-dark
+}
+
+.gh-main {
+    @apply
+    w-full max-w-screen-xl grow mx-auto
+    bg-bgSet dark:bg-bgSet-dark
+}
+
+.gh-footer-container {
+    @apply
+    w-full max-w-screen-xl mx-auto
+    bg-bgSet dark:bg-bgSet-dark
+}
+
+.gh-page {
+    @apply w-full flex flex-col h-full
+}
+
+.gh-post-feed {
+    @apply
+    grid gap-4 md:gap-6
+    grid-cols-1 md:grid-cols-2 lg:grid-cols-3
+}
+
+.gh-post-loader {
+    @apply
+    w-full h-full
+    flex justify-center items-center
+}
+
+.gh-post-loader > div {
+    @apply
+    m-auto w-80 aspect-square hidden
+}
+
+.gh-more-post-loader {
+    @apply
+    w-full row-start-1 row-end-2 col-start-1 col-end-2
+    flex justify-center items-center
+}
+
+.gh-more-post-loader > div {
+    @apply
+    m-auto w-80 px-4 hidden
+}
+
+.gh-post-feed-footer {
+    @apply
+    w-full grid
+}
+
+.gh-post-feed-footer-info {
+    @apply
+    flex flex-col gap-x-1
+    pt-11 md:pt-20 pb-11 md:pb-24 opacity-100
+    items-center row-start-1 row-end-2 col-start-1 col-end-2
+    transition-opacity ease-in-out duration-300 motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.gh-post-feed-footer-info > img {
+    @apply
+    w-32 pb-3 rounded-full
+}
+
+.gh-post-feed-footer-info > h4 {
+    @apply
+    text-body1 font-bold text-blackSet dark:text-blackSet-dark
+}
+
+.gh-post-feed-footer-info > p {
+    @apply
+    text-body2 font-normal text-greyLightSet dark:text-greyLightSet-dark
+}
+
+hr {
+    @apply
+    w-full border opacity-10
+    border-blackSet dark:border-blackSet-dark
+}
+
+
+/* Read More */
+
+.gh-more-posts {
+    @apply
+    w-full
+}
+
+.gh-more-posts > h2 {
+    @apply
+    text-headline1 font-bold
+    text-blackSet dark:text-blackSet-dark
+    mb-4 mt-8
+}
+
+.hide {
+    @apply
+    opacity-0
+}
+
+
