@@ -23,12 +23,19 @@ func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (ev
 	config := common.NewConfig()
 	ctx = context.WithValue(ctx, common.ConfigKey, config)
 
-	data, msg, err := validateForm(req.Body)
+	status, msg := processSubscribeRequest(ctx, config, req.Body)
+	origin := req.Headers["origin"]
+
+	return common.MakeResponse(origin, config.AllowedOrigins, status, msg), nil
+}
+
+func processSubscribeRequest(ctx context.Context, config *common.Config, body string) (int, string) {
+	data, msg, err := validateForm(body)
 	if msg != "" || err != nil {
 		log.Println("Failed to validate request body",
 			"error: ", fmt.Sprintf("%v", err),
 			"message: ", msg)
-		return common.MakeResponse(http.StatusBadRequest, msg), nil
+		return http.StatusBadRequest, msg
 	}
 
 	err = validateCaptcha(ctx, config, data.Captcha)
@@ -36,7 +43,7 @@ func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (ev
 		log.Println("Failed to validate captcha",
 			"error: ", err.Error(),
 		)
-		return common.MakeResponse(http.StatusBadRequest, "Unable to complete subscription"), nil
+		return http.StatusBadRequest, "Unable to complete subscription"
 	}
 
 	err = subscribe(ctx, config.NewsletterListId, data)
@@ -44,13 +51,10 @@ func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (ev
 		log.Println("Subscription request failed",
 			"error: ", err.Error(),
 		)
-		return common.MakeResponse(http.StatusBadGateway, "Something went wrong"), nil
+		return http.StatusBadGateway, "Something went wrong"
 	}
 
-	return common.MakeResponse(
-		http.StatusCreated,
-		"Successfully created",
-	), nil
+	return http.StatusCreated, "Successfully created"
 }
 
 // subscribe forwards the request to MailChimp to subscribe the user

@@ -9,6 +9,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -33,17 +34,27 @@ func getResponseBody(success bool, data any) string {
 }
 
 // MakeResponse returns an error or success lambda response
-func MakeResponse(code int, data any) events.APIGatewayProxyResponse {
+func MakeResponse(origin string, allowed []string, code int, data any) events.APIGatewayProxyResponse {
 	success := false
-	if code <= 299 {
+	if code >= 200 && code <= 299 {
 		success = true
+	}
+
+	headers := map[string]string{
+		"Content-Type":                 "application/json",
+		"Access-Control-Allow-Methods": "OPTIONS,POST",
+		"Access-Control-Allow-Headers": "Content-Type,Authorization",
+	}
+	for _, o := range allowed {
+		if strings.EqualFold(o, origin) {
+			headers["Access-Control-Allow-Origin"] = origin
+			break
+		}
 	}
 	return events.APIGatewayProxyResponse{
 		StatusCode: code,
 		Body:       getResponseBody(success, data),
-		Headers: map[string]string{
-			"Content-Type": "application/json",
-		},
+		Headers:    headers,
 	}
 }
 

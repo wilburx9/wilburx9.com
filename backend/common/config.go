@@ -15,6 +15,7 @@ type Config struct {
 	EmailSender        string
 	ProgrammingSegment string
 	PhotographySegment string
+	AllowedOrigins     []string
 }
 
 // NewConfig instantiates Config
@@ -28,6 +29,7 @@ func NewConfig() *Config {
 		EmailSender:        os.Getenv("EMAIL_SENDER"),
 		ProgrammingSegment: os.Getenv("PROGRAMMING_SEGMENT"),
 		PhotographySegment: os.Getenv("PHOTOGRAPHY_SEGMENT"),
+		AllowedOrigins:     []string{os.Getenv("PROD_FRONTEND_URL"), os.Getenv("DEV_FRONTEND_URL")},
 	}
 }
 

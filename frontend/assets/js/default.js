@@ -38,6 +38,10 @@ function handleDarkMode() {
     }
 }
 
+function isDarkTheme() {
+    return $('html').hasClass('dark');
+}
+
 function setHrefs() {
     document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll('[id=about-me]').forEach(e => e.href = window.location.origin)
@@ -75,12 +79,13 @@ function parseBookmark(content, linkId, imageId) {
 }
 
 function getProgressAnimation(container) {
-    return getLottieAnimation(container, 'loading')
+    let name = isDarkTheme() ? 'loading_dark' : 'loading_light'
+    return getLottieAnimation(container, name)
 }
 
 function getLottieAnimation(container, name) {
     return bodymovin.loadAnimation({
-        container:container[0],
+        container: container[0],
         renderer: 'svg',
         loop: true,
         autoplay: true,

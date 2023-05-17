@@ -36,16 +36,18 @@ func main() {
 
 // handleBroadcast creates a campaign and schedules to be sent.
 func handleBroadcast(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ctx = context.WithValue(ctx, common.ConfigKey, common.NewConfig())
+	config := common.NewConfig()
+	ctx = context.WithValue(ctx, common.ConfigKey, config)
 
-	status, msg := processRequest(ctx, req.Body)
+	status, msg := processBroadcastRequest(ctx, req.Body)
+	origin := req.Headers["origin"]
 
-	return common.MakeResponse(status, msg), nil
+	return common.MakeResponse(origin, config.AllowedOrigins, status, msg), nil
 }
 
-// processRequest schedules an email campaign about an hour form now.
+// processBroadcastRequest schedules an email campaign about an hour form now.
 // For Ghost not to retry the request because of short timeout, update webhook timeout. See https://forum.ghost.org/t/webhook-getting-triggered-multiple-times/16503/3
-func processRequest(ctx context.Context, body string) (int, string) {
+func processBroadcastRequest(ctx context.Context, body string) (int, string) {
 	var reqData lambdaReqBody
 	err := json.Unmarshal([]byte(body), &reqData)
 	if err != nil {

@@ -8,12 +8,11 @@ class Subscription {
     }
 
     renderCaptcha(siteKey) {
-        let isDarkTheme = $('html').hasClass('dark');
         turnstile.ready(() => {
             this.turnstileWidgetId = turnstile.render('.form-captcha-container', {
                 sitekey: siteKey,
                 action: 'email-subscription',
-                theme: isDarkTheme ? 'dark' : 'light',
+                theme: isDarkTheme() ? 'dark' : 'light',
                 'response-field-name': 'captcha',
                 callback: () => this.submitForm(),
             });
