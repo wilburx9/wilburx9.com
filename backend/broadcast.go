@@ -36,9 +36,8 @@ func main() {
 func handleBroadcast(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	origin := req.Headers["origin"]
 
-	err := InitConfig()
-	if err != nil {
-		return GenerateResponse(origin, http.StatusInternalServerError, err.Error()), nil
+	if !InitSuccess() {
+		return GenerateResponse(origin, http.StatusInternalServerError, "Something went wrong"), nil
 	}
 
 	status, msg := processBroadcastRequest(ctx, req.Body)

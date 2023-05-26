@@ -24,9 +24,8 @@ func main() {
 func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	origin := req.Headers["origin"]
 
-	err := InitConfig()
-	if err != nil {
-		return GenerateResponse(origin, http.StatusInternalServerError, err.Error()), nil
+	if !InitSuccess() {
+		return GenerateResponse(origin, http.StatusInternalServerError, "Something went wrong"), nil
 	}
 
 	status, msg := processSubscribeRequest(ctx, req.Body)
@@ -53,7 +52,8 @@ func processSubscribeRequest(ctx context.Context, body string) (int, string) {
 
 	err = subscribe(ctx, data.Email, data.Tags)
 	if err != nil {
-		log.Println("Subscription request failed",
+		log.Println(
+			"Subscription request failed",
 			"error: ", err.Error(),
 		)
 		return http.StatusBadGateway, "Something went wrong"

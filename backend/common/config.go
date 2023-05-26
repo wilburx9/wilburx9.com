@@ -2,13 +2,12 @@ package common
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/secretsmanager"
-	"log"
+	"github.com/aws/aws-sdk-go/service/ssm"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -22,25 +21,15 @@ type Config struct {
 	TimeZone          string   `json:"time_zone"`
 }
 
-// InitConfig instantiates Config
-func InitConfig() error {
-	config, err := newConfig()
-	if err != nil {
-		log.Println(err)
-		return errors.New("something went wrong")
-	}
-
-	AppConfig = config
-	return nil
-}
-
+// newConfig instantiates Config
 func newConfig() (*Config, error) {
 	sess, err := session.NewSession()
 	if err != nil {
-		return &Config{}, fmt.Errorf("aws session init failed: %w", err)
+		return nil, fmt.Errorf("aws session init failed: %w", err)
 	}
 
-	svc := secretsmanager.New(sess)
+	ssmSvc := ssm.New(sess)
+
 	m := map[string]any{
 		"allowed_origins":    []string{},
 		"email_sender":       "",
@@ -49,25 +38,33 @@ func newConfig() (*Config, error) {
 		"turnstile_secret":   "",
 	}
 
-	for s := range m {
-		key := strings.ToUpper(fmt.Sprintf("wilburx9_%v", s))
-		input := &secretsmanager.GetSecretValueInput{SecretId: aws.String(key)}
-		value, err := svc.GetSecretValue(input)
-		if err != nil {
-			return &Config{}, fmt.Errorf("unable to read %q from store: %w", key, err)
+	// Read all the secrets into the map using the map keys
+	for k, v := range m {
+		key := strings.ToUpper(fmt.Sprintf("wilburx9_%v", k))
+		input := &ssm.GetParameterInput{
+			Name:           aws.String(key),
+			WithDecryption: aws.Bool(true),
 		}
-		m[s] = value
+		param, err := ssmSvc.GetParameter(input)
+		if err != nil {
+			return nil, fmt.Errorf("unable to read %q from store: %w in %v", key, err, *sess.Config.Region)
+		}
+		if (reflect.TypeOf(v)).Kind() == reflect.Slice {
+			m[k] = strings.Split(*param.Parameter.Value, ",")
+		} else {
+			m[k] = *param.Parameter.Value
+		}
 	}
 
 	mBytes, err := json.Marshal(m)
 	if err != nil {
-		return &Config{}, fmt.Errorf("unable to marshal config map: %w", err)
+		return nil, fmt.Errorf("unable to marshal config map: %w", err)
 	}
 
 	var config Config
 	err = json.Unmarshal(mBytes, &config)
 	if err != nil {
-		return &Config{}, fmt.Errorf("unable to marshal config map: %w", err)
+		return nil, fmt.Errorf("unable to unmarshal config map: %w", err)
 	}
 
 	config.TimeZone = strings.ReplaceAll(os.Getenv("TZ"), ":", "")

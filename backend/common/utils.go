@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/mailerlite/mailerlite-go"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -15,8 +16,30 @@ const (
 	Blog        = "blog"
 )
 
+func init() {
+	config, err := newConfig()
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	AppConfig = config
+	MailClient = mailerlite.NewClient(AppConfig.MailerLiteToken)
+}
+
 // AppConfig is a global container for app-wide config
 var AppConfig *Config
+
+// MailClient is the email marketing client
+var MailClient *mailerlite.Client
+
+// InitSuccess returns true if global variables have successful initialized
+func InitSuccess() bool {
+	return AppConfig != nil && MailClient != nil
+}
+
+// HttpClient returns an instance of Http Client with custom config
+var HttpClient = &http.Client{Timeout: time.Second * 20}
 
 // GenerateResponse returns an error or success lambda response
 func GenerateResponse(origin string, code int, data any) events.APIGatewayProxyResponse {
@@ -30,10 +53,12 @@ func GenerateResponse(origin string, code int, data any) events.APIGatewayProxyR
 		"Access-Control-Allow-Methods": "OPTIONS,POST",
 		"Access-Control-Allow-Headers": "Content-Type,Authorization",
 	}
-	for _, o := range AppConfig.AllowedOrigins {
-		if strings.EqualFold(o, origin) {
-			headers["Access-Control-Allow-Origin"] = origin
-			break
+	if AppConfig != nil {
+		for _, o := range AppConfig.AllowedOrigins {
+			if strings.EqualFold(o, origin) {
+				headers["Access-Control-Allow-Origin"] = origin
+				break
+			}
 		}
 	}
 	return events.APIGatewayProxyResponse{
@@ -42,14 +67,6 @@ func GenerateResponse(origin string, code int, data any) events.APIGatewayProxyR
 		Headers:    headers,
 	}
 }
-
-// HttpClient returns an instance of Http Client with custom config
-var HttpClient = &http.Client{
-	Timeout: time.Second * 20,
-}
-
-// MailClient is the email marketing client
-var MailClient = mailerlite.NewClient(AppConfig.MailerLiteToken)
 
 func getResponseBody(success bool, data any) string {
 
@@ -60,6 +77,7 @@ func getResponseBody(success bool, data any) string {
 
 	b, err := json.Marshal(res)
 	if err != nil {
+		log.Println("error while marshalling response body: ", err)
 		return "Something went wrong"
 	}
 	return string(b)
