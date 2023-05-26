@@ -16,10 +16,10 @@ const (
 )
 
 // AppConfig is a global container for app-wide config
-var AppConfig = NewConfig()
+var AppConfig *Config
 
-// MakeResponse returns an error or success lambda response
-func MakeResponse(origin string, code int, data any) events.APIGatewayProxyResponse {
+// GenerateResponse returns an error or success lambda response
+func GenerateResponse(origin string, code int, data any) events.APIGatewayProxyResponse {
 	success := false
 	if code >= 200 && code <= 299 {
 		success = true

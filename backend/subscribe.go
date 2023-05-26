@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/common"
+	. "backend/common"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -22,10 +22,16 @@ func main() {
 // handleSubscribe is called when the Lambda receivers a request.
 // nil errors are returned because I want return custom http errors as opposed to Lambda's default 500.
 func handleSubscribe(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	status, msg := processSubscribeRequest(ctx, req.Body)
 	origin := req.Headers["origin"]
 
-	return common.MakeResponse(origin, status, msg), nil
+	err := InitConfig()
+	if err != nil {
+		return GenerateResponse(origin, http.StatusInternalServerError, err.Error()), nil
+	}
+
+	status, msg := processSubscribeRequest(ctx, req.Body)
+
+	return GenerateResponse(origin, status, msg), nil
 }
 
 func processSubscribeRequest(ctx context.Context, body string) (int, string) {
@@ -59,7 +65,7 @@ func processSubscribeRequest(ctx context.Context, body string) (int, string) {
 // subscribe forwards the request to the mail client to subscribe the user
 func subscribe(ctx context.Context, email string, tags []string) error {
 
-	allGroups, _, err := common.MailClient.Group.List(ctx, &mailerlite.ListGroupOptions{})
+	allGroups, _, err := MailClient.Group.List(ctx, &mailerlite.ListGroupOptions{})
 	if err != nil {
 		return err
 	}
@@ -88,7 +94,7 @@ func subscribe(ctx context.Context, email string, tags []string) error {
 		return err
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", common.MailClient.APIKey()))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", MailClient.APIKey()))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
@@ -107,7 +113,7 @@ func subscribe(ctx context.Context, email string, tags []string) error {
 
 // validateCaptcha ensures this is not a spam request
 func validateCaptcha(ctx context.Context, captcha string) error {
-	data := fmt.Sprintf("secret=%v&response=%v", common.AppConfig.TurnstileSecret, captcha)
+	data := fmt.Sprintf("secret=%v&response=%v", AppConfig.TurnstileSecret, captcha)
 
 	u := "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u, strings.NewReader(data))
@@ -116,7 +122,7 @@ func validateCaptcha(ctx context.Context, captcha string) error {
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	res, err := common.HttpClient.Do(req)
+	res, err := HttpClient.Do(req)
 
 	defer res.Body.Close()
 
@@ -126,7 +132,7 @@ func validateCaptcha(ctx context.Context, captcha string) error {
 		return err
 	}
 
-	if t.Success && t.Hostname == common.AppConfig.TurnstileHostName {
+	if t.Success && t.Hostname == AppConfig.TurnstileHostname {
 		return nil
 	}
 
@@ -168,12 +174,12 @@ func cleanTags(rawTags []string) []string {
 	for _, tag := range rawTags {
 		trimmed := strings.ToLower(strings.TrimSpace(tag))
 		// Only take the tag if it's valid
-		if trimmed == common.Photography || trimmed == common.Programming {
+		if trimmed == Photography || trimmed == Programming {
 			tapsMap[trimmed] = true
 		}
 	}
 
-	var tags = []string{common.Blog} // Every subscriber belongs to the "blog" tag
+	var tags = []string{Blog} // Every subscriber belongs to the "blog" tag
 
 	// Convert the map to a list
 	for v := range tapsMap {
@@ -182,7 +188,7 @@ func cleanTags(rawTags []string) []string {
 
 	// If tags wasn't sent in the request, add all supported tags
 	if len(tags) == 1 {
-		tags = append(tags, common.Photography, common.Programming)
+		tags = append(tags, Photography, Programming)
 	}
 
 	return tags
