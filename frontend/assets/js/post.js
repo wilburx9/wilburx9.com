@@ -19,41 +19,57 @@
     });
 }()
 
-function handlePrimaryTag(tag) {
-    processImages(tag)
-}
 
-// Resize and add blur effect to images.
-function processImages(primaryTag) {
-    let wrapperMinAR = getMinAspectRatio();
-    $(".kg-image-card img").each(function (i, image) {
-        let lightBoxId = `lightbox__photo__${i}`;
-        let $imgWrapper = $("<div></div>");
-        let imgW = Number($(image).attr("width"));
-        let imgH = Number($(image).attr("height"));
-        let imgAR = `${imgW}/${imgH}`;
+class ImageProcessor {
+    postPrimaryTag
+    photographyTag = 'photography'
 
+    constructor(primaryTag) {
+        this.postPrimaryTag = primaryTag
+        this.process()
+    }
 
+    // Loop through every figure image tag and apply modifications to them
+    process() {
+        $(".kg-image-card img").each((i, image) => {
+            let $wrapper = $("<div></div>");
+            let width = Number($(image).attr("width"));
+            let height = Number($(image).attr("height"));
+            let aspectRatio = `${width}/${height}`;
+
+            let $figure = this.resizeAndWrap(image, $wrapper, width, height)
+            if (this.postPrimaryTag !== this.photographyTag) return
+
+            this.addLightBox(image, $wrapper, $figure, `lightbox__photo__${i}`, aspectRatio, width, height)
+            this.addExifData($figure)
+        });
+    }
+
+    // Wrap the image in a blurred background
+    resizeAndWrap(image, $wrapper, width, height) {
         // Ensure the container height is not larger than the image
-        $imgWrapper.css({
+        $wrapper.css({
             "background-image": `url("${image.currentSrc || image.src}")`,
-            "aspect-ratio": Math.max((imgW / imgH), wrapperMinAR).toString(),
-            "max-height": `${imgH}px`
+            "aspect-ratio": Math.max((width / height), getMinAspectRatio()).toString(),
+            "max-height": `${height}px`
         }).addClass("group"); // Add group for Tailwind group hover
 
 
         $(image).css({
-            "aspect-ratio": `${imgW}/${imgH}`,
-            "max-width": `${imgW}px`,
-            "max-height": `${imgH}px`
+            "aspect-ratio": `${width}/${height}`,
+            "max-width": `${width}px`,
+            "max-height": `${height}px`
         });
 
         let $container = $(image).parent(); // The <figure> container of the image
-        $container.prepend($imgWrapper);
-        $imgWrapper.append(image);
+        $container.prepend($wrapper);
+        $wrapper.append(image);
+        return $container
+    }
 
-        if (primaryTag === 'photography') {
-            const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
+    // Adda lightbox and zoom handles to the images
+    addLightBox(image, $wrapper, $figure, lightBoxId, aspectRatio, imgW, imgH) {
+        const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
                 <div class="photo-lightbox-content">
                     <div class="group" style="${getZoomImgWrapperStyle(imgW, imgH)}">
                     <span class='photo-zoom-out-handle'>
@@ -62,38 +78,42 @@ function processImages(primaryTag) {
                                   d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
                         </svg>
                     </span>
-                        <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${imgAR}"/>
+                        <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${aspectRatio}"/>
                     </div>
                 </div>
             </div>`;
-            const zoomInIcon = `<span class='photo-zoom-in-handle'>
+        const zoomInIcon = `<span class='photo-zoom-in-handle'>
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="m19 19-4.35-4.35M9 6v6M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
                 </svg>
             </span>`;
-            // Add the zoom-in icon as the last child of the image wrapper.
-            $imgWrapper.prepend(zoomInIcon);
-            // Add the lightbox above the image figure. After this, the image figure and lightbox share the same parent.
-            $container.before(lightBox);
+        // Add the zoom-in icon as the last child of the image wrapper.
+        $wrapper.prepend(zoomInIcon);
+        // Add the lightbox above the image figure. After this, the image figure and lightbox share the same parent.
+        $figure.before(lightBox);
 
-            // Show the lightbox when the zoom-in icon on the image is clicked.
-            $container.find('.photo-zoom-in-handle').click(() => {
-                showLightBox(lightBoxId, $container)
-            })
+        // Show the lightbox when the zoom-in icon on the image is clicked.
+        $figure.find('.photo-zoom-in-handle').click(() => {
+            showLightBox(lightBoxId, $figure)
+        })
 
-            // Close the lightbox when the zoom-out icon on the image is clicked.
-            $container.parent().find(`#${lightBoxId} .photo-zoom-out-handle`).click(() => {
-                closeLightBox(lightBoxId, $container)
-            })
+        // Close the lightbox when the zoom-out icon on the image is clicked.
+        $figure.parent().find(`#${lightBoxId} .photo-zoom-out-handle`).click(() => {
+            closeLightBox(lightBoxId, $figure)
+        })
 
-            // Listen for click events on the content background.
-            $(`#${lightBoxId} .photo-lightbox-content`).click(event => {
-                // Close the lightbox only if it was the content background that is clicked.
-                if (event.target === event.currentTarget) closeLightBox(lightBoxId, $container)
-            })
-        }
-    });
+        // Listen for click events on the content background.
+        $(`#${lightBoxId} .photo-lightbox-content`).click(event => {
+            // Close the lightbox only if it was the content background that is clicked.
+            if (event.target === event.currentTarget) closeLightBox(lightBoxId, $figure)
+        })
+    }
+
+    addExifData($figure) {
+
+    }
+
 }
 
 

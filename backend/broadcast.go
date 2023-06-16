@@ -128,10 +128,7 @@ func scheduleCampaign(ctx context.Context, campaignId string) error {
 	}
 
 	_, _, err = MailClient.Campaign.Schedule(ctx, campaignId, schedule)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func createCampaign(ctx context.Context, post Post, content string) (string, error) {
