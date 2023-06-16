@@ -39,7 +39,7 @@ pre[class*="language-"] {
 
 pre[class*="language-"] > code[class*="language-"] {
     @apply
-    grow overflow-auto pr-6 sm:pr-0 pt-0 sm:pr-6 pl-6 pb-6
+    grow overflow-auto pr-6 pt-0 sm:pr-6 pl-6 pb-6
 }
 
 /* Inline code */

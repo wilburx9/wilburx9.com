@@ -29,6 +29,15 @@ body {
     overflow-x-clip
 }
 
+* {
+    @apply
+    scrollbar:w-3.5 scrollbar:h-3.5
+    scrollbar-track:bg-zinc-200 dark:scrollbar-track:bg-[#2c2c2c] scrollbar-track:rounded-lg
+    scrollbar-thumb:bg-clip-content scrollbar-thumb:bg-zinc-400 dark:scrollbar-thumb:bg-[#6b6b6b]
+    scrollbar-thumb:border-[2.5px] scrollbar-thumb:border-transparent scrollbar-thumb:border-solid scrollbar-thumb:rounded-lg
+    scrollbar-corner:bg-transparent
+}
+
 html,
 .gh-body {
     @apply
