@@ -71,14 +71,14 @@ class ImageProcessor {
     addLightBox(image, $wrapper, $figure, lightBoxId, aspectRatio, width, height) {
         const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
                 <div class="photo-lightbox-content">
-                    <div class="group" style="${this.getZoomImgWrapperStyle(width, height)}">
-                    <span class='photo-zoom-out-handle'>
-                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
-                        </svg>
-                    </span>
-                        <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${aspectRatio}"/>
+                    <div class="group">
+                        <span class='photo-zoom-out-handle'>
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
+                            </svg>
+                        </span>
+                            <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${aspectRatio}"/>
                     </div>
                 </div>
             </div>`;
@@ -95,7 +95,7 @@ class ImageProcessor {
 
         // Show the lightbox when the zoom-in icon on the image is clicked.
         $figure.find('.photo-zoom-in-handle').click(() => {
-            this.showLightBox(lightBoxId, $figure)
+            this.showLightBox(lightBoxId, $figure, width, height)
         })
 
         // Close the lightbox when the zoom-out icon on the image is clicked.
@@ -121,7 +121,7 @@ class ImageProcessor {
         $(`#${id} .photo-lightbox-content img`).removeClass('scale-full')
     }
 
-    showLightBox(id, figure) {
+    showLightBox(id, figure, imgWidth, imgHeight) {
         // Listen for escape key
         $(document).on(`keyup.${id}`, event => {
             if (event.key === "Escape") this.closeLightBox(id, figure);
@@ -129,6 +129,7 @@ class ImageProcessor {
         figure.find('img.kg-image').fadeOut()
         $(`#${id}`).fadeIn()
         $(`#${id} .photo-lightbox-content img`).addClass('scale-full')
+        $(`#${id} .photo-lightbox-content > div`).attr('style', this.getZoomImgWrapperStyle(imgWidth, imgHeight))
     }
 
     getZoomImgWrapperStyle(imgW, imgH) {
