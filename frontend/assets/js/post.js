@@ -50,7 +50,7 @@ class ImageProcessor {
         // Ensure the container height is not larger than the image
         $wrapper.css({
             "background-image": `url("${image.currentSrc || image.src}")`,
-            "aspect-ratio": Math.max((width / height), getMinAspectRatio()).toString(),
+            "aspect-ratio": Math.max((width / height), this.getMinAspectRatio()).toString(),
             "max-height": `${height}px`
         }).addClass("group"); // Add group for Tailwind group hover
 
@@ -68,10 +68,10 @@ class ImageProcessor {
     }
 
     // Adda lightbox and zoom handles to the images
-    addLightBox(image, $wrapper, $figure, lightBoxId, aspectRatio, imgW, imgH) {
+    addLightBox(image, $wrapper, $figure, lightBoxId, aspectRatio, width, height) {
         const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
                 <div class="photo-lightbox-content">
-                    <div class="group" style="${getZoomImgWrapperStyle(imgW, imgH)}">
+                    <div class="group" style="${this.getZoomImgWrapperStyle(width, height)}">
                     <span class='photo-zoom-out-handle'>
                         <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -95,23 +95,58 @@ class ImageProcessor {
 
         // Show the lightbox when the zoom-in icon on the image is clicked.
         $figure.find('.photo-zoom-in-handle').click(() => {
-            showLightBox(lightBoxId, $figure)
+            this.showLightBox(lightBoxId, $figure)
         })
 
         // Close the lightbox when the zoom-out icon on the image is clicked.
         $figure.parent().find(`#${lightBoxId} .photo-zoom-out-handle`).click(() => {
-            closeLightBox(lightBoxId, $figure)
+            this.closeLightBox(lightBoxId, $figure)
         })
 
         // Listen for click events on the content background.
         $(`#${lightBoxId} .photo-lightbox-content`).click(event => {
             // Close the lightbox only if it was the content background that is clicked.
-            if (event.target === event.currentTarget) closeLightBox(lightBoxId, $figure)
+            if (event.target === event.currentTarget) this.closeLightBox(lightBoxId, $figure)
         })
     }
 
     addExifData($figure) {
 
+    }
+
+    closeLightBox(id, figure) {
+        $(document).off(`keyup.${id}`);
+        $(`#${id}`).fadeOut()
+        figure.find('img.kg-image').fadeIn()
+        $(`#${id} .photo-lightbox-content img`).removeClass('scale-full')
+    }
+
+    showLightBox(id, figure) {
+        // Listen for escape key
+        $(document).on(`keyup.${id}`, event => {
+            if (event.key === "Escape") this.closeLightBox(id, figure);
+        });
+        figure.find('img.kg-image').fadeOut()
+        $(`#${id}`).fadeIn()
+        $(`#${id} .photo-lightbox-content img`).addClass('scale-full')
+    }
+
+    getZoomImgWrapperStyle(imgW, imgH) {
+        let minW = Math.min(imgW, $(window).width())
+        let minH = Math.min(imgH, $(window).height())
+        let style = `aspect-ratio: ${imgW / imgH}; `
+        if (minH > minW) {
+            style += `height: auto; max-height: 100%; width: ${minW}px;`
+        } else {
+            style += `width: auto; max-width: 100%; height: ${minH}px;`
+        }
+        return style
+    }
+
+    getMinAspectRatio() {
+        // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
+        if ($(window).width() > 768) return 1.5
+        return 0.6
     }
 
 }
@@ -126,9 +161,23 @@ class ImageProcessor {
         if (pre.tagName.toLowerCase() !== 'pre') continue
 
         let copied = `<span class="hide" id="copied"><span>Copied</span><svg class="fill-greenSet dark:fill-greenSet-dark" width="20" height="20" stroke="none" fill="none"><circle cx="10" cy="10" r="10"/><g clip-path="url(#a)"><path fill="#fff" d="M8.438 12.188 6.25 10l-.73.73 2.918 2.916 6.25-6.25-.73-.73-5.52 5.521Z"/></g><defs><clipPath id="a"><path fill="#fff" d="M3.75 3.75h12.5v12.5H3.75z"/></clipPath></defs></svg></span>`
-        let copy = `<span id="copy" onclick='copyCode(this.parentElement)'><span>Copy</span><svg width="22" height="22" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 1.003c-.675.009-1.08.048-1.408.215a2 2 0 0 0-.874.874c-.167.328-.206.733-.215 1.408M18.5 1.003c.675.009 1.08.048 1.408.215a2 2 0 0 1 .874.874c.167.328.206.733.215 1.408m0 9c-.009.675-.048 1.08-.215 1.408a2 2 0 0 1-.874.874c-.328.167-.733.206-1.408.215M21 7v2m-8-8h2M4.2 21h7.6c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C15 19.48 15 18.92 15 17.8v-7.6c0-1.12 0-1.68-.218-2.108a2 2 0 0 0-.874-.874C13.48 7 12.92 7 11.8 7H4.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C1 8.52 1 9.08 1 10.2v7.6c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874C2.52 21 3.08 21 4.2 21Z"/></svg></span>`
+        let copy = `<span id="copy"><span>Copy</span><svg width="22" height="22" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 1.003c-.675.009-1.08.048-1.408.215a2 2 0 0 0-.874.874c-.167.328-.206.733-.215 1.408M18.5 1.003c.675.009 1.08.048 1.408.215a2 2 0 0 1 .874.874c.167.328.206.733.215 1.408m0 9c-.009.675-.048 1.08-.215 1.408a2 2 0 0 1-.874.874c-.328.167-.733.206-1.408.215M21 7v2m-8-8h2M4.2 21h7.6c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C15 19.48 15 18.92 15 17.8v-7.6c0-1.12 0-1.68-.218-2.108a2 2 0 0 0-.874-.874C13.48 7 12.92 7 11.8 7H4.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C1 8.52 1 9.08 1 10.2v7.6c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874C2.52 21 3.08 21 4.2 21Z"/></svg></span>`
         pre.insertAdjacentHTML("afterbegin", `<div class="code-copy"><div>${copied}${copy}</div></div>`)
     }
+
+    function copyCode(e) {
+        let code = e.parentElement.parentElement.getElementsByTagName('code')[0]
+        let text = code.innerText || code.textContent
+        copy(e, text)
+    }
+
+    // Set click listeners on all the copy buttons
+    let copyButtons = document.querySelectorAll('#copy');
+    copyButtons.forEach((button) => {
+        button.addEventListener('click', function() {
+            copyCode(this.parentElement);
+        });
+    });
 }();
 
 // Set click listeners for the back and share buttons.
@@ -142,30 +191,7 @@ class ImageProcessor {
     })
 }();
 
-
-function closeLightBox(id, figure) {
-    $(document).off(`keyup.${id}`);
-    $(`#${id}`).fadeOut()
-    figure.find('img.kg-image').fadeIn()
-    $(`#${id} .photo-lightbox-content img`).removeClass('scale-full')
-}
-
-function showLightBox(id, figure) {
-    // Listen for escape key
-    $(document).on(`keyup.${id}`, event => {
-        if (event.key === "Escape") closeLightBox(id, figure);
-    });
-    figure.find('img.kg-image').fadeOut()
-    $(`#${id}`).fadeIn()
-    $(`#${id} .photo-lightbox-content img`).addClass('scale-full')
-}
-
-function copyCode(e) {
-    let code = e.parentElement.parentElement.getElementsByTagName('code')[0]
-    let text = code.innerText || code.textContent
-    copy(e, text)
-}
-
+// Copy text from the element
 function copy(element, text, toggle) {
     if (element.children[0].className !== 'hide') return
     navigator.clipboard.writeText(text).then(function () {
@@ -178,22 +204,4 @@ function copy(element, text, toggle) {
             if (typeof toggle === 'function') toggle()
         }, 2000);
     });
-}
-
-function getMinAspectRatio() {
-    // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
-    if ($(window).width() > 768) return 1.5
-    return 0.6
-}
-
-function getZoomImgWrapperStyle(imgW, imgH) {
-    let minW = Math.min(imgW, $(window).width())
-    let minH = Math.min(imgH, $(window).height())
-    let style = `aspect-ratio: ${imgW / imgH}; `
-    if (minH > minW) {
-        style += `height: auto; max-height: 100%; width: ${minW}px;`
-    } else {
-        style += `width: auto; max-width: 100%; height: ${minH}px;`
-    }
-    return style
 }
