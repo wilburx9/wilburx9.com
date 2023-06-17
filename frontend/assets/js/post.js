@@ -21,45 +21,42 @@
 
 
 class ImageProcessor {
-    postPrimaryTag
-    photography = 'photography'
+    isPhotography
 
     constructor(primaryTag) {
-        this.postPrimaryTag = primaryTag
+        this.isPhotography = primaryTag === 'photography'
         this.postProcess()
     }
 
     // Loop through every figure image tag and apply modifications to them
     postProcess() {
-        let featuredImg = $('.gh-feature-image > img')
-        if (featuredImg[0].complete) {
-            this.postProcessImg(featuredImg[0], 'featured-image', true)
-        } else {
-            featuredImg.on("load", () => {
-                this.postProcessImg(featuredImg[0], 'featured-image', true)
-            });
-        }
         $(".kg-image-card img").each((i, image) => this.postProcessImg(image, i, false));
+
+
+        if (!this.isPhotography) return // We don't want to touch featured images for non-photography posts
+        this.execOnImageLoad($('.gh-feature-image > img')[0], img => {
+            this.postProcessImg(img, 'featured-image', true)
+        })
     }
 
     postProcessImg(image, key, featured) {
-        let isPhotography = this.postPrimaryTag === this.photography;
         let $wrapper = $("<div></div>");
         let $figure = $(image).parent(); // The <figure> container of the image
         let width = Number($(image).attr("width")) || image.naturalWidth;
         let height = Number($(image).attr("height")) || image.naturalHeight;
 
         this.resizeAndWrap(image, $figure, $wrapper, width, height, featured)
-        if (!isPhotography) return
+        if (!this.isPhotography) return // Don't add lightbox and exif data on images for non-photography posts
 
+        console.log(`postProcessImg :: ${key} calling exif`)
         this.addLightBox(image, $figure, $wrapper, width, height, `lightbox__photo__${key}`)
-        this.addExifData(image, $figure)
+        this.execOnImageLoad(image, img => this.addExifData(img, $figure))
     }
 
     // Wrap the image in a blurred background and add zoom-in handle
     resizeAndWrap(image, $figure, $wrapper, width, height, featured) {
 
-        // Don't modify the size of the image, and it's wrapper for featured images
+        // Don't modify the size of the image, and its wrapper for featured images
         if (!featured) {
             // Ensure the container height is not larger than the image
             $wrapper.css({
@@ -81,7 +78,7 @@ class ImageProcessor {
         return $figure
     }
 
-    // Adda lightbox and zoom-out handle to the images
+    // Add a lightbox and zoom-out handle to the image
     addLightBox(image, $figure, $wrapper, width, height, lightBoxId) {
         const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
                 <div class="photo-lightbox-content">
@@ -125,7 +122,9 @@ class ImageProcessor {
     }
 
     addExifData(image, $figure) {
+        console.log(`addExifData :: aa :: ${image.complete} :: ${image.src}`)
         EXIF.getData(image, function () {
+            console.log(`addExifData :: bb :: ${image.src}`)
             // Retrieve the exif data
             let model = EXIF.getTag(this, 'Model')
             let fStop = EXIF.getTag(this, 'FNumber')
@@ -141,6 +140,8 @@ class ImageProcessor {
             if (iso) exifDiv += `<span id="iso">${iso}</span>`
             if (focal) exifDiv += `<span id="focal">${focal} mm</span>`
             exifDiv += '</div>'
+
+            console.log(`addExifData :: ${image.src} :: ${exifDiv} :: ${JSON.stringify(EXIF.getAllTags(this))}`)
 
             // Add the whole exif div only if at least one data is valid
             if (model || fStop || ss || iso || focal) $figure.after(exifDiv)
@@ -181,6 +182,14 @@ class ImageProcessor {
         // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
         if ($(window).width() > 768) return 1.5
         return 0.6
+    }
+
+    execOnImageLoad(image, onLoad) {
+        if (image.complete) {
+            onLoad(image)
+        } else {
+            $(image).on('load', () => onLoad(image));
+        }
     }
 
 }
