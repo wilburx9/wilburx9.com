@@ -22,53 +22,67 @@
 
 class ImageProcessor {
     postPrimaryTag
-    photographyTag = 'photography'
+    photography = 'photography'
 
     constructor(primaryTag) {
         this.postPrimaryTag = primaryTag
-        this.process()
+        this.postProcess()
     }
 
     // Loop through every figure image tag and apply modifications to them
-    process() {
-        $(".kg-image-card img").each((i, image) => {
-            let $wrapper = $("<div></div>");
-            let width = Number($(image).attr("width"));
-            let height = Number($(image).attr("height"));
-            let aspectRatio = `${width}/${height}`;
-
-            let $figure = this.resizeAndWrap(image, $wrapper, width, height)
-            if (this.postPrimaryTag !== this.photographyTag) return
-
-            this.addLightBox(image, $wrapper, $figure, `lightbox__photo__${i}`, aspectRatio, width, height)
-            this.addExifData($figure)
-        });
+    postProcess() {
+        let featuredImg = $('.gh-feature-image > img')
+        if (featuredImg[0].complete) {
+            this.postProcessImg(featuredImg[0], 'featured-image', true)
+        } else {
+            featuredImg.on("load", () => {
+                this.postProcessImg(featuredImg[0], 'featured-image', true)
+            });
+        }
+        $(".kg-image-card img").each((i, image) => this.postProcessImg(image, i, false));
     }
 
-    // Wrap the image in a blurred background
-    resizeAndWrap(image, $wrapper, width, height) {
-        // Ensure the container height is not larger than the image
-        $wrapper.css({
-            "background-image": `url("${image.currentSrc || image.src}")`,
-            "aspect-ratio": Math.max((width / height), this.getMinAspectRatio()).toString(),
-            "max-height": `${height}px`
-        }).addClass("group"); // Add group for Tailwind group hover
+    postProcessImg(image, key, featured) {
+        let isPhotography = this.postPrimaryTag === this.photography;
+        let $wrapper = $("<div></div>");
+        let $figure = $(image).parent(); // The <figure> container of the image
+        let width = Number($(image).attr("width")) || image.naturalWidth;
+        let height = Number($(image).attr("height")) || image.naturalHeight;
 
+        this.resizeAndWrap(image, $figure, $wrapper, width, height, featured)
+        if (!isPhotography) return
 
-        $(image).css({
-            "aspect-ratio": `${width}/${height}`,
-            "max-width": `${width}px`,
-            "max-height": `${height}px`
-        });
+        this.addLightBox(image, $figure, $wrapper, width, height, `lightbox__photo__${key}`)
+        this.addExifData(image, $figure)
+    }
 
-        let $container = $(image).parent(); // The <figure> container of the image
-        $container.prepend($wrapper);
+    // Wrap the image in a blurred background and add zoom-in handle
+    resizeAndWrap(image, $figure, $wrapper, width, height, featured) {
+
+        // Don't modify the size of the image, and it's wrapper for featured images
+        if (!featured) {
+            // Ensure the container height is not larger than the image
+            $wrapper.css({
+                "background-image": `url("${image.currentSrc || image.src}")`,
+                "aspect-ratio": Math.max((width / height), this.getMinAspectRatio()).toString(),
+                "max-height": `${height}px`
+            })
+
+            $(image).css({
+                "aspect-ratio": `${width}/${height}`,
+                "max-width": `${width}px`,
+                "max-height": `${height}px`
+            });
+        }
+
+        $wrapper.addClass("group"); // Add group for Tailwind group hover
+        $figure.prepend($wrapper);
         $wrapper.append(image);
-        return $container
+        return $figure
     }
 
-    // Adda lightbox and zoom handles to the images
-    addLightBox(image, $wrapper, $figure, lightBoxId, aspectRatio, width, height) {
+    // Adda lightbox and zoom-out handle to the images
+    addLightBox(image, $figure, $wrapper, width, height, lightBoxId) {
         const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
                 <div class="photo-lightbox-content">
                     <div class="group">
@@ -78,7 +92,7 @@ class ImageProcessor {
                                       d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
                             </svg>
                         </span>
-                            <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${aspectRatio}"/>
+                            <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${width}/${height}"/>
                     </div>
                 </div>
             </div>`;
@@ -110,8 +124,27 @@ class ImageProcessor {
         })
     }
 
-    addExifData($figure) {
+    addExifData(image, $figure) {
+        EXIF.getData(image, function () {
+            // Retrieve the exif data
+            let model = EXIF.getTag(this, 'Model')
+            let fStop = EXIF.getTag(this, 'FNumber')
+            let ss = EXIF.getTag(this, 'ExposureTime')
+            let iso = EXIF.getTag(this, 'ISOSpeedRatings')
+            let focal = EXIF.getTag(this, 'FocalLength')
 
+            // Add only valid data
+            let exifDiv = '<div class="image-exif">'
+            if (model) exifDiv += `<span id="camera">${model}</span>`
+            if (fStop) exifDiv += `<span id="aperture">f/${fStop}</span>`
+            if (ss) exifDiv += `<span id="shutter">1/${1 / ss}</span>`
+            if (iso) exifDiv += `<span id="iso">${iso}</span>`
+            if (focal) exifDiv += `<span id="focal">${focal} mm</span>`
+            exifDiv += '</div>'
+
+            // Add the whole exif div only if at least one data is valid
+            if (model || fStop || ss || iso || focal) $figure.after(exifDiv)
+        });
     }
 
     closeLightBox(id, figure) {
@@ -175,7 +208,7 @@ class ImageProcessor {
     // Set click listeners on all the copy buttons
     let copyButtons = document.querySelectorAll('#copy');
     copyButtons.forEach((button) => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             copyCode(this.parentElement);
         });
     });
