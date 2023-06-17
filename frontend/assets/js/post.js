@@ -30,49 +30,36 @@ class ImageProcessor {
 
     // Loop through every figure image tag and apply modifications to them
     postProcess() {
-        $(".kg-image-card img").each((i, image) => this.postProcessImg(image, i, false));
+        $(".kg-image-card img").each((i, image) => {
+            let $wrapper = $("<div></div>");
+            let $figure = $(image).parent(); // The <figure> container of the image
+            let width = Number($(image).attr("width")) || image.naturalWidth;
+            let height = Number($(image).attr("height")) || image.naturalHeight;
 
+            this.resizeAndWrap(image, $figure, $wrapper, width, height)
+            if (!this.isPhotography) return // Don't add lightbox and exif data on images for non-photography posts
 
-        if (!this.isPhotography) return // We don't want to touch featured images for non-photography posts
-        this.execOnImageLoad($('.gh-feature-image > img')[0], img => {
-            this.postProcessImg(img, 'featured-image', true)
-        })
-    }
-
-    postProcessImg(image, key, featured) {
-        let $wrapper = $("<div></div>");
-        let $figure = $(image).parent(); // The <figure> container of the image
-        let width = Number($(image).attr("width")) || image.naturalWidth;
-        let height = Number($(image).attr("height")) || image.naturalHeight;
-
-        this.resizeAndWrap(image, $figure, $wrapper, width, height, featured)
-        if (!this.isPhotography) return // Don't add lightbox and exif data on images for non-photography posts
-
-        console.log(`postProcessImg :: ${key} calling exif`)
-        this.addLightBox(image, $figure, $wrapper, width, height, `lightbox__photo__${key}`)
-        this.execOnImageLoad(image, img => this.addExifData(img, $figure))
+            this.addLightBox(image, $figure, $wrapper, width, height, `lightbox__photo__${i}`)
+            this.execOnImageLoad(image, img => this.addExifData(img, $figure))
+        });
     }
 
     // Wrap the image in a blurred background and add zoom-in handle
-    resizeAndWrap(image, $figure, $wrapper, width, height, featured) {
+    resizeAndWrap(image, $figure, $wrapper, width, height) {
 
-        // Don't modify the size of the image, and its wrapper for featured images
-        if (!featured) {
-            // Ensure the container height is not larger than the image
-            $wrapper.css({
-                "background-image": `url("${image.currentSrc || image.src}")`,
-                "aspect-ratio": Math.max((width / height), this.getMinAspectRatio()).toString(),
-                "max-height": `${height}px`
-            })
+        // Ensure the container height is not larger than the image
+        $wrapper.css({
+            "background-image": `url("${image.currentSrc || image.src}")`,
+            "aspect-ratio": Math.max((width / height), this.getMinAspectRatio()).toString(),
+            "max-height": `${height}px`
+        }).addClass("group"); // Add group for Tailwind group hover
 
-            $(image).css({
-                "aspect-ratio": `${width}/${height}`,
-                "max-width": `${width}px`,
-                "max-height": `${height}px`
-            });
-        }
+        $(image).css({
+            "aspect-ratio": `${width}/${height}`,
+            "max-width": `${width}px`,
+            "max-height": `${height}px`
+        });
 
-        $wrapper.addClass("group"); // Add group for Tailwind group hover
         $figure.prepend($wrapper);
         $wrapper.append(image);
         return $figure
@@ -121,14 +108,13 @@ class ImageProcessor {
         })
     }
 
+    // Add the image exif data below it.
     addExifData(image, $figure) {
-        console.log(`addExifData :: aa :: ${image.complete} :: ${image.src}`)
         EXIF.getData(image, function () {
-            console.log(`addExifData :: bb :: ${image.src}`)
             // Retrieve the exif data
             let model = EXIF.getTag(this, 'Model')
             let fStop = EXIF.getTag(this, 'FNumber')
-            let ss = EXIF.getTag(this, 'ExposureTime')
+            let exposure = EXIF.getTag(this, 'ExposureTime')
             let iso = EXIF.getTag(this, 'ISOSpeedRatings')
             let focal = EXIF.getTag(this, 'FocalLength')
 
@@ -136,15 +122,13 @@ class ImageProcessor {
             let exifDiv = '<div class="image-exif">'
             if (model) exifDiv += `<span id="camera">${model}</span>`
             if (fStop) exifDiv += `<span id="aperture">f/${fStop}</span>`
-            if (ss) exifDiv += `<span id="shutter">1/${1 / ss}</span>`
+            if (exposure) exifDiv += `<span id="shutter">1/${1 / exposure}</span>`
             if (iso) exifDiv += `<span id="iso">${iso}</span>`
             if (focal) exifDiv += `<span id="focal">${focal} mm</span>`
             exifDiv += '</div>'
 
-            console.log(`addExifData :: ${image.src} :: ${exifDiv} :: ${JSON.stringify(EXIF.getAllTags(this))}`)
-
             // Add the whole exif div only if at least one data is valid
-            if (model || fStop || ss || iso || focal) $figure.after(exifDiv)
+            if (model || fStop || exposure || iso || focal) $figure.after(exifDiv)
         });
     }
 
