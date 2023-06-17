@@ -105,6 +105,6 @@
     </div>
     <script src="{{asset "built/post.js"}}"></script>
     {{#primary_tag}}
-        <script>handlePrimaryTag(`{{slug}}`)</script>
+        <script>new ImageProcessor(`{{slug}}`)</script>
     {{/primary_tag}}
 {{/post}}

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/common"
+	. "backend/common"
 	"bytes"
 	"context"
 	_ "embed"
@@ -34,10 +34,14 @@ func main() {
 
 // handleBroadcast creates a campaign and schedules to be sent.
 func handleBroadcast(ctx context.Context, req events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	status, msg := processBroadcastRequest(ctx, req.Body)
 	origin := req.Headers["origin"]
 
-	return common.MakeResponse(origin, status, msg), nil
+	if !InitSuccess() {
+		return GenerateResponse(origin, http.StatusInternalServerError, "Something went wrong"), nil
+	}
+
+	status, msg := processBroadcastRequest(ctx, req.Body)
+	return GenerateResponse(origin, status, msg), nil
 }
 
 // processBroadcastRequest schedules an email campaign about an hour form now.
@@ -91,10 +95,10 @@ func processBroadcastRequest(ctx context.Context, body string) (int, string) {
 }
 
 func scheduleCampaign(ctx context.Context, campaignId string) error {
-	timezone := common.AppConfig.TimeZone
+	timezone := AppConfig.TimeZone
 	when := time.Now().Add(time.Hour)
 
-	list, _, err := common.MailClient.Timezone.List(ctx)
+	list, _, err := MailClient.Timezone.List(ctx)
 	if err != nil {
 		return err
 	}
@@ -123,21 +127,18 @@ func scheduleCampaign(ctx context.Context, campaignId string) error {
 		},
 	}
 
-	_, _, err = common.MailClient.Campaign.Schedule(ctx, campaignId, schedule)
-	if err != nil {
-		return err
-	}
-	return nil
+	_, _, err = MailClient.Campaign.Schedule(ctx, campaignId, schedule)
+	return err
 }
 
 func createCampaign(ctx context.Context, post Post, content string) (string, error) {
-	allSegments, _, err := common.MailClient.Segment.List(ctx, &mailerlite.ListSegmentOptions{})
+	allSegments, _, err := MailClient.Segment.List(ctx, &mailerlite.ListSegmentOptions{})
 	if err != nil {
 		return "", err
 	}
 	supportedSegments := []string{
-		fmt.Sprintf("%v: %v", common.Blog, common.Photography),
-		fmt.Sprintf("%v: %v", common.Blog, common.Programming),
+		fmt.Sprintf("%v: %v", Blog, Photography),
+		fmt.Sprintf("%v: %v", Blog, Programming),
 	}
 
 	// Get the first Segment that matches any of the supported segments
@@ -153,7 +154,7 @@ func createCampaign(ctx context.Context, post Post, content string) (string, err
 		return "", errors.New("won't send campaigns for non-(programming or photography) articles")
 	}
 
-	sender := common.AppConfig.EmailSender
+	sender := AppConfig.EmailSender
 	emails := &[]mailerlite.Emails{
 		{
 			Subject:  post.Title,
@@ -168,7 +169,7 @@ func createCampaign(ctx context.Context, post Post, content string) (string, err
 		Emails:   *emails,
 		Segments: []string{segment},
 	}
-	c, _, err := common.MailClient.Campaign.Create(ctx, campaign)
+	c, _, err := MailClient.Campaign.Create(ctx, campaign)
 	if err != nil {
 		return "", err
 	}

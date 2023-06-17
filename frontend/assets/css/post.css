@@ -93,7 +93,7 @@
 
 .gh-feature-image > img {
     @apply
-    w-full aspect-video object-cover
+    w-full aspect-video object-cover z-20 relative
 }
 
 figcaption {
@@ -242,10 +242,9 @@ figcaption {
 .code-copy > div > span#copy {
     @apply
     cursor-pointer px-4
-    hover:bg-borderSet hover:bg-borderSet-dark
-    focus:bg-borderSet focus:bg-borderSet-dark
-    active:bg-borderSet active:bg-borderSet-dark
-    hover:bg-borderSet hover:bg-borderSet-dark
+    hover:bg-borderSet dark:hover:bg-borderSet-dark
+    focus:bg-borderSet dark:focus:bg-borderSet-dark
+    active:bg-borderSet dark:active:bg-borderSet-dark
     stroke-current z-20
 }
 

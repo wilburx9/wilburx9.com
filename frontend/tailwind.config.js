@@ -108,6 +108,14 @@ module.exports = {
         }
     },
     plugins: [
-        require('@tailwindcss/line-clamp')
+        require('@tailwindcss/line-clamp'),
+        function ({ addVariant }) {
+            addVariant('supports-scrollbars', '@supports selector(::-webkit-scrollbar)')
+            addVariant('children', '& > *')
+            addVariant('scrollbar', '&::-webkit-scrollbar')
+            addVariant('scrollbar-track', '&::-webkit-scrollbar-track')
+            addVariant('scrollbar-thumb', '&::-webkit-scrollbar-thumb')
+            addVariant('scrollbar-corner', '&::-webkit-scrollbar-corner')
+        },
     ],
 }

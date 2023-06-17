@@ -19,81 +19,163 @@
     });
 }()
 
-function handlePrimaryTag(tag) {
-    processImages(tag)
-}
 
-// Resize and add blur effect to images.
-function processImages(primaryTag) {
-    let wrapperMinAR = getMinAspectRatio();
-    $(".kg-image-card img").each(function (i, image) {
-        let lightBoxId = `lightbox__photo__${i}`;
-        let $imgWrapper = $("<div></div>");
-        let imgW = Number($(image).attr("width"));
-        let imgH = Number($(image).attr("height"));
-        let imgAR = `${imgW}/${imgH}`;
+class ImageProcessor {
+    isPhotography
 
+    constructor(primaryTag) {
+        this.isPhotography = primaryTag === 'photography'
+        this.postProcess()
+    }
+
+    // Loop through every figure image tag and apply modifications to them
+    postProcess() {
+        $(".kg-image-card img").each((i, image) => {
+            let $wrapper = $("<div></div>");
+            let $figure = $(image).parent(); // The <figure> container of the image
+            let width = Number($(image).attr("width")) || image.naturalWidth;
+            let height = Number($(image).attr("height")) || image.naturalHeight;
+
+            this.resizeAndWrap(image, $figure, $wrapper, width, height)
+            if (!this.isPhotography) return // Don't add lightbox and exif data on images for non-photography posts
+
+            this.addLightBox(image, $figure, $wrapper, width, height, `lightbox__photo__${i}`)
+            this.execOnImageLoad(image, img => this.addExifData(img, $figure))
+        });
+    }
+
+    // Wrap the image in a blurred background and add zoom-in handle
+    resizeAndWrap(image, $figure, $wrapper, width, height) {
 
         // Ensure the container height is not larger than the image
-        $imgWrapper.css({
+        $wrapper.css({
             "background-image": `url("${image.currentSrc || image.src}")`,
-            "aspect-ratio": Math.max((imgW / imgH), wrapperMinAR).toString(),
-            "max-height": `${imgH}px`
+            "aspect-ratio": Math.max((width / height), this.getMinAspectRatio()).toString(),
+            "max-height": `${height}px`
         }).addClass("group"); // Add group for Tailwind group hover
 
-
         $(image).css({
-            "aspect-ratio": `${imgW}/${imgH}`,
-            "max-width": `${imgW}px`,
-            "max-height": `${imgH}px`
+            "aspect-ratio": `${width}/${height}`,
+            "max-width": `${width}px`,
+            "max-height": `${height}px`
         });
 
-        let $container = $(image).parent(); // The <figure> container of the image
-        $container.prepend($imgWrapper);
-        $imgWrapper.append(image);
+        $figure.prepend($wrapper);
+        $wrapper.append(image);
+        return $figure
+    }
 
-        if (primaryTag === 'photography') {
-            const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
+    // Add a lightbox and zoom-out handle to the image
+    addLightBox(image, $figure, $wrapper, width, height, lightBoxId) {
+        const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
                 <div class="photo-lightbox-content">
-                    <div class="group" style="${getZoomImgWrapperStyle(imgW, imgH)}">
-                    <span class='photo-zoom-out-handle'>
-                        <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                  d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
-                        </svg>
-                    </span>
-                        <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${imgAR}"/>
+                    <div class="group">
+                        <span class='photo-zoom-out-handle'>
+                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                      d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
+                            </svg>
+                        </span>
+                            <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${width}/${height}"/>
                     </div>
                 </div>
             </div>`;
-            const zoomInIcon = `<span class='photo-zoom-in-handle'>
+        const zoomInIcon = `<span class='photo-zoom-in-handle'>
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="m19 19-4.35-4.35M9 6v6M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
                 </svg>
             </span>`;
-            // Add the zoom-in icon as the last child of the image wrapper.
-            $imgWrapper.prepend(zoomInIcon);
-            // Add the lightbox above the image figure. After this, the image figure and lightbox share the same parent.
-            $container.before(lightBox);
+        // Add the zoom-in icon as the last child of the image wrapper.
+        $wrapper.prepend(zoomInIcon);
+        // Add the lightbox above the image figure. After this, the image figure and lightbox share the same parent.
+        $figure.before(lightBox);
 
-            // Show the lightbox when the zoom-in icon on the image is clicked.
-            $container.find('.photo-zoom-in-handle').click(() => {
-                showLightBox(lightBoxId, $container)
-            })
+        // Show the lightbox when the zoom-in icon on the image is clicked.
+        $figure.find('.photo-zoom-in-handle').click(() => {
+            this.showLightBox(lightBoxId, $figure, width, height)
+        })
 
-            // Close the lightbox when the zoom-out icon on the image is clicked.
-            $container.parent().find(`#${lightBoxId} .photo-zoom-out-handle`).click(() => {
-                closeLightBox(lightBoxId, $container)
-            })
+        // Close the lightbox when the zoom-out icon on the image is clicked.
+        $figure.parent().find(`#${lightBoxId} .photo-zoom-out-handle`).click(() => {
+            this.closeLightBox(lightBoxId, $figure)
+        })
 
-            // Listen for click events on the content background.
-            $(`#${lightBoxId} .photo-lightbox-content`).click(event => {
-                // Close the lightbox only if it was the content background that is clicked.
-                if (event.target === event.currentTarget) closeLightBox(lightBoxId, $container)
-            })
+        // Listen for click events on the content background.
+        $(`#${lightBoxId} .photo-lightbox-content`).click(event => {
+            // Close the lightbox only if it was the content background that is clicked.
+            if (event.target === event.currentTarget) this.closeLightBox(lightBoxId, $figure)
+        })
+    }
+
+    // Add the image exif data below it.
+    addExifData(image, $figure) {
+        EXIF.getData(image, function () {
+            // Retrieve the exif data
+            let model = EXIF.getTag(this, 'Model')
+            let fStop = EXIF.getTag(this, 'FNumber')
+            let exposure = EXIF.getTag(this, 'ExposureTime')
+            let iso = EXIF.getTag(this, 'ISOSpeedRatings')
+            let focal = EXIF.getTag(this, 'FocalLength')
+
+            // Add only valid data
+            let exifDiv = '<div class="image-exif">'
+            if (model) exifDiv += `<span id="camera">${model}</span>`
+            if (fStop) exifDiv += `<span id="aperture">f/${fStop}</span>`
+            if (exposure) exifDiv += `<span id="shutter">1/${1 / exposure}</span>`
+            if (iso) exifDiv += `<span id="iso">${iso}</span>`
+            if (focal) exifDiv += `<span id="focal">${focal} mm</span>`
+            exifDiv += '</div>'
+
+            // Add the whole exif div only if at least one data is valid
+            if (model || fStop || exposure || iso || focal) $figure.after(exifDiv)
+        });
+    }
+
+    closeLightBox(id, figure) {
+        $(document).off(`keyup.${id}`);
+        $(`#${id}`).fadeOut()
+        figure.find('img.kg-image').fadeIn()
+        $(`#${id} .photo-lightbox-content img`).removeClass('scale-full')
+    }
+
+    showLightBox(id, figure, imgWidth, imgHeight) {
+        // Listen for escape key
+        $(document).on(`keyup.${id}`, event => {
+            if (event.key === "Escape") this.closeLightBox(id, figure);
+        });
+        figure.find('img.kg-image').fadeOut()
+        $(`#${id}`).fadeIn()
+        $(`#${id} .photo-lightbox-content img`).addClass('scale-full')
+        $(`#${id} .photo-lightbox-content > div`).attr('style', this.getZoomImgWrapperStyle(imgWidth, imgHeight))
+    }
+
+    getZoomImgWrapperStyle(imgW, imgH) {
+        let minW = Math.min(imgW, $(window).width())
+        let minH = Math.min(imgH, $(window).height())
+        let style = `aspect-ratio: ${imgW / imgH}; `
+        if (minH > minW) {
+            style += `height: auto; max-height: 100%; width: ${minW}px;`
+        } else {
+            style += `width: auto; max-width: 100%; height: ${minH}px;`
         }
-    });
+        return style
+    }
+
+    getMinAspectRatio() {
+        // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
+        if ($(window).width() > 768) return 1.5
+        return 0.6
+    }
+
+    execOnImageLoad(image, onLoad) {
+        if (image.complete) {
+            onLoad(image)
+        } else {
+            $(image).on('load', () => onLoad(image));
+        }
+    }
+
 }
 
 
@@ -106,9 +188,23 @@ function processImages(primaryTag) {
         if (pre.tagName.toLowerCase() !== 'pre') continue
 
         let copied = `<span class="hide" id="copied"><span>Copied</span><svg class="fill-greenSet dark:fill-greenSet-dark" width="20" height="20" stroke="none" fill="none"><circle cx="10" cy="10" r="10"/><g clip-path="url(#a)"><path fill="#fff" d="M8.438 12.188 6.25 10l-.73.73 2.918 2.916 6.25-6.25-.73-.73-5.52 5.521Z"/></g><defs><clipPath id="a"><path fill="#fff" d="M3.75 3.75h12.5v12.5H3.75z"/></clipPath></defs></svg></span>`
-        let copy = `<span id="copy" onclick='copyCode(this.parentElement)'><span>Copy</span><svg width="22" height="22" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 1.003c-.675.009-1.08.048-1.408.215a2 2 0 0 0-.874.874c-.167.328-.206.733-.215 1.408M18.5 1.003c.675.009 1.08.048 1.408.215a2 2 0 0 1 .874.874c.167.328.206.733.215 1.408m0 9c-.009.675-.048 1.08-.215 1.408a2 2 0 0 1-.874.874c-.328.167-.733.206-1.408.215M21 7v2m-8-8h2M4.2 21h7.6c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C15 19.48 15 18.92 15 17.8v-7.6c0-1.12 0-1.68-.218-2.108a2 2 0 0 0-.874-.874C13.48 7 12.92 7 11.8 7H4.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C1 8.52 1 9.08 1 10.2v7.6c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874C2.52 21 3.08 21 4.2 21Z"/></svg></span>`
+        let copy = `<span id="copy"><span>Copy</span><svg width="22" height="22" fill="none"><path stroke-linecap="round" stroke-linejoin="round" d="M9.5 1.003c-.675.009-1.08.048-1.408.215a2 2 0 0 0-.874.874c-.167.328-.206.733-.215 1.408M18.5 1.003c.675.009 1.08.048 1.408.215a2 2 0 0 1 .874.874c.167.328.206.733.215 1.408m0 9c-.009.675-.048 1.08-.215 1.408a2 2 0 0 1-.874.874c-.328.167-.733.206-1.408.215M21 7v2m-8-8h2M4.2 21h7.6c1.12 0 1.68 0 2.108-.218a2 2 0 0 0 .874-.874C15 19.48 15 18.92 15 17.8v-7.6c0-1.12 0-1.68-.218-2.108a2 2 0 0 0-.874-.874C13.48 7 12.92 7 11.8 7H4.2c-1.12 0-1.68 0-2.108.218a2 2 0 0 0-.874.874C1 8.52 1 9.08 1 10.2v7.6c0 1.12 0 1.68.218 2.108a2 2 0 0 0 .874.874C2.52 21 3.08 21 4.2 21Z"/></svg></span>`
         pre.insertAdjacentHTML("afterbegin", `<div class="code-copy"><div>${copied}${copy}</div></div>`)
     }
+
+    function copyCode(e) {
+        let code = e.parentElement.parentElement.getElementsByTagName('code')[0]
+        let text = code.innerText || code.textContent
+        copy(e, text)
+    }
+
+    // Set click listeners on all the copy buttons
+    let copyButtons = document.querySelectorAll('#copy');
+    copyButtons.forEach((button) => {
+        button.addEventListener('click', function () {
+            copyCode(this.parentElement);
+        });
+    });
 }();
 
 // Set click listeners for the back and share buttons.
@@ -122,30 +218,7 @@ function processImages(primaryTag) {
     })
 }();
 
-
-function closeLightBox(id, figure) {
-    $(document).off(`keyup.${id}`);
-    $(`#${id}`).fadeOut()
-    figure.find('img.kg-image').fadeIn()
-    $(`#${id} .photo-lightbox-content img`).removeClass('scale-full')
-}
-
-function showLightBox(id, figure) {
-    // Listen for escape key
-    $(document).on(`keyup.${id}`, event => {
-        if (event.key === "Escape") closeLightBox(id, figure);
-    });
-    figure.find('img.kg-image').fadeOut()
-    $(`#${id}`).fadeIn()
-    $(`#${id} .photo-lightbox-content img`).addClass('scale-full')
-}
-
-function copyCode(e) {
-    let code = e.parentElement.parentElement.getElementsByTagName('code')[0]
-    let text = code.innerText || code.textContent
-    copy(e, text)
-}
-
+// Copy text from the element
 function copy(element, text, toggle) {
     if (element.children[0].className !== 'hide') return
     navigator.clipboard.writeText(text).then(function () {
@@ -158,22 +231,4 @@ function copy(element, text, toggle) {
             if (typeof toggle === 'function') toggle()
         }, 2000);
     });
-}
-
-function getMinAspectRatio() {
-    // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
-    if ($(window).width() > 768) return 1.5
-    return 0.6
-}
-
-function getZoomImgWrapperStyle(imgW, imgH) {
-    let minW = Math.min(imgW, $(window).width())
-    let minH = Math.min(imgH, $(window).height())
-    let style = `aspect-ratio: ${imgW / imgH}; `
-    if (minH > minW) {
-        style += `height: auto; max-height: 100%; width: ${minW}px;`
-    } else {
-        style += `width: auto; max-width: 100%; height: ${minH}px;`
-    }
-    return style
 }
