@@ -3,20 +3,16 @@ package main
 import (
 	. "backend/common"
 	"context"
-	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/xor-gate/goexif2/exif"
-	"github.com/yosssi/gohtml"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"path"
-	"path/filepath"
 	"strings"
 )
 
@@ -39,13 +35,13 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		fmt.Println("Request body: ", string(body))
-		procesUpdateRequest(r.Context(), string(body))
+		processUpdateRequest(r.Context(), string(body))
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}
 }
 
-func procesUpdateRequest(ctx context.Context, body string) (int, string) {
+func processUpdateRequest(ctx context.Context, body string) (int, string) {
 	var reqData updateRequestBody
 	err := json.Unmarshal([]byte(body), &reqData)
 	if err != nil {
@@ -62,7 +58,7 @@ func procesUpdateRequest(ctx context.Context, body string) (int, string) {
 		return http.StatusInternalServerError, "something went wrong"
 	}
 
-	fmt.Println(gohtml.Format(div))
+	fmt.Println(div)
 
 	return http.StatusOK, "successfully added exif tags"
 }
@@ -79,7 +75,6 @@ func addExifDiv(html string) (string, error) {
 		if exists {
 			div, err := getExifDiv(src)
 			if err == nil {
-				fmt.Println(src, " :: ", gohtml.Format(div))
 				figure := s.Closest(".kg-image-card")
 				figure.AfterHtml(div)
 				addedExif = true
@@ -90,49 +85,64 @@ func addExifDiv(html string) (string, error) {
 	})
 
 	if addedExif {
-		return doc.Html()
+		return doc.Find("body").Html()
 	}
 	return "", errors.New("didn't add any exif tag. See log for the reason")
 }
 
 func getExifDiv(url string) (string, error) {
-	f, err := fileFromUrl(url)
+	file, err := fileFromUrl(url)
 	if err != nil {
 		return "", err
 	}
-	x, err := exif.Decode(f)
+
+	defer func() {
+		_ = file.Close()
+		_ = os.Remove(file.Name())
+	}()
+
+	x, err := exif.Decode(file)
 	if err != nil {
 		return "", fmt.Errorf("unable to get image exif: %w", err)
 	}
-
 	var sb strings.Builder
 	sb.WriteString(`<div class="image-exif">`)
 	validExifFound := false
 
 	model, err := x.Get(exif.Model)
 	if err == nil {
-		sb.WriteString(fmt.Sprintf(`<span id="camera">%v</span>`, string(model.Val)))
+		val, _ := model.StringVal()
+		sb.WriteString(fmt.Sprintf(`<span id="camera">%v</span>`, val))
 		validExifFound = true
 	}
 	fStop, err := x.Get(exif.FNumber)
 	if err == nil {
-		sb.WriteString(fmt.Sprintf(`<span id="aperture">f/%v</span>`, string(fStop.Val)))
-		validExifFound = true
+		num, dem, err := fStop.Rat2(0)
+		if err == nil {
+			sb.WriteString(fmt.Sprintf(`<span id="aperture">F/%.1f</span>`, float64(num)/float64(dem)))
+			validExifFound = true
+		}
 	}
 	exposure, err := x.Get(exif.ExposureTime)
 	if err == nil {
-		sb.WriteString(fmt.Sprintf(`<span id="shutter">1/%v</span>`, 1/binary.BigEndian.Uint64(exposure.Val)))
-		validExifFound = true
+		num, dem, err := exposure.Rat2(0)
+		if err == nil {
+			sb.WriteString(fmt.Sprintf(`<span id="shutter">%v/%v</span>`, num, dem))
+			validExifFound = true
+		}
 	}
 	iso, err := x.Get(exif.ISOSpeedRatings)
 	if err == nil {
-		sb.WriteString(fmt.Sprintf(`<span id="iso">%v</span>`, string(iso.Val)))
+		sb.WriteString(fmt.Sprintf(`<span id="iso">ISO %v</span>`, iso.String()))
 		validExifFound = true
 	}
 	focal, err := x.Get(exif.FocalLength)
 	if err == nil {
-		sb.WriteString(fmt.Sprintf(`<span id="focal">%vmm</span>`, string(focal.Val)))
-		validExifFound = true
+		num, dem, err := focal.Rat2(0)
+		if err == nil {
+			sb.WriteString(fmt.Sprintf(`<span id="focal">%vmm</span>`, num/dem))
+			validExifFound = true
+		}
 	}
 
 	sb.WriteString(`</div>`)
@@ -151,7 +161,7 @@ func fileFromUrl(url string) (*os.File, error) {
 	}
 
 	defer resp.Body.Close()
-	file, err := os.Create(fmt.Sprintf("temp/exif/%v", filepath.Base(path.Base(url))))
+	file, err := os.CreateTemp("", "*")
 	if err != nil {
 		return nil, fmt.Errorf("unable to create image: %w", err)
 	}
