@@ -2,14 +2,14 @@
 .chip {
     @apply
     flex flex-row gap-x-1 items-center
-    px-4 py-2
+    px-4 py-2 text-center
     bg-bgSet dark:bg-bgSet-dark
     border rounded-full border-blackSet dark:border-blackSet-dark
     stroke-greySet dark:stroke-greySet-dark
     hover:border-orangeSet dark:hover:border-orangeSet-dark
     active:border-orangeSet dark:active:border-orangeSet-dark
     focus:border-orangeSet dark:focus:border-orangeSet-dark
-    checked:border-orangeSet dark:focus:border-orangeSet-dark
+    checked:border-orangeSet dark:checked:border-orangeSet-dark
     text-body1 font-normal text-greySet dark:text-greySet-dark
     no-underline transition duration-300 ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
@@ -59,8 +59,7 @@
 .primary-button svg,
 .secondary-button svg {
     @apply
-    stroke-blackSet dark:stroke-blackSet-dark
-    stroke-current
+    dark:stroke-blackSet-dark stroke-current
 }
 
 .secondary-button.copied {
@@ -161,7 +160,7 @@ figure.kg-bookmark-card a.kg-bookmark-container {
 figure.kg-bookmark-card .kg-bookmark-thumbnail {
     @apply
     flex grow min-w-[22%] sm:min-w-[15%]  md:min-w-[10%] relative
-    aspect-square grid
+    aspect-square
 }
 
 figure.kg-bookmark-card .kg-bookmark-thumbnail > img {

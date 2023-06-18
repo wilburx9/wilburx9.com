@@ -33,11 +33,13 @@
 .gh-post-content h2 {
     @apply
     text-text2 md:text-headline2 xl:text-headline1 font-bold
+    mt-6 md:mt-16 mb-3 md:mb-5
 }
 
 .gh-post-content h3 {
     @apply
     text-text3 md:text-text2 xl:text-text1 font-bold
+    mt-5 md:mt-8 mb-2 md:mb-3
 }
 
 .gh-post-meta {
@@ -104,8 +106,7 @@ figcaption {
 
 .kg-image-card {
     @apply
-    w-full
-    mt-8
+    w-full my-8
 }
 
 .kg-image-card > div {
