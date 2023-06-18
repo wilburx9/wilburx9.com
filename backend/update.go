@@ -2,6 +2,7 @@ package main
 
 import (
 	. "backend/common"
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -14,10 +15,11 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
-	http.HandleFunc("/update", editHandler)
+	http.HandleFunc("/edit", editHandler)
 
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
@@ -34,7 +36,6 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fmt.Println("Request body: ", string(body))
 		processUpdateRequest(r.Context(), string(body))
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
@@ -58,9 +59,58 @@ func processUpdateRequest(ctx context.Context, body string) (int, string) {
 		return http.StatusInternalServerError, "something went wrong"
 	}
 
-	fmt.Println(div)
+	err = updatePost(reqData.Post.Current.ID, div)
+	if err != nil {
+		fmt.Println(err)
+		return http.StatusInternalServerError, "something went wrong"
+	}
 
 	return http.StatusOK, "successfully added exif tags"
+}
+
+func updatePost(id, html string) error {
+	now := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+	u := fmt.Sprintf("%v/posts/%v", "http://localhost:2368/ghost/api/admin", id)
+	println("url:", u)
+	body := map[string]any{"posts": []any{map[string]any{"updated_at": now, "id": id, "html": html}}}
+	reqBody := new(bytes.Buffer)
+
+	err := json.NewEncoder(reqBody).Encode(body)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPut, u, reqBody)
+	if err != nil {
+		return err
+	}
+
+	token, err := GetJWTToken("GHOST_API_KEY")
+	if err != nil {
+		return err
+	}
+
+	println("token: ", fmt.Sprintf("Ghost %s", token))
+	req.Header.Set("Authorization", fmt.Sprintf("Ghost %s", token))
+	req.Header.Set("Content-Type", "application/json")
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer res.Body.Close()
+	println(res.StatusCode)
+
+	s, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	fmt.Println(string(s))
+
+	return nil
+
 }
 
 func addExifDiv(html string) (string, error) {
