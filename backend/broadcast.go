@@ -50,7 +50,7 @@ func processBroadcastRequest(ctx context.Context, body string) (int, string) {
 	var reqData lambdaReqBody
 	err := json.Unmarshal([]byte(body), &reqData)
 	if err != nil {
-		return http.StatusBadRequest, fmt.Sprintf("invalid request body")
+		return http.StatusBadRequest, "invalid request body"
 	}
 
 	// Validate the request body

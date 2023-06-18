@@ -40,7 +40,6 @@ class ImageProcessor {
             if (!this.isPhotography) return // Don't add lightbox and exif data on images for non-photography posts
 
             this.addLightBox(image, $figure, $wrapper, width, height, `lightbox__photo__${i}`)
-            this.execOnImageLoad(image, img => this.addExifData(img, $figure))
         });
     }
 
@@ -108,30 +107,6 @@ class ImageProcessor {
         })
     }
 
-    // Add the image exif data below it.
-    addExifData(image, $figure) {
-        EXIF.getData(image, function () {
-            // Retrieve the exif data
-            let model = EXIF.getTag(this, 'Model')
-            let fStop = EXIF.getTag(this, 'FNumber')
-            let exposure = EXIF.getTag(this, 'ExposureTime')
-            let iso = EXIF.getTag(this, 'ISOSpeedRatings')
-            let focal = EXIF.getTag(this, 'FocalLength')
-
-            // Add only valid data
-            let exifDiv = '<div class="image-exif">'
-            if (model) exifDiv += `<span id="camera">${model}</span>`
-            if (fStop) exifDiv += `<span id="aperture">f/${fStop}</span>`
-            if (exposure) exifDiv += `<span id="shutter">1/${1 / exposure}</span>`
-            if (iso) exifDiv += `<span id="iso">${iso}</span>`
-            if (focal) exifDiv += `<span id="focal">${focal} mm</span>`
-            exifDiv += '</div>'
-
-            // Add the whole exif div only if at least one data is valid
-            if (model || fStop || exposure || iso || focal) $figure.after(exifDiv)
-        });
-    }
-
     closeLightBox(id, figure) {
         $(document).off(`keyup.${id}`);
         $(`#${id}`).fadeOut()
@@ -166,14 +141,6 @@ class ImageProcessor {
         // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
         if ($(window).width() > 768) return 1.5
         return 0.6
-    }
-
-    execOnImageLoad(image, onLoad) {
-        if (image.complete) {
-            onLoad(image)
-        } else {
-            $(image).on('load', () => onLoad(image));
-        }
     }
 
 }
