@@ -1,10 +1,8 @@
 package common
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/golang-jwt/jwt"
 	"github.com/mailerlite/mailerlite-go"
 	"log"
 	"net/http"
@@ -68,27 +66,6 @@ func GenerateResponse(origin string, code int, data any) events.APIGatewayProxyR
 		Body:       getResponseBody(success, data),
 		Headers:    headers,
 	}
-}
-
-// GetJWTToken generates a jwt from a ':' separated key
-func GetJWTToken(key string) (string, error) {
-	keys := strings.Split(key, ":")
-	id, secret := keys[0], keys[1]
-
-	secretB, err := hex.DecodeString(secret)
-	if err != nil {
-		return "", err
-	}
-
-	now := time.Now()
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"iat": now.Unix(),
-		"exp": now.Add(time.Minute * 5).Unix(),
-		"aud": "/admin/",
-	})
-	token.Header["kid"] = id
-
-	return token.SignedString(secretB)
 }
 
 func getResponseBody(success bool, data any) string {
