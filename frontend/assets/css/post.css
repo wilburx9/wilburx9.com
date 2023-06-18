@@ -84,8 +84,8 @@
 
 .gh-article-container > .gh-article {
     @apply
-    w-full flex flex-col grow
-    mt-16 md:px-28 md:-mt-12
+    w-full flex flex-col md:grow max-w-4xl
+    mt-16 md:-mt-12 mx-auto px-1
 }
 
 .gh-feature-image {
@@ -101,12 +101,12 @@
 figcaption {
     @apply
     text-caption italic text-center text-greyLightSet dark:text-greyLightSet-dark
-    my-2
+    my-2 mx-1 md:mx-5 lg:mx-20
 }
 
 .kg-image-card {
     @apply
-    w-full my-8
+    w-full mt-8
 }
 
 .kg-image-card > div {

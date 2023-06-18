@@ -85,8 +85,8 @@ module.exports = {
                 'lineHeight': '20px',
                 'fontWeight': '500'
             }],
-            'caption': ['12px', {
-                'lineHeight': '18px',
+            'caption': ['14px', {
+                'lineHeight': '19px',
                 'fontWeight': '400',
             }],
             'exif': ['14px', {
