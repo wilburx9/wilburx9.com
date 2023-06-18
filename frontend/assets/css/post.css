@@ -162,13 +162,13 @@ figcaption {
     max-w-fit max-h-fit
 }
 
-.photo-lightbox-content> div > img {
+.photo-lightbox-content > div > img {
     @apply
     w-screen scale-90
     transition-transform ease-in-out duration-300 motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
-.photo-lightbox-content> div > img.scale-full {
+.photo-lightbox-content > div > img.scale-full {
     @apply
     scale-100
 }
@@ -181,44 +181,51 @@ figcaption {
 
 .image-exif {
     @apply
-    flex flex-row pt-4 pb-8 flex-wrap
-    gap-8 items-center justify-center
+    flex flex-row pt-2 md:pt-4 pb-8 flex-wrap
+    gap-6 md:gap-8 items-center justify-center
 }
 
 .image-exif > span {
     @apply
-    flex flex-col items-center justify-between gap-y-2
+    flex flex-col items-center justify-between gap-y-1 md:gap-y-2
     text-exif text-greySet dark:text-greySet-dark text-center
+    text-[12px] md:text-[14px]
+}
+
+.image-exif > span:before {
+    @apply
+    inline-block content-[''] bg-contain
+    w-5 h-5 md:w-6 md:h-5 bg-no-repeat
 }
 
 .image-exif > span#camera:before {
     @apply
-    content-[url('../images/exif_camera.svg')]
-    dark:content-[url('../images/exif_camera_dark.svg')]
+    bg-[url('../images/exif_camera.svg')]
+    dark:bg-[url('../images/exif_camera_dark.svg')]
 }
 
 .image-exif > span#aperture:before {
     @apply
-    content-[url('../images/exif_aperture.svg')]
-    dark:content-[url('../images/exif_aperture_dark.svg')]
+    bg-[url('../images/exif_aperture.svg')]
+    dark:bg-[url('../images/exif_aperture_dark.svg')]
 }
 
 .image-exif > span#shutter:before {
     @apply
-    content-[url('../images/exif_shutter.svg')]
-    dark:content-[url('../images/exif_shutter_dark.svg')]
+    bg-[url('../images/exif_shutter.svg')]
+    dark:bg-[url('../images/exif_shutter_dark.svg')]
 }
 
 .image-exif > span#iso:before {
     @apply
-    content-[url('../images/exif_iso.svg')]
-    dark:content-[url('../images/exif_iso_dark.svg')]
+    bg-[url('../images/exif_iso.svg')]
+    dark:bg-[url('../images/exif_iso_dark.svg')]
 }
 
 .image-exif > span#focal:before {
     @apply
-    content-[url('../images/exif_focal.svg')]
-    dark:content-[url('../images/exif_focal_dark.svg')]
+    bg-[url('../images/exif_focal.svg')]
+    dark:bg-[url('../images/exif_focal_dark.svg')]
 }
 
 .code-copy {
