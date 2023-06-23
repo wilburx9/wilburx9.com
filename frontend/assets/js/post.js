@@ -66,8 +66,11 @@ class ImageProcessor {
 
     // Add a lightbox and zoom-out handle to the image
     addLightBox(image, $figure, $wrapper, width, height, lightBoxId) {
+        let imgUrl = image.src
+        let highResUmgUrl = this.getHighResUrl(imgUrl)
+
         const lightBox = `<div class='photo-lightbox' id='${lightBoxId}'>
-                <div class="photo-lightbox-content">
+               <div class="photo-lightbox-content">
                     <div class="group">
                         <span class='photo-zoom-out-handle'>
                             <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
@@ -75,10 +78,11 @@ class ImageProcessor {
                                       d="m19 19-4.35-4.35M6 9h6m5 0A8 8 0 1 1 1 9a8 8 0 0 1 16 0Z"/>
                             </svg>
                         </span>
-                            <img src="${image.src}" alt="${image.alt}" style="aspect-ratio: ${width}/${height}"/>
+                        <img src="${imgUrl}" data-high-res-src="${highResUmgUrl}" alt="${image.alt}" style="aspect-ratio: ${width}/${height}"/>
                     </div>
                 </div>
             </div>`;
+
         const zoomInIcon = `<span class='photo-zoom-in-handle'>
                 <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -115,14 +119,30 @@ class ImageProcessor {
     }
 
     showLightBox(id, figure, imgWidth, imgHeight) {
+
         // Listen for escape key
         $(document).on(`keyup.${id}`, event => {
             if (event.key === "Escape") this.closeLightBox(id, figure);
         });
+
         figure.find('img.kg-image').fadeOut()
         $(`#${id}`).fadeIn()
         $(`#${id} .photo-lightbox-content img`).addClass('scale-full')
         $(`#${id} .photo-lightbox-content > div`).attr('style', this.getZoomImgWrapperStyle(imgWidth, imgHeight))
+
+        setTimeout(() => this.handleImageLoading(id), 500);
+    }
+
+    handleImageLoading(lightBoxId) {
+        let $img = $(`#${lightBoxId} .photo-lightbox-content img`)
+        let highResSrc = $img.data('high-res-src');
+
+        let preloadImg = new Image()
+        preloadImg.onload = function () {
+            $img[0].src = highResSrc
+        }
+
+        preloadImg.src = highResSrc
     }
 
     getZoomImgWrapperStyle(imgW, imgH) {
@@ -141,6 +161,19 @@ class ImageProcessor {
         // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
         if ($(window).width() > 768) return 1.5
         return 0.6
+    }
+
+    // Append an '_o' before the image extension
+    getHighResUrl(imgUrl) {
+        let url = new URL(imgUrl);
+        // Check if the image host includes the page host. We don't want to modify the url of external images
+        if (url.host.includes(window.location.host)) {
+            let imagePath = url.pathname.split(".");
+            return `${url.protocol}//${url.host}${imagePath[0]}_o.${imagePath[1]}`;
+        } else {
+            // Return the original url if the image host does not include the page host
+            return imgUrl;
+        }
     }
 
 }
