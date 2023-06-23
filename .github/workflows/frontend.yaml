@@ -25,22 +25,22 @@ jobs:
 
       - name: Install dependencies
         working-directory: frontend
-        if: env.CHANGES > 0
+        if: env.CHANGES != '0'
         run: yarn install
 
       - name: Generate CSS & JS
         working-directory: frontend
-        if: env.CHANGES > 0
+        if: env.CHANGES != '0'
         run: yarn pretest
 
       - name: Package the theme into a zip file
         working-directory: frontend
-        if: env.CHANGES > 0
+        if: env.CHANGES != '0'
         run: gulp zip
 
       - name: Deploy and activate the theme
         working-directory: frontend
-        if: env.CHANGES > 0
+        if: env.CHANGES != '0'
         env:
           GHOST_API_URL: ${{ secrets.GHOST_ADMIN_API_URL }}
           GHOST_API_KEY: ${{ secrets.GHOST_ADMIN_API_KEY }}
@@ -48,13 +48,13 @@ jobs:
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
-        if: env.CHANGES > 0
+        if: env.CHANGES != '0'
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Clear Lightsail Distribution Cache
-        if: env.CHANGES > 0
+        if: env.CHANGES != '0'
         run: |
           aws lightsail reset-distribution-cache --distribution-name ${{ secrets.LIGHTSAIL_DISTRIBUTION }}
 
