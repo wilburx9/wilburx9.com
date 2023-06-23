@@ -15,6 +15,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
+      - name: Fetch tags
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+
       - name: Check if backend code has changed
         run: |
           LAST_TAG_SHA=$(git rev-list -n 1 $(git describe --abbrev=0 --tags ${{ github.ref }}^))
