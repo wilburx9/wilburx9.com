@@ -14,51 +14,37 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Check if backend code has changed
-        run: |
-          LAST_TAG=$(git describe --tags --abbrev=0)
-          CHANGES=$(git diff --name-only $LAST_TAG HEAD -- 'backend/**' | wc -l)
-          echo "CHANGES=$CHANGES" >> $GITHUB_ENV
 
       - name: Setup Go
         uses: actions/setup-go@v4
-        if: env.CHANGES != '0'
         with:
           go-version: 1.20.x
 
       - name: Build subscribe function
         working-directory: backend
-        if: env.CHANGES != '0'
         run: |
           GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build subscribe.go
           zip -j ./subscribe.zip ./subscribe
 
       - name: Build broadcast function
         working-directory: backend
-        if: env.CHANGES != '0'
         run: |
           GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build broadcast.go
           zip -j ./broadcast.zip ./broadcast
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
-        if: env.CHANGES != '0'
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy subscribe function
         working-directory: backend
-        if: env.CHANGES != '0'
         run: |
           aws lambda update-function-code --function-name ${{ vars.LAMBDA_FUNCTION_SUBSCRIBE }} --zip-file fileb://./subscribe.zip
 
       - name: Deploy broadcast function
         working-directory: backend
-        if: env.CHANGES != '0'
         run: |
           aws lambda update-function-code --function-name ${{ vars.LAMBDA_FUNCTION_BROADCAST }} --zip-file fileb://./broadcast.zip
 
