@@ -14,33 +14,33 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-
-      - name: Fetch tags
-        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+        with:
+          fetch-depth: 0
 
       - name: Check if frontend code has changed
         run: |
-          LAST_TAG_SHA=$(git rev-list -n 1 $(git describe --abbrev=0 --tags ${{ github.ref }}^))
-          CHANGED_FILES=$(git diff --name-only $LAST_TAG_SHA ${{ github.sha }} -- frontend/)
-          if [ -z "$CHANGED_FILES" ]; then
-            echo "No frontend code was updated. Skipping deployment."
-            exit 0
-          fi
+          LAST_TAG=$(git describe --tags --abbrev=0)
+          CHANGES=$(git diff --name-only $LAST_TAG HEAD -- 'frontend/**' | wc -l)
+          echo "CHANGES=$CHANGES" >> $GITHUB_ENV
 
       - name: Install dependencies
         working-directory: frontend
+        if: env.CHANGES > 0
         run: yarn install
 
       - name: Generate CSS & JS
         working-directory: frontend
+        if: env.CHANGES > 0
         run: yarn pretest
 
       - name: Package the theme into a zip file
         working-directory: frontend
+        if: env.CHANGES > 0
         run: gulp zip
 
       - name: Deploy and activate the theme
         working-directory: frontend
+        if: env.CHANGES > 0
         env:
           GHOST_API_URL: ${{ secrets.GHOST_ADMIN_API_URL }}
           GHOST_API_KEY: ${{ secrets.GHOST_ADMIN_API_KEY }}
@@ -48,11 +48,13 @@ jobs:
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
+        if: env.CHANGES > 0
         with:
           role-to-assume: ${{ secrets.AWS_ROLE }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Clear Lightsail Distribution Cache
+        if: env.CHANGES > 0
         run: |
           aws lightsail reset-distribution-cache --distribution-name ${{ secrets.LIGHTSAIL_DISTRIBUTION }}
 
