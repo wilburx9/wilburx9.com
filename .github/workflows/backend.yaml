@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-    paths:
-      - 'backend/**'
 
 jobs:
   deploy-backend:
@@ -16,6 +14,15 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+
+      - name: Check if backend code has changed
+        run: |
+          LAST_TAG_SHA=$(git rev-list -n 1 $(git describe --abbrev=0 --tags ${{ github.ref }}^))
+          CHANGED_FILES=$(git diff --name-only $LAST_TAG_SHA ${{ github.sha }} -- backend/)
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No backend code was updated. Skipping deployment."
+            exit 0
+          fi
 
       - name: Setup Go
         uses: actions/setup-go@v4
