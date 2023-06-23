@@ -193,39 +193,39 @@ figcaption {
 }
 
 .image-exif > span:before {
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
     @apply
-    inline-block content-[''] bg-contain
-    w-5 h-5 md:w-6 md:h-5 bg-no-repeat
+    inline-block content-['']
+    w-5 h-5 md:w-6 md:h-6
+    bg-[#3d3d3d] dark:bg-[#e2e2e2]
 }
 
 .image-exif > span#camera:before {
-    @apply
-    bg-[url('../images/exif_camera.svg')]
-    dark:bg-[url('../images/exif_camera_dark.svg')]
+    -webkit-mask-image: url('../images/exif_camera.svg');
+    mask-image: url('../images/exif_camera.svg');
 }
 
 .image-exif > span#aperture:before {
-    @apply
-    bg-[url('../images/exif_aperture.svg')]
-    dark:bg-[url('../images/exif_aperture_dark.svg')]
+    -webkit-mask-image: url('../images/exif_aperture.svg');
+    mask-image: url('../images/exif_aperture.svg');
 }
 
 .image-exif > span#shutter:before {
-    @apply
-    bg-[url('../images/exif_shutter.svg')]
-    dark:bg-[url('../images/exif_shutter_dark.svg')]
+    -webkit-mask-image: url('../images/exif_shutter.svg');
+    mask-image: url('../images/exif_shutter.svg');
 }
 
 .image-exif > span#iso:before {
-    @apply
-    bg-[url('../images/exif_iso.svg')]
-    dark:bg-[url('../images/exif_iso_dark.svg')]
+    -webkit-mask-image: url('../images/exif_iso.svg');
+    mask-image: url('../images/exif_iso.svg');
 }
 
 .image-exif > span#focal:before {
-    @apply
-    bg-[url('../images/exif_focal.svg')]
-    dark:bg-[url('../images/exif_focal_dark.svg')]
+    -webkit-mask-image: url('../images/exif_focal.svg');
+    mask-image: url('../images/exif_focal.svg');
 }
 
 .code-copy {
