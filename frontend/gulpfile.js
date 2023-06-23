@@ -40,6 +40,7 @@ function hbs(done) {
 }
 
 function css(done) {
+    var genMaps = process.env.GEN_SOURCEMAPS !== 'false';
     var processors = [
         easyimport,
         colorFunction(),
@@ -49,18 +50,19 @@ function css(done) {
     ];
 
     pump([
-        src('assets/css/*.css', {sourcemaps: true}),
+        src('assets/css/*.css', {sourcemaps: genMaps}),
         postcss(processors),
-        dest('assets/built/', {sourcemaps: '.'}),
+        dest('assets/built/', {sourcemaps: genMaps ? '.' : false}),
         livereload()
     ], handleError(done));
 }
 
 function js(done) {
+    var genMaps = process.env.GEN_SOURCEMAPS !== 'false';
     pump([
-        src('assets/js/*.js', {sourcemaps: true}),
+        src('assets/js/*.js', {sourcemaps: genMaps}),
         uglify(),
-        dest('assets/built/', {sourcemaps: '.'}),
+        dest('assets/built/', {sourcemaps: genMaps ? '.' : false}),
         livereload()
     ], handleError(done));
 }
