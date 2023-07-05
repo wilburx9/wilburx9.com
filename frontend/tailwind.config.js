@@ -93,8 +93,12 @@ module.exports = {
                 'lineHeight': '20px',
                 'fontWeight': '300',
             }],
-            'code': ['20px', {
-                'lineHeight': '32px',
+            'code': ['13px', {
+                'lineHeight': '22px',
+                'fontWeight': '400',
+            }],
+            'LargeCode': ['16px', {
+                'lineHeight': '27px',
                 'fontWeight': '400',
             }],
             'title': ['58px', {
