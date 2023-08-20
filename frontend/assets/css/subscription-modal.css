@@ -38,18 +38,18 @@
 
 .subscription-form .form-title {
     @apply
-    text-headline2 font-bold w-full mt-4
+    text-headline2 font-semibold w-full mt-4
 }
 
 .subscription-form .form-desc {
     @apply
-    text-body2 font-normal mt-2
+    text-body2 font-light mt-2
     text-greySet dark:text-greySet-dark w-full
 }
 
 .subscription-form .form-subheader {
     @apply
-    text-body1 font-bold w-full mt-8
+    text-body1 font-semibold w-full mt-8
 }
 
 .subscription-form .form-tags {
@@ -85,7 +85,7 @@
     w-full border border-greyLightSet dark:border-greyLightSet-dark
     bg-bgSet dark:bg-bgSet-dark px-4 pt-[6.3%] pb-[2%] rounded-xl
     caret-orangeSet dark:caret-orangeSet-dark
-    text-body2 font-normal relative
+    text-body2 font-light relative
 }
 
 .subscription-modal input[type="email"]:-webkit-autofill {
@@ -117,7 +117,7 @@
 
 .subscription-modal input[type="email"] + label {
     @apply
-    text-body2 font-normal top-2/4 left-4 absolute -translate-y-2/4
+    text-body2 font-light top-2/4 left-4 absolute -translate-y-2/4
     text-greyLightSet dark:text-greyLightSet-dark
     transition-all duration-300 ease-in-out motion-reduce:transition-none
 }
@@ -130,7 +130,7 @@
 
 .subscription-form .form-error {
     @apply
-    w-full text-body3 font-normal mt-1 hidden
+    w-full text-body3 font-light mt-1 hidden
     text-redSet dark:text-redSet-dark
 }
 
@@ -197,13 +197,13 @@
 .subscription-modal .success-title,
 .subscription-modal .error-title {
     @apply
-    text-headline2 font-bold mt-10
+    text-headline2 font-semibold mt-10
 }
 
 .subscription-modal .success-desc,
 .subscription-modal .error-desc {
     @apply
-    text-body2 font-normal mt-1.5
+    text-body2 font-light mt-1.5
     text-greyLightSet dark:text-greyLightSet-dark
     text-center
 }

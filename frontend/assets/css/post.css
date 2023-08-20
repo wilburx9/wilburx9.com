@@ -1,20 +1,20 @@
 .gh-title {
     @apply
-    text-headline2 sm:text-headline font-bold
+    text-headline2 sm:text-headline font-semibold
     text-blackSet dark:text-blackSet-dark
     mt-4
 }
 
 .gh-post-content {
     @apply
-    text-text3 md:text-text2 xl:text-text1 font-normal
+    text-text3 md:text-text2 xl:text-text1 font-light
     text-greySet dark:text-greySet-dark
 }
 
 .gh-post-content b,
 .gh-post-content strong {
     @apply
-    font-bold
+    font-semibold
 }
 
 .gh-post-content a {
@@ -32,24 +32,24 @@
 
 .gh-post-content h2 {
     @apply
-    text-text2 md:text-headline2 xl:text-headline1 font-bold
+    text-text2 md:text-headline2 xl:text-headline1 font-semibold
     mt-6 md:mt-16 mb-3 md:mb-5
 }
 
 .gh-post-content h3 {
     @apply
-    text-text3 md:text-text2 xl:text-text1 font-bold
+    text-text3 md:text-text2 xl:text-text1 font-semibold
     mt-5 md:mt-8 mb-2 md:mb-3
 }
 
 .gh-post-meta {
     @apply w-full
     text-greyLightSet dark:text-greyLightSet-dark
-    text-body3 font-normal line-clamp-1 mt-2
+    text-body3 font-light line-clamp-1 mt-2
 }
 
 .gh-article .gh-post-meta {
-    @apply text-body3 md:text-body2 font-normal
+    @apply text-body3 md:text-body2 font-light
 }
 
 .gh-post-footer {
@@ -59,7 +59,7 @@
 
 .gh-post-footer > h2 {
     @apply
-    text-headline1 font-bold
+    text-headline1 font-semibold
     text-blackSet dark:text-blackSet-dark
 }
 
@@ -85,7 +85,7 @@
 .gh-article-container > .gh-article {
     @apply
     w-full flex flex-col md:grow max-w-4xl
-    mt-16 md:-mt-12 mx-auto px-1
+    mt-16 md:-mt-12 mx-auto px-1 lg:px-10
 }
 
 .gh-feature-image {
@@ -281,7 +281,7 @@ figcaption {
     flex flex-row gap-1 justify-start items-center
     text-greySet dark:text-greySet-dark
     stroke-greySet dark:stroke-greySet-dark
-    text-body2 font-normal
+    text-body2 font-light
 }
 
 .external-reading-time {

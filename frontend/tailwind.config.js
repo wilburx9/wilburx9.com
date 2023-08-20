@@ -53,8 +53,8 @@ module.exports = {
             'mono': ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
         },
         fontSize: {
-            'text1': ['20px', {
-                'lineHeight': '32px',
+            'text1': ['18px', {
+                'lineHeight': '34px',
             }],
             'text2': ['16px', {
                 'lineHeight': '28px',
@@ -73,7 +73,7 @@ module.exports = {
             }],
             'headline': ['36px', {
                 'lineHeight': '54px',
-                'fontWeight': '700'
+                'fontWeight': '600'
             }],
             'headline1': ['24px', {
                 'lineHeight': '28px',
@@ -83,31 +83,31 @@ module.exports = {
             }],
             'button': ['16px', {
                 'lineHeight': '20px',
-                'fontWeight': '500'
+                'fontWeight': '400'
             }],
             'caption': ['14px', {
                 'lineHeight': '19px',
-                'fontWeight': '400',
+                'fontWeight': '300',
             }],
             'exif': ['14px', {
-                'lineHeight': '20px',
-                'fontWeight': '300',
+                'lineHeight': '19px',
+                'fontWeight': '200',
             }],
             'code': ['13px', {
                 'lineHeight': '22px',
-                'fontWeight': '400',
+                'fontWeight': '300',
             }],
-            'LargeCode': ['16px', {
+            'largeCode': ['16px', {
                 'lineHeight': '27px',
-                'fontWeight': '400',
+                'fontWeight': '300',
             }],
             'title': ['58px', {
-                'lineHeight': '68px',
-                'fontWeight': '700',
+                'lineHeight': '60px',
+                'fontWeight': '600',
             }],
             'largeTitle': ['62px', {
-                'lineHeight': '72px',
-                'fontWeight': '700',
+                'lineHeight': '65px',
+                'fontWeight': '600',
             }],
         }
     },

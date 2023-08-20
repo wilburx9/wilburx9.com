@@ -22,7 +22,7 @@ pre[class*="language-"] {
     -ms-hyphens: none;
     hyphens: none;
     @apply
-    font-mono text-code md:text-LargeCode text-greySet dark:text-greySet-dark
+    font-mono text-code md:text-largeCode text-greySet dark:text-greySet-dark
     text-left whitespace-pre break-normal overflow-auto
 }
 
@@ -125,7 +125,7 @@ pre[class*="language-"] > code[class*="language-"] {
 
 .token.important,
 .token.bold {
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .token.italic {

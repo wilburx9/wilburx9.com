@@ -117,12 +117,12 @@ html,
 
 .gh-post-feed-footer-info > h4 {
     @apply
-    text-body1 font-bold text-blackSet dark:text-blackSet-dark
+    text-body1 font-semibold text-blackSet dark:text-blackSet-dark
 }
 
 .gh-post-feed-footer-info > p {
     @apply
-    text-body2 font-normal text-greyLightSet dark:text-greyLightSet-dark
+    text-body2 font-light text-greyLightSet dark:text-greyLightSet-dark
 }
 
 hr {
@@ -141,7 +141,7 @@ hr {
 
 .gh-more-posts > h2 {
     @apply
-    text-headline1 font-bold
+    text-headline1 font-semibold
     text-blackSet dark:text-blackSet-dark
     mb-4 mt-8
 }

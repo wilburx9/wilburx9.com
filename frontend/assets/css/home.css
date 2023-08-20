@@ -65,12 +65,12 @@
 .home-content h1 {
     @apply
     text-center sm:text-left text-blackSet dark:text-blackSet-dark
-    text-headline1 font-bold sm:text-title md:text-largeTitle max-w-prose
+    text-headline1 font-semibold sm:text-title md:text-largeTitle max-w-prose
 }
 
 .home-content h2 {
     @apply
     text-center sm:text-left pt-2
     text-greySet dark:text-greySet-dark max-w-prose
-    text-body2 font-normal sm:text-body1 md:text-headline2
+    text-body2 font-light sm:text-body1 md:text-headline2
 }
