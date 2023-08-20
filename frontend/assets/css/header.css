@@ -5,7 +5,7 @@
 
 .gh-tag-nav-container {
     @apply
-    flex flex-row gap-x-1
+    flex flex-row gap-x-1 flex-wrap sm:flex-nowrap
     items-center justify-center w-full lg:w-min
 }
 
@@ -19,7 +19,7 @@
     @apply
     flex flex-row gap-x-1 items-center
     px-2.5 py-3.5
-    text-body1 font-normal text-greySet dark:text-greySet-dark
+    text-body1 font-light text-greySet dark:text-greySet-dark
     stroke-greySet dark:stroke-greySet-dark
 }
 

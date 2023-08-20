@@ -1,20 +1,20 @@
 .gh-title {
     @apply
-    text-headline2 sm:text-headline font-bold
+    text-headline2 sm:text-headline font-semibold
     text-blackSet dark:text-blackSet-dark
     mt-4
 }
 
 .gh-post-content {
     @apply
-    text-text3 md:text-text2 xl:text-text1 font-normal
+    text-text3 md:text-text2 xl:text-text1 font-light
     text-greySet dark:text-greySet-dark
 }
 
 .gh-post-content b,
 .gh-post-content strong {
     @apply
-    font-bold
+    font-semibold
 }
 
 .gh-post-content a {
@@ -32,22 +32,24 @@
 
 .gh-post-content h2 {
     @apply
-    text-text2 md:text-headline2 xl:text-headline1 font-bold
+    text-text2 md:text-headline2 xl:text-headline1 font-semibold
+    mt-6 md:mt-16 mb-3 md:mb-5
 }
 
 .gh-post-content h3 {
     @apply
-    text-text3 md:text-text2 xl:text-text1 font-bold
+    text-text3 md:text-text2 xl:text-text1 font-semibold
+    mt-5 md:mt-8 mb-2 md:mb-3
 }
 
 .gh-post-meta {
     @apply w-full
     text-greyLightSet dark:text-greyLightSet-dark
-    text-body3 font-normal line-clamp-1 mt-2
+    text-body3 font-light line-clamp-1 mt-2
 }
 
 .gh-article .gh-post-meta {
-    @apply text-body3 md:text-body2 font-normal
+    @apply text-body3 md:text-body2 font-light
 }
 
 .gh-post-footer {
@@ -57,7 +59,7 @@
 
 .gh-post-footer > h2 {
     @apply
-    text-headline1 font-bold
+    text-headline1 font-semibold
     text-blackSet dark:text-blackSet-dark
 }
 
@@ -82,8 +84,8 @@
 
 .gh-article-container > .gh-article {
     @apply
-    w-full flex flex-col grow
-    mt-16 md:px-28 md:-mt-12
+    w-full flex flex-col md:grow max-w-4xl
+    mt-16 md:-mt-12 mx-auto px-1 lg:px-10
 }
 
 .gh-feature-image {
@@ -99,13 +101,12 @@
 figcaption {
     @apply
     text-caption italic text-center text-greyLightSet dark:text-greyLightSet-dark
-    my-2
+    my-2 mx-1 md:mx-5 lg:mx-20
 }
 
 .kg-image-card {
     @apply
-    w-full
-    mt-8
+    w-full mt-8
 }
 
 .kg-image-card > div {
@@ -161,13 +162,13 @@ figcaption {
     max-w-fit max-h-fit
 }
 
-.photo-lightbox-content> div > img {
+.photo-lightbox-content > div > img {
     @apply
     w-screen scale-90
     transition-transform ease-in-out duration-300 motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
-.photo-lightbox-content> div > img.scale-full {
+.photo-lightbox-content > div > img.scale-full {
     @apply
     scale-100
 }
@@ -180,44 +181,51 @@ figcaption {
 
 .image-exif {
     @apply
-    flex flex-row pt-4 pb-8 flex-wrap
-    gap-8 items-center justify-center
+    flex flex-row pt-2 md:pt-4 pb-8 flex-wrap
+    gap-6 md:gap-8 items-center justify-center
 }
 
 .image-exif > span {
     @apply
-    flex flex-col items-center justify-between gap-y-2
+    flex flex-col items-center justify-between gap-y-1 md:gap-y-2
     text-exif text-greySet dark:text-greySet-dark text-center
+    text-[12px] md:text-[14px]
+}
+
+.image-exif > span:before {
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    @apply
+    inline-block content-['']
+    w-5 h-5 md:w-6 md:h-6
+    bg-[#3d3d3d] dark:bg-[#e2e2e2]
 }
 
 .image-exif > span#camera:before {
-    @apply
-    content-[url('../images/exif_camera.svg')]
-    dark:content-[url('../images/exif_camera_dark.svg')]
+    -webkit-mask-image: url('../images/exif_camera.svg');
+    mask-image: url('../images/exif_camera.svg');
 }
 
 .image-exif > span#aperture:before {
-    @apply
-    content-[url('../images/exif_aperture.svg')]
-    dark:content-[url('../images/exif_aperture_dark.svg')]
+    -webkit-mask-image: url('../images/exif_aperture.svg');
+    mask-image: url('../images/exif_aperture.svg');
 }
 
 .image-exif > span#shutter:before {
-    @apply
-    content-[url('../images/exif_shutter.svg')]
-    dark:content-[url('../images/exif_shutter_dark.svg')]
+    -webkit-mask-image: url('../images/exif_shutter.svg');
+    mask-image: url('../images/exif_shutter.svg');
 }
 
 .image-exif > span#iso:before {
-    @apply
-    content-[url('../images/exif_iso.svg')]
-    dark:content-[url('../images/exif_iso_dark.svg')]
+    -webkit-mask-image: url('../images/exif_iso.svg');
+    mask-image: url('../images/exif_iso.svg');
 }
 
 .image-exif > span#focal:before {
-    @apply
-    content-[url('../images/exif_focal.svg')]
-    dark:content-[url('../images/exif_focal_dark.svg')]
+    -webkit-mask-image: url('../images/exif_focal.svg');
+    mask-image: url('../images/exif_focal.svg');
 }
 
 .code-copy {
@@ -273,7 +281,7 @@ figcaption {
     flex flex-row gap-1 justify-start items-center
     text-greySet dark:text-greySet-dark
     stroke-greySet dark:stroke-greySet-dark
-    text-body2 font-normal
+    text-body2 font-light
 }
 
 .external-reading-time {

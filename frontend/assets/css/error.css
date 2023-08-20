@@ -12,12 +12,12 @@
 
 .error-page-content h1 {
     @apply
-    text-headline1 font-bold md:text-title text-center
+    text-headline1 font-semibold md:text-title text-center
     mt-9 text-blackSet dark:text-blackSet-dark
 }
 
 .error-page-content p {
     @apply
-    text-body1 font-normal text-center max-w-prose
+    text-body1 font-light text-center max-w-prose
     mt-2 mb-8 text-greyLightSet dark:text-greyLightSet-dark
 }

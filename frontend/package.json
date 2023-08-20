@@ -2,7 +2,7 @@
     "name": "wilburx9",
     "description": "A custom ghost theme for wilburx9.com/blog",
     "demo": "https://wilburx9.com/blog",
-    "version": "3.0.0",
+    "version": "3.0.7",
     "engines": {
         "ghost": ">=4.0.0"
     },
@@ -41,9 +41,9 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/wilburt/wilburx9.com"
+        "url": "https://github.com/wilburx9/wilburx9.com"
     },
-    "bugs": "https://github.com/wilburt/wilburx9.com",
+    "bugs": "https://github.com/wilburx9/wilburx9.com",
     "contributors": [
         {
             "name": "Wilberforce Uwadiegwu",

@@ -12,7 +12,7 @@
 
 .gh-footer p {
     @apply
-    text-center md:text-left text-body3 font-normal text-blackSet dark:text-blackSet-dark py-4
+    text-center md:text-left text-body3 font-light text-blackSet dark:text-blackSet-dark py-4
 }
 
 .gh-footer-icon {
