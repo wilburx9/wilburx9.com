@@ -54,7 +54,7 @@ module.exports = {
         },
         fontSize: {
             'text1': ['18px', {
-                'lineHeight': '34px',
+                'lineHeight': '30px',
             }],
             'text2': ['16px', {
                 'lineHeight': '28px',
@@ -85,8 +85,8 @@ module.exports = {
                 'lineHeight': '20px',
                 'fontWeight': '400'
             }],
-            'caption': ['14px', {
-                'lineHeight': '19px',
+            'caption': ['12px', {
+                'lineHeight': '15px',
                 'fontWeight': '300',
             }],
             'exif': ['14px', {
