@@ -10,11 +10,9 @@ import (
 	"time"
 )
 
-const (
-	Photography = "photography"
-	Programming = "programming"
-	Blog        = "blog"
-)
+var Groups = []string{"photography", "software"}
+
+const Blog = "blog"
 
 func init() {
 	config, err := newConfig()

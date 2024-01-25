@@ -9,9 +9,11 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/mailerlite/mailerlite-go"
+	"github.com/samber/lo"
 	"log"
 	"net/http"
 	"net/mail"
+	"slices"
 	"strings"
 )
 
@@ -169,26 +171,22 @@ func validateForm(body string) (requestData, string, error) {
 
 // cleanTags ensures the tags in the request are valid. Also, adds default tags
 func cleanTags(rawTags []string) []string {
-	var tapsMap = make(map[string]bool, 0) // Use a map to prevent duplicates
+	var tagsMap = make(map[string]bool, 0) // Use a map to prevent duplicates
 
 	for _, tag := range rawTags {
 		trimmed := strings.ToLower(strings.TrimSpace(tag))
 		// Only take the tag if it's valid
-		if trimmed == Photography || trimmed == Programming {
-			tapsMap[trimmed] = true
+		if slices.Contains(Groups, trimmed) {
+			tagsMap[trimmed] = true
 		}
 	}
 
 	var tags = []string{Blog} // Every subscriber belongs to the "blog" tag
-
-	// Convert the map to a list
-	for v := range tapsMap {
-		tags = append(tags, v)
-	}
+	tags = append(tags, lo.Keys(tagsMap)...)
 
 	// If tags wasn't sent in the request, add all supported tags
 	if len(tags) == 1 {
-		tags = append(tags, Photography, Programming)
+		tags = append(tags, Groups...)
 	}
 
 	return tags

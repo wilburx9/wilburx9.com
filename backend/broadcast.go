@@ -13,6 +13,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/go-playground/validator/v10"
 	"github.com/mailerlite/mailerlite-go"
+	"github.com/samber/lo"
 	"html"
 	"log"
 	"math"
@@ -136,22 +137,18 @@ func createCampaign(ctx context.Context, post Post, content string) (string, err
 	if err != nil {
 		return "", err
 	}
-	supportedSegments := []string{
-		fmt.Sprintf("%v: %v", Blog, Photography),
-		fmt.Sprintf("%v: %v", Blog, Programming),
-	}
+	supportedSegments := lo.Map(Groups, func(item string, _ int) string {
+		return fmt.Sprintf("%v: %v", Blog, item)
+	})
 
-	// Get the first Segment that matches any of the supported segments
-	var segment string
-	for _, s := range allSegments.Data {
-		for _, tag := range supportedSegments {
-			if strings.EqualFold(s.Name, tag) {
-				segment = s.ID
-			}
-		}
-	}
-	if segment == "" {
-		return "", errors.New("won't send campaigns for non-(programming or photography) articles")
+	segment, ok := lo.Find(allSegments.Data, func(seg mailerlite.Segment) bool {
+		return lo.ContainsBy(supportedSegments, func(tag string) bool {
+			return strings.EqualFold(seg.Name, tag)
+		})
+	})
+
+	if !ok {
+		return "", errors.New("won't send campaigns for non-(software or photography) articles")
 	}
 
 	sender := AppConfig.EmailSender
@@ -167,7 +164,7 @@ func createCampaign(ctx context.Context, post Post, content string) (string, err
 		Name:     fmt.Sprintf("New Publication: %v", post.Title),
 		Type:     mailerlite.CampaignTypeRegular,
 		Emails:   *emails,
-		Segments: []string{segment},
+		Segments: []string{segment.ID},
 	}
 	c, _, err := MailClient.Campaign.Create(ctx, campaign)
 	if err != nil {
@@ -208,20 +205,16 @@ func (l lambdaReqBody) toPost() Post {
 	// Check if this post is a reference to an external article and retrieve the feature image.
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(p.HTML))
 	if err == nil {
-		bookmark := doc.Find("figure.kg-bookmark-card")
 
-		// A post which is just a reference to an external article
-		// will contain nothing but the bookmark card and the reading time.
-		if bookmark.Length() > 0 && bookmark.Children().Length() != 2 {
-
-			// Only set the feature image if this post didn't have one
+		if lo.ContainsBy(p.Tags, func(item slug) bool {
+			return strings.EqualFold(item.Name, "#external")
+		}) {
 			if featureImage == "" {
 				img := doc.Find("div.kg-bookmark-thumbnail img")
 				if img.Length() > 0 {
 					featureImage, _ = img.Attr("src")
 				}
 			}
-
 		}
 	}
 
@@ -237,7 +230,8 @@ func (l lambdaReqBody) toPost() Post {
 		FeatureImageCaption: featureImageCaption,
 		Excerpt:             p.Excerpt,
 		URL:                 p.URL,
-		Tag:                 p.PrimaryTag.Slug,
+		Tag:                 p.PrimaryTag,
+		Tags:                p.Tags,
 	}
 }
 
@@ -249,7 +243,8 @@ type Post struct {
 	FeatureImageCaption string
 	Excerpt             string
 	URL                 string
-	Tag                 string
+	Tag                 slug
+	Tags                []slug
 }
 
 type lambdaReqBody struct {
@@ -267,15 +262,16 @@ type lambdaReqBody struct {
 			URL                 string    `json:"url" validate:"http_url"`
 			Visibility          string    `json:"visibility" validate:"required"`
 			HTML                string    `json:"html" validate:"required"`
-
-			PrimaryAuthor struct {
+			PrimaryTag          slug      `json:"primary_tag" validate:"required"`
+			Tags                []slug    `json:"tags" validate:"required"`
+			PrimaryAuthor       struct {
 				Name string `json:"name" validate:"required"`
 			} `json:"primary_author" validate:"required"`
-
-			PrimaryTag struct {
-				Name string `json:"name" validate:"required"`
-				Slug string `json:"slug" validate:"required"`
-			} `json:"primary_tag" validate:"required"`
 		} `json:"current" validate:"required"`
 	} `json:"post" validate:"required"`
+}
+
+type slug struct {
+	Slug string `json:"slug" validate:"required"`
+	Name string `json:"name" validate:"required"`
 }

@@ -13,7 +13,7 @@
                 />
             {{else}}
                 <img id="card-image-{{id}}"
-                     src="{{#match primary_tag.slug 'programming'}}{{asset "images/default_code.png"}}{{else}}{{asset
+                     src="{{#match primary_tag.slug 'software'}}{{asset "images/default_code.png"}}{{else}}{{asset
                          "images/default_photography.png"}}{{/match}}"
                      alt="{{title}}"/>
             {{/if}}
@@ -30,7 +30,7 @@
             <div class="gh-card-tags">
                 {{#primary_tag}}
                     <span class="gh-post-primary-tag">
-                    {{#match slug 'programming'}} {{> "icons/programming"}} {{else}} {{> "icons/photography"}}
+                    {{#match slug 'software'}} {{> "icons/software"}} {{else}} {{> "icons/photography"}}
                     {{/match}}
                         <span>{{name}}</span>
                 </span>
