@@ -20,6 +20,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"text/template"
@@ -137,14 +138,10 @@ func createCampaign(ctx context.Context, post Post, content string) (string, err
 	if err != nil {
 		return "", err
 	}
-	supportedSegments := lo.Map(Groups, func(item string, _ int) string {
-		return fmt.Sprintf("%v: %v", Blog, item)
-	})
 
+	primarySegment := fmt.Sprintf("%v: %v", Blog, post.PrimaryTag)
 	segment, ok := lo.Find(allSegments.Data, func(seg mailerlite.Segment) bool {
-		return lo.ContainsBy(supportedSegments, func(tag string) bool {
-			return strings.EqualFold(seg.Name, tag)
-		})
+		return strings.EqualFold(seg.Name, primarySegment)
 	})
 
 	if !ok {
@@ -161,7 +158,7 @@ func createCampaign(ctx context.Context, post Post, content string) (string, err
 		},
 	}
 	campaign := &mailerlite.CreateCampaign{
-		Name:     fmt.Sprintf("New Publication: %v", post.Title),
+		Name:     post.Title,
 		Type:     mailerlite.CampaignTypeRegular,
 		Emails:   *emails,
 		Segments: []string{segment.ID},
@@ -206,7 +203,7 @@ func (l lambdaReqBody) toPost() Post {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(p.HTML))
 	if err == nil {
 
-		if lo.ContainsBy(p.Tags, func(item slug) bool {
+		if slices.ContainsFunc(p.Tags, func(item slug) bool {
 			return strings.EqualFold(item.Name, "#external")
 		}) {
 			if featureImage == "" {
@@ -230,7 +227,7 @@ func (l lambdaReqBody) toPost() Post {
 		FeatureImageCaption: featureImageCaption,
 		Excerpt:             p.Excerpt,
 		URL:                 p.URL,
-		Tag:                 p.PrimaryTag,
+		PrimaryTag:          p.PrimaryTag,
 		Tags:                p.Tags,
 	}
 }
@@ -243,7 +240,7 @@ type Post struct {
 	FeatureImageCaption string
 	Excerpt             string
 	URL                 string
-	Tag                 slug
+	PrimaryTag          slug
 	Tags                []slug
 }
 
