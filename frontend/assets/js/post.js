@@ -9,8 +9,8 @@
 }()
 
 function addExternalArticleInfo(tagString) {
-    let tags = tagString.split(',').map(tag => tag.trim().substring(1));
-    if (!tags.includes("external")) return
+    let tags = tagString.split(',').map(tag => tag.trim());
+    if (!tags.includes("#external")) return
     $('.gh-post-content').prepend('<p>This is an external article. Click the card below to read the full content.</p>');
 }
 

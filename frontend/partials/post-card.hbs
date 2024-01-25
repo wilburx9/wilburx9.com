@@ -1,4 +1,4 @@
-<!-- Individual post card -->
+<!-- Individual post-card -->
 <article class="gh-card group {{post_class}}">
     <a id="card-link-{{id}}" class="gh-card-link" href="{{url}}">
         <div class="gh-card-image">
@@ -51,5 +51,5 @@
             </span>
         </div>
     </a>
-    <script>parseBookmark(`{{{content}}}`, `card-link-{{id}}`, `card-image-{{id}}`)</script>
+    <script>postProcessBookmarkCard(`{{{content}}}`, `{{{tags autolink="false" visibility="internal"}}}`, `card-link-{{id}}`, `card-image-{{id}}`)</script>
 </article>
