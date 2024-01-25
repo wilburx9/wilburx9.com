@@ -1,6 +1,12 @@
 {{!< default}}
 
 {{#post}}
+    {{#has tag="#external"}}
+        <!-- Prevent external articles from showing up in search engine results -->
+        {{#contentFor "metaTags"}}
+            <meta name="robots" content="noindex">
+        {{/contentFor}}
+    {{/has}}
     <div class="gh-article-container {{post_class}}">
         <nav>
             <a class="pl-4 sm:pl-16 md:pl-0">
@@ -107,4 +113,5 @@
     {{#primary_tag}}
         <script>new ImageProcessor(`{{slug}}`)</script>
     {{/primary_tag}}
+    <script>addExternalArticleInfo(`{{tags autolink="false" visibility="internal"}}`)</script>
 {{/post}}
