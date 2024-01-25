@@ -2,8 +2,10 @@ name: Deploy the Ghost theme
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - 'live'
+    paths:
+      - 'frontend/**'
 
 jobs:
   deploy-frontend:
