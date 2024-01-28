@@ -61,12 +61,9 @@ func processBroadcastRequest(ctx context.Context, body string) (int, string) {
 		return http.StatusBadRequest, err.Error()
 	}
 
-	// 1. To prevent sending notification for drafts, confirm this post is published.
-	// 2. To prevent sending emails for unpublished and republished posts, ensure
-	//	  that the diff b/w publication and updated dates is not more than 30 minutes.
 	if !reqData.canBroadcast() {
 		return http.StatusBadRequest, fmt.Sprintf(
-			"this post is too old to be rescheduled. It was created at %v and updated at %v ",
+			"this post is too old to be scheduled. It was created at %v and updated at %v ",
 			reqData.Post.Current.PublishedAt,
 			reqData.Post.Current.UpdatedAt,
 		)
