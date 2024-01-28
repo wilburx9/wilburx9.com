@@ -129,7 +129,7 @@
 }
 
 .gh-card-title {
-    @apply w-full text-body1 font-semibold text-blackSet dark:text-blackSet-dark line-clamp-3 min-h-[60px]
+    @apply w-full text-body1 font-semibold text-blackSet dark:text-blackSet-dark line-clamp-2
 }
 
 .gh-card-excerpt {

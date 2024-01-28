@@ -17,6 +17,11 @@
     font-semibold
 }
 
+.gh-post-content p {
+    @apply
+    my-5
+}
+
 .gh-post-content a {
     @apply
     underline

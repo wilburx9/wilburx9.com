@@ -1,3 +1,5 @@
+// Script for handling click event of the tags in the header
+
 $(function () {
     let request = null
     let currentSlug = ""

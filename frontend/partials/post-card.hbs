@@ -1,4 +1,4 @@
-<!-- Individual post card -->
+<!-- Individual post-card -->
 <article class="gh-card group {{post_class}}">
     <a id="card-link-{{id}}" class="gh-card-link" href="{{url}}">
         <div class="gh-card-image">
@@ -13,7 +13,7 @@
                 />
             {{else}}
                 <img id="card-image-{{id}}"
-                     src="{{#match primary_tag.slug 'programming'}}{{asset "images/default_code.png"}}{{else}}{{asset
+                     src="{{#match primary_tag.slug 'software'}}{{asset "images/default_code.png"}}{{else}}{{asset
                          "images/default_photography.png"}}{{/match}}"
                      alt="{{title}}"/>
             {{/if}}
@@ -30,7 +30,7 @@
             <div class="gh-card-tags">
                 {{#primary_tag}}
                     <span class="gh-post-primary-tag">
-                    {{#match slug 'programming'}} {{> "icons/programming"}} {{else}} {{> "icons/photography"}}
+                    {{#match slug 'software'}} {{> "icons/software"}} {{else}} {{> "icons/photography"}}
                     {{/match}}
                         <span>{{name}}</span>
                 </span>
@@ -51,5 +51,5 @@
             </span>
         </div>
     </a>
-    <script>parseBookmark(`{{{content}}}`, `card-link-{{id}}`, `card-image-{{id}}`)</script>
+    <script>postProcessBookmarkCard(`{{{content}}}`, `{{{tags autolink="false" visibility="internal"}}}`, `card-link-{{id}}`, `card-image-{{id}}`)</script>
 </article>

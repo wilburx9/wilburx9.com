@@ -2,8 +2,10 @@ name: Deploy the AWS Lambdas
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - 'live'
+    paths:
+      - 'backend/**'
 
 jobs:
   deploy-backend:

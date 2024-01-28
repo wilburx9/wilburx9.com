@@ -51,28 +51,27 @@ function setHrefs() {
 }
 
 // Get the details from a bookmark card and set the url
-// and image to the post card url and featured image
-function parseBookmark(content, linkId, imageId) {
+// and image to the post-card url and featured image
+function postProcessBookmarkCard(content, tagString, linkId, imageId) {
+    let tags = tagString.split(',').map(tag => tag.trim());
+    if (!tags.includes("#external")) return
+
     let c = $('<div></div>').html(content)
     let bookmark = $(c).find('figure.kg-bookmark-card')
-
-    // A post which is just a reference to an external article
-    // will contain nothing but the bookmark card and the reading time.
-    if (!bookmark || c.children().length !== 2) return
 
     let url = bookmark.find('a.kg-bookmark-container').attr('href');
     let image = bookmark.find('div.kg-bookmark-thumbnail img:first').attr('src');
     let readingTime = $(c).find('.external-reading-time').text();
 
 
-    // The anchor tag wrapper of the post card
+    // The anchor tag wrapper of the post-card
     let anchor = $('#' + linkId);
     // This image will not be found if the post has a feature image
     let img = anchor.find('#' + imageId);
     if (img.length) img.attr('src', image);
 
     anchor.find('#external-tag').css('display', 'flex');
-    anchor.find('#reading-time').text(readingTime);
+    anchor.find('#reading-time').text(readingTime + " read");
     anchor.attr('href', url);
     anchor.attr('target', '_blank');
 

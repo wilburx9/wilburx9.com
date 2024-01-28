@@ -38,7 +38,7 @@ func newConfig() (*Config, error) {
 		"turnstile_secret":   "",
 	}
 
-	// Read all the secrets into the map using the map keys
+	// Read all the secrets into the map
 	for k, v := range m {
 		key := strings.ToUpper(fmt.Sprintf("wilburx9_%v", k))
 		input := &ssm.GetParameterInput{
