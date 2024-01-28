@@ -6,7 +6,6 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/aws/aws-lambda-go/events"
@@ -139,13 +138,13 @@ func createCampaign(ctx context.Context, post Post, content string) (string, err
 		return "", err
 	}
 
-	primarySegment := fmt.Sprintf("%v: %v", Blog, post.PrimaryTag)
+	primarySegment := fmt.Sprintf("%v: %v", Blog, post.PrimaryTag.Slug)
 	segment, ok := lo.Find(allSegments.Data, func(seg mailerlite.Segment) bool {
 		return strings.EqualFold(seg.Name, primarySegment)
 	})
 
 	if !ok {
-		return "", errors.New("won't send campaigns for non-(software or photography) articles")
+		return "", fmt.Errorf("won't send campaigns for non-(software or photography) articles: %q", primarySegment)
 	}
 
 	sender := AppConfig.EmailSender
@@ -200,17 +199,14 @@ func (l lambdaReqBody) toPost() Post {
 	featureImage := p.FeatureImage
 
 	// Check if this post is a reference to an external article and retrieve the feature image.
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(p.HTML))
-	if err == nil {
-
-		if slices.ContainsFunc(p.Tags, func(item slug) bool {
-			return strings.EqualFold(item.Name, "#external")
-		}) {
-			if featureImage == "" {
-				img := doc.Find("div.kg-bookmark-thumbnail img")
-				if img.Length() > 0 {
-					featureImage, _ = img.Attr("src")
-				}
+	if featureImage == "" && slices.ContainsFunc(p.Tags, func(item tag) bool {
+		return strings.EqualFold(item.Name, "#external")
+	}) {
+		doc, err := goquery.NewDocumentFromReader(strings.NewReader(p.HTML))
+		if err == nil {
+			img := doc.Find("div.kg-bookmark-thumbnail img")
+			if img.Length() > 0 {
+				featureImage, _ = img.Attr("src")
 			}
 		}
 	}
@@ -240,27 +236,27 @@ type Post struct {
 	FeatureImageCaption string
 	Excerpt             string
 	URL                 string
-	PrimaryTag          slug
-	Tags                []slug
+	PrimaryTag          tag
+	Tags                []tag
 }
 
 type lambdaReqBody struct {
 	Post struct {
 		Current struct {
 			Excerpt             string    `json:"excerpt" validate:"required"`
-			FeatureImage        string    `json:"feature_image" validate:"http_url"`
-			FeatureImageCaption string    `json:"feature_image_caption" validate:"required"`
+			FeatureImage        string    `json:"feature_image"`
+			FeatureImageCaption string    `json:"feature_image_caption"`
 			ID                  string    `json:"id" validate:"required"`
 			PublishedAt         time.Time `json:"published_at" validate:"required"`
-			ReadingTime         int64     `json:"reading_time" validate:"required"`
+			ReadingTime         int64     `json:"reading_time"` // Not required of short posts with 0 reading time
 			Status              string    `json:"status" validate:"required"`
 			Title               string    `json:"title" validate:"required"`
 			UpdatedAt           time.Time `json:"updated_at" validate:"required"`
 			URL                 string    `json:"url" validate:"http_url"`
 			Visibility          string    `json:"visibility" validate:"required"`
 			HTML                string    `json:"html" validate:"required"`
-			PrimaryTag          slug      `json:"primary_tag" validate:"required"`
-			Tags                []slug    `json:"tags" validate:"required"`
+			PrimaryTag          tag       `json:"primary_tag" validate:"required"`
+			Tags                []tag     `json:"tags" validate:"required"`
 			PrimaryAuthor       struct {
 				Name string `json:"name" validate:"required"`
 			} `json:"primary_author" validate:"required"`
@@ -268,7 +264,7 @@ type lambdaReqBody struct {
 	} `json:"post" validate:"required"`
 }
 
-type slug struct {
+type tag struct {
 	Slug string `json:"slug" validate:"required"`
 	Name string `json:"name" validate:"required"`
 }

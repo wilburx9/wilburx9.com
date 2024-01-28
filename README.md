@@ -50,11 +50,11 @@ Hence, the backend directory contains two Go Services deployed to AWS Lambda:
 ### Deploying
 Deployment is done by a [CD workflow](.github/workflows/backend.yaml) which is triggered when there's a new push event on the _live_ branch that changed the backend directory.
 * **Secrets**: AWS Systems Manager Parameter Store is used to store the secrets used by both services. These secrets are:
-  1. WILBURX9_ALLOWED_ORIGINS: The origins allowed by the Lambdas; should be the site's homepage. Without this, the subscription form will fail because of good old CORS error.
-  2. WILBURX9_EMAIL_SENDER: The email for the sender of the newsletter.
-  3. WILBURX9_MAILER_LITE_TOKEN: [API token for MailerLite](https://www.mailerlite.com/help/where-to-find-the-mailerlite-api-key-groupid-and-documentation).
-  4. WILBURX9_TURNSTILE_HOSTNAME: Your website domain configured on Cloudflare [Tunrnstile](https://developers.cloudflare.com/turnstile/) dashboard.
-  5. WILBURX9_TURNSTILE_SECRET: Turnstile site's Secret key.
+  1. `WILBURX9_ALLOWED_ORIGINS`: The origins allowed by the Lambdas; should be the site's homepage. Without this, the subscription form will fail because of good old CORS error.
+  2. `WILBURX9_EMAIL_SENDER`: The email for the sender of the newsletter.
+  3. `WILBURX9_MAILER_LITE_TOKEN`: [API token for MailerLite](https://www.mailerlite.com/help/where-to-find-the-mailerlite-api-key-groupid-and-documentation).
+  4. `WILBURX9_TURNSTILE_HOSTNAME`: Your website domain configured on Cloudflare [Tunrnstile](https://developers.cloudflare.com/turnstile/) dashboard.
+  5. `WILBURX9_TURNSTILE_SECRET`: Turnstile site's Secret key.
 * Create Lambdas
   1. Create two Lambda Functions on AWS using the Go 1.x runtime and x86_64 architecture. Ensure their roles has a statement that allows reading from `ssm:GetParameter`; this is to ensure the services can read the secrets created above.
   2. Add the function names to [GitHub variables](https://docs.github.com/en/actions/learn-github-actions/variables) using  `LAMBDA_FUNCTION_SUBSCRIBE` and `LAMBDA_FUNCTION_BROADCAST`.
