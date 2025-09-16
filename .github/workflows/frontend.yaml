@@ -27,7 +27,7 @@ jobs:
 
       - name: Package the theme into a zip file
         working-directory: frontend
-        run: yarn zip
+        run: GEN_SOURCEMAPS=false yarn zip
 
       - name: Deploy and activate the theme
         working-directory: frontend

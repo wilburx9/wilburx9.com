@@ -17,6 +17,8 @@ var cssnano = require('cssnano');
 var easyimport = require('postcss-easy-import');
 var tailwindcss = require('tailwindcss');
 
+var genMaps = process.env.GEN_SOURCEMAPS !== 'false';
+
 function serve(done) {
     livereload.listen();
     done();
@@ -40,7 +42,6 @@ function hbs(done) {
 }
 
 function css(done) {
-    var genMaps = process.env.GEN_SOURCEMAPS !== 'false';
     var processors = [
         easyimport,
         colorFunction(),
@@ -58,7 +59,6 @@ function css(done) {
 }
 
 function js(done) {
-    var genMaps = process.env.GEN_SOURCEMAPS !== 'false';
     pump([
         src('assets/js/*.js', {sourcemaps: genMaps}),
         uglify(),
