@@ -82,7 +82,7 @@ function zipper(done) {
             '!**/*.map',
             '!assets/css/**',
             '!assets/js/**',
-            '!assets/screenshot-desktop.jpg'
+            '!assets/screenshot-desktop.png'
         ]),
         zip(filename),
         dest(targetDir)

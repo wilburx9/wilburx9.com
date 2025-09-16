@@ -8,7 +8,7 @@
     },
     "license": "MIT",
     "screenshots": {
-        "desktop": "assets/screenshot-desktop.jpg"
+        "desktop": "assets/screenshot-desktop.png"
     },
     "scripts": {
         "dev": "gulp",
@@ -65,7 +65,7 @@
         "gulp-util": "3.0.8",
         "gulp-watch": "5.0.1",
         "gulp-zip": "5.1.0",
-        "postcss": "8.4.21",
+        "postcss": "8.4.31",
         "postcss-color-mod-function": "3.0.3",
         "postcss-easy-import": "4.0.0"
     },
