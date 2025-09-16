@@ -2,9 +2,9 @@
     "name": "wilburx9",
     "description": "A custom ghost theme for wilburx9.com/blog",
     "demo": "https://wilburx9.com/blog",
-    "version": "3.0.9",
+    "version": "5.9.0",
     "engines": {
-        "ghost": ">=4.0.0"
+        "ghost": ">=5.0.0"
     },
     "license": "MIT",
     "screenshots": {
@@ -53,14 +53,14 @@
     ],
     "devDependencies": {
         "@tailwindcss/line-clamp": "^0.4.2",
+        "@tryghost/release-utils": "0.8.1",
         "autoprefixer": "10.4.14",
         "beeper": "2.1.0",
         "cssnano": "5.1.15",
-        "gscan": "4.36.1",
+        "gscan": "4.48.0",
         "gulp": "4.0.2",
         "gulp-livereload": "4.0.2",
         "gulp-postcss": "9.0.1",
-        "gulp-sourcemaps": "3.0.0",
         "gulp-uglify": "3.0.2",
         "gulp-util": "3.0.8",
         "gulp-watch": "5.0.1",
@@ -73,8 +73,7 @@
         "defaults"
     ],
     "config": {
-        "card_assets": true,
-        "posts_per_page": 15,
+        "posts_per_page": 25,
         "image_sizes": {
             "xxs": {
                 "width": 30
@@ -89,12 +88,13 @@
                 "width": 600
             },
             "l": {
-                "width": 1200
+                "width": 1000
             },
             "xl": {
                 "width": 2000
             }
         },
+        "card_assets": true,
         "custom": {
             "turnstile_site_key": {
                 "type": "text",
@@ -109,5 +109,10 @@
     "dependencies": {
         "@tryghost/admin-api": "^1.13.6",
         "tailwindcss": "^3.2.7"
+    },
+    "renovate": {
+        "extends": [
+            "@tryghost:theme"
+        ]
     }
 }

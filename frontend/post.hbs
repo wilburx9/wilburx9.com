@@ -8,56 +8,57 @@
         {{/contentFor}}
     {{/has}}
     <div class="gh-article-container {{post_class}}">
-        <nav>
-            <a class="pl-4 sm:pl-16 md:pl-0">
+        {{#match @page.show_title_and_feature_image}}
+            <nav>
+                <a class="pl-4 sm:pl-16 md:pl-0">
             <span class="icon -ml-3.5" id="back_icon">
                 {{> "icons/arrow-left"}}
             </span>
-            </a>
-            <span class="pr-4 sm:pr-16 md:pr-0">{{> "theme-switch"}}</span>
-        </nav>
-        <div class="gh-article">
-            <article>
-                <header>
-                    {{#primary_tag}}
-                        <span class="gh-post-primary-tag">
+                </a>
+                <span class="pr-4 sm:pr-16 md:pr-0">{{> "theme-switch"}}</span>
+            </nav>
+            <div class="gh-article">
+                <article>
+                    <header>
+                        {{#primary_tag}}
+                            <span class="gh-post-primary-tag">
                             {{#match slug 'software'}} {{> "icons/software"}} {{else}} {{> "icons/photography"}}
                             {{/match}}
-                            <span>{{name}}</span>
+                                <span>{{name}}</span>
                         </span>
-                    {{/primary_tag}}
-                    <h1 class="gh-title">{{title}}</h1>
-                    <span class="gh-post-meta mt-4 mb-6"><time datetime="{{date format="YYYY-MM-DD"}}">{{date
-                        format="D MMM YYYY"}}</time> &minus; {{reading_time}}
+                        {{/primary_tag}}
+                        <h1 class="gh-title">{{title}}</h1>
+                        <span class="gh-post-meta mt-4 mb-6"><time datetime="{{date format="YYYY-MM-DD"}}">{{date
+                                format="D MMM YYYY"}}</time> &minus; {{reading_time}}
                     </span>
 
-                    {{#if feature_image}}
-                        <figure class="gh-feature-image">
-                            <img
-                                srcset="{{img_url feature_image size="s"}} 300w,
+                        {{#if feature_image}}
+                            <figure class="gh-feature-image">
+                                <img
+                                        srcset="{{img_url feature_image size="s"}} 300w,
                         {{img_url feature_image size="m"}} 600w,
                         {{img_url feature_image size="l"}} 1000w,
                         {{img_url feature_image size="xl"}} 2000w"
-                                sizes="(max-width: 1000px) 1000px, 2000px"
-                                loading="lazy"
-                                src="{{img_url feature_image size="xl"}}"
-                                alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
-                            />
-                            {{#if feature_image_caption}}
-                                <figcaption>{{feature_image_caption}}</figcaption>
-                            {{/if}}
-                        </figure>
-                    {{/if}}
-                </header>
+                                        sizes="(max-width: 1000px) 1000px, 2000px"
+                                        loading="lazy"
+                                        src="{{img_url feature_image size="xl"}}"
+                                        alt="{{#if feature_image_alt}}{{feature_image_alt}}{{else}}{{title}}{{/if}}"
+                                />
+                                {{#if feature_image_caption}}
+                                    <figcaption>{{feature_image_caption}}</figcaption>
+                                {{/if}}
+                            </figure>
+                        {{/if}}
+                    </header>
 
-                <div class="gh-post-content">
-                    {{content}}
-                </div>
+                    <div class="gh-post-content">
+                        {{content}}
+                    </div>
 
-                <footer class="gh-post-footer">
-                    <hr class="mb-8"/>
-                    <h2>Stay Updated: Share & Subscribe!</h2>
-                    <div class="flex flex-row gap-x-2 mt-4">
+                    <footer class="gh-post-footer">
+                        <hr class="mb-8"/>
+                        <h2>Stay Updated: Share & Subscribe!</h2>
+                        <div class="flex flex-row gap-x-2 mt-4">
                     <span class="group secondary-button" id="post-link-copy">
                         <span class="hide">
                             <svg class="fill-greenSet dark:fill-greenSet-dark" width="17" height="18" stroke="none"
@@ -78,7 +79,7 @@
                             Copy Link
                         </span>
                     </span>
-                        <span class="group secondary-button" id="post-subscribe">
+                            <span class="group secondary-button" id="post-subscribe">
                         <span>
                             <svg width="18" height="18" fill="none">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -87,31 +88,32 @@
                             Subscribe
                         </span>
                     </span>
-                    </div>
-                    <hr class="mt-8"/>
-                </footer>
-            </article>
-            <aside class="gh-more-posts">
-                {{#get "posts" filter="tags:[{{primary_tag.slug}}]+id:-{{id}}" limit="3"
-                       include="tags" as |more_posts|}}
-
-                    {{#if more_posts}}
-                        <h2>Other Articles You Might Enjoy!</h2>
-                        <div class="gh-post-feed">
-                            {{#foreach more_posts}}
-                                {{> "post-card"}}
-                            {{/foreach}}
                         </div>
-                    {{/if}}
+                        <hr class="mt-8"/>
+                    </footer>
+                </article>
+                <aside class="gh-more-posts">
+                    {{#get "posts" filter="tags:[{{primary_tag.slug}}]+id:-{{id}}" limit="3"
+                           include="tags" as |more_posts|}}
 
-                {{/get}}
-            </aside>
-        </div>
-        {{> "subscription-modal"}}
+                        {{#if more_posts}}
+                            <h2>Other Articles You Might Enjoy!</h2>
+                            <div class="gh-post-feed">
+                                {{#foreach more_posts}}
+                                    {{> "post-card"}}
+                                {{/foreach}}
+                            </div>
+                        {{/if}}
+
+                    {{/get}}
+                </aside>
+            </div>
+            {{> "subscription-modal"}}
+            <script src="{{asset "built/post.js"}}"></script>
+            {{#primary_tag}}
+                <script>new ImageProcessor(`{{slug}}`)</script>
+            {{/primary_tag}}
+            <script>addExternalArticleInfo(`{{tags autolink="false" visibility="internal"}}`)</script>
+        {{/match}}
     </div>
-    <script src="{{asset "built/post.js"}}"></script>
-    {{#primary_tag}}
-        <script>new ImageProcessor(`{{slug}}`)</script>
-    {{/primary_tag}}
-    <script>addExternalArticleInfo(`{{tags autolink="false" visibility="internal"}}`)</script>
 {{/post}}
