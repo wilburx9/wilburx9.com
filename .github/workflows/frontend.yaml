@@ -36,13 +36,3 @@ jobs:
           GHOST_API_KEY: ${{ secrets.GHOST_ADMIN_API_KEY }}
         run: yarn deploy
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Clear Lightsail Distribution Cache
-        run: |
-          aws lightsail reset-distribution-cache --distribution-name ${{ secrets.LIGHTSAIL_DISTRIBUTION }}
-
