@@ -98,7 +98,7 @@ async function deploy(done) {
         let admin = new GhostAdminAPI({
             url: url,
             key: apiKey,
-            version: "v5"
+            version: "v6.0"
         })
         await admin.themes.upload({file: zipPath})
         await admin.themes.activate(themeName)
