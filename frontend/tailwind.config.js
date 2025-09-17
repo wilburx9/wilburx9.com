@@ -49,8 +49,9 @@ module.exports = {
             },
         },
         fontFamily: {
-            'sans': ['Poppins', ...defaultTheme.fontFamily.sans],
-            'mono': ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
+            sans: ["var(--gh-font-body, Poppins)", ...defaultTheme.fontFamily.sans],
+            heading: ["var(--gh-font-heading, Poppins)", ...defaultTheme.fontFamily.sans],
+            mono: ["JetBrains Mono", ...defaultTheme.fontFamily.mono],
         },
         fontSize: {
             'text1': ['18px', {

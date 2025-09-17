@@ -17,6 +17,8 @@ var cssnano = require('cssnano');
 var easyimport = require('postcss-easy-import');
 var tailwindcss = require('tailwindcss');
 
+var genMaps = process.env.GEN_SOURCEMAPS !== 'false';
+
 function serve(done) {
     livereload.listen();
     done();
@@ -40,7 +42,6 @@ function hbs(done) {
 }
 
 function css(done) {
-    var genMaps = process.env.GEN_SOURCEMAPS !== 'false';
     var processors = [
         easyimport,
         colorFunction(),
@@ -58,7 +59,6 @@ function css(done) {
 }
 
 function js(done) {
-    var genMaps = process.env.GEN_SOURCEMAPS !== 'false';
     pump([
         src('assets/js/*.js', {sourcemaps: genMaps}),
         uglify(),
@@ -82,7 +82,7 @@ function zipper(done) {
             '!**/*.map',
             '!assets/css/**',
             '!assets/js/**',
-            '!assets/screenshot-desktop.jpg'
+            '!assets/screenshot-desktop.png'
         ]),
         zip(filename),
         dest(targetDir)
@@ -98,7 +98,7 @@ async function deploy(done) {
         let admin = new GhostAdminAPI({
             url: url,
             key: apiKey,
-            version: "v5"
+            version: "v6.0"
         })
         await admin.themes.upload({file: zipPath})
         await admin.themes.activate(themeName)

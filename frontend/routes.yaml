@@ -5,7 +5,6 @@ collections:
   /blog/:
     permalink: /blog/{primary_tag}/{slug}/
     template: index
-    data: page.blog
 
 taxonomies:
   tag: /blog/{slug}/

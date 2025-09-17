@@ -29,6 +29,11 @@ body {
     overflow-x-clip
 }
 
+h1, h2, h3, h4, h5, h6 {
+    @apply
+    font-heading
+}
+
 * {
     @apply
     scrollbar:w-3.5 scrollbar:h-3.5
