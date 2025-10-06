@@ -1,7 +1,7 @@
 name: Deploy the Ghost theme
 
 on:
-  pull_request:
+  push:
     branches:
       - 'live'
     paths:
