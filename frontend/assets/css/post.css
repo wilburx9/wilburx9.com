@@ -235,29 +235,30 @@ figcaption {
 
 .code-copy {
     @apply
-    text-button text-blackSet dark:text-blackSet-dark
+    text-body2 text-blackSet dark:text-blackSet-dark
+    border-b border-borderSet/40 dark:border-borderSet-dark/40
     font-sans
 }
 
 .code-copy > div {
     @apply
-    grid pt-1 pr-1 sm:pt-3 sm:pr-3
+    grid
 }
 
 .code-copy > div > span {
     @apply
     row-start-1 row-end-2 col-start-1 col-end-2
-    flex flex-row gap-2.5 cursor-pointer justify-self-end
-    duration-500 py-2.5 justify-center relative rounded-md
+    flex flex-row gap-2.5 cursor-pointer justify-self-end items-center
+    duration-500 py-2.5 justify-center relative
     transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .code-copy > div > span#copy {
     @apply
     cursor-pointer px-4
-    hover:bg-borderSet dark:hover:bg-borderSet-dark
-    focus:bg-borderSet dark:focus:bg-borderSet-dark
-    active:bg-borderSet dark:active:bg-borderSet-dark
+    hover:text-blackSet/40 dark:hover:text-blackSet-dark/60
+    focus:text-blackSet/40 dark:focus:text-blackSet-dark/60
+    active:text-blackSet/40 dark:active:text-blackSet-dark/60
     stroke-current z-20
 }
 
@@ -271,7 +272,6 @@ figcaption {
     @apply
     hidden sm:block
 }
-
 
 .gh-card-tags {
     @apply
