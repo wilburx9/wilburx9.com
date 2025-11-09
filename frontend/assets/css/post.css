@@ -53,8 +53,40 @@
     text-body3 font-light line-clamp-1 mt-2
 }
 
-.gh-article .gh-post-meta {
-    @apply text-body3 md:text-body2 font-light
+.gh-article-excerpt {
+    @apply
+    w-full
+    text-body2 md:text-body1 font-light
+    text-greyLightSet dark:text-greyLightSet-dark
+    mt-3
+}
+
+.gh-article-meta {
+    @apply
+    flex items-center gap-2
+    mb-8 mt-6 md:mb-12
+}
+
+.gh-article-author-name {
+    @apply
+    font-medium text-body1
+    text-blackSet dark:text-blackSet-dark
+}
+
+.gh-article-meta-wrapper {
+    @apply
+    flex flex-col gap-1
+}
+.author-profile-image {
+    @apply
+    w-[56px] h-auto
+    object-cover rounded-full
+}
+
+.gh-article-meta {
+    @apply
+    text-body3 md:text-body2 font-light
+    text-greyLightSet dark:text-greyLightSet-dark
 }
 
 .gh-post-footer {
@@ -64,7 +96,7 @@
 
 .gh-post-footer > h2 {
     @apply
-    text-headline1 font-semibold
+    text-headline2 md:text-headline1 font-semibold
     text-blackSet dark:text-blackSet-dark
 }
 

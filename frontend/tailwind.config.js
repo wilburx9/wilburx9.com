@@ -73,7 +73,7 @@ module.exports = {
                 'lineHeight': '16px',
             }],
             'headline': ['36px', {
-                'lineHeight': '54px',
+                'lineHeight': '46px',
                 'fontWeight': '600'
             }],
             'headline1': ['24px', {

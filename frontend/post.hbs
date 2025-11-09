@@ -28,9 +28,26 @@
                         </span>
                         {{/primary_tag}}
                         <h1 class="gh-title">{{title}}</h1>
-                        <span class="gh-post-meta mt-4 mb-6"><time datetime="{{date format="YYYY-MM-DD"}}">{{date
-                                format="D MMM YYYY"}}</time> &minus; {{reading_time}}
-                    </span>
+                        {{#if custom_excerpt}}
+                            <p class="gh-article-excerpt">{{custom_excerpt}}</p>
+                        {{/if}}
+
+                        <div class="gh-article-meta">
+                            {{#primary_author}}
+                                <img class="author-profile-image" src="{{img_url profile_image size="xs"}}" alt="{{name}}">
+                            {{/primary_author}}
+                            <div class="gh-article-meta-wrapper">
+                                {{#primary_author}}
+                                    <h4 class="gh-article-author-name">{{name}}</h4>
+                                {{/primary_author}}
+                                <div class="gh-article-meta-content">
+                                    <time class="gh-article-meta-date" datetime="{{date format="YYYY-MM-DD"}}">{{date format="DD MMM YYYY"}}</time>
+                                    {{#if reading_time}}
+                                        <span class="gh-article-meta-length"> &minus; {{reading_time}}</span>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
 
                         {{#if feature_image}}
                             <figure class="gh-feature-image">
