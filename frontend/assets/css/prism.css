@@ -47,7 +47,7 @@ figure.kg-code-card {
 pre[class*="language-"] > code[class*="language-"] {
     scrollbar-width: none;
     @apply
-    grow overflow-auto pr-3 pt-0 sm:pt-3 sm:pr-3 pl-3 pb-3
+    grow overflow-auto p-2.5
 }
 
 /* Inline code */

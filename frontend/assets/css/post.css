@@ -302,7 +302,7 @@ figcaption {
 
 .code-copy > div > span > span {
     @apply
-    hidden sm:block
+    block
 }
 
 .gh-card-tags {
