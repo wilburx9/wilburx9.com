@@ -86,6 +86,10 @@ module.exports = {
                 'lineHeight': '20px',
                 'fontWeight': '400'
             }],
+            'buttonSmall': ['14px', {
+                'lineHeight': '20px',
+                'fontWeight': '400'
+            }],
             'caption': ['12px', {
                 'lineHeight': '15px',
                 'fontWeight': '300',

@@ -16,9 +16,9 @@
 
 .primary-button {
     @apply
-    py-4 px-6 cursor-pointer grid text-center
+    py-2 md:py-4 px-6 cursor-pointer grid text-center
     bg-blackSet dark:bg-blackSet-dark rounded-xl
-    text-bgSet dark:text-bgSet-dark text-button
+    text-bgSet dark:text-bgSet-dark text-buttonSmall md:text-button
     hover:bg-orangeSet dark:hover:bg-orangeSet-dark
     active:bg-orangeSet dark:active:bg-orangeSet-dark
     focus:bg-orangeSet dark:focus:bg-orangeSet-dark
@@ -33,8 +33,8 @@
 
 .secondary-button {
     @apply
-    py-4 px-6 cursor-pointer grid text-center
-    text-blackSet dark:text-blackSet-dark text-button
+    py-2 md:py-4 px-6 cursor-pointer grid text-center
+    text-blackSet dark:text-blackSet-dark text-buttonSmall md:text-button
     border border-blackSet dark:border-blackSet-dark rounded-xl
     hover:border-orangeSet dark:hover:border-orangeSet-dark
     active:border-orangeSet dark:active:border-orangeSet-dark
