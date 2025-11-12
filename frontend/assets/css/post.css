@@ -122,7 +122,7 @@
 .gh-article-container > .gh-article {
     @apply
     w-full flex flex-col md:grow max-w-4xl
-    mt-16 md:-mt-12 mx-auto px-1 lg:px-10
+    mx-auto px-1 lg:px-10
 }
 
 .gh-feature-image {

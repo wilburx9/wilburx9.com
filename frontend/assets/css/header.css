@@ -1,6 +1,8 @@
 .gh-full-header {
-    @apply flex flex-row w-full items-center gap-x-4
-    pt-6 lg:pt-11 pb-5 lg:pb-9
+    @apply
+    w-full max-w-screen-xl mx-auto
+    flex flex-row items-center gap-x-4
+    pt-1 lg:pt-7 pb-5 lg:pb-7
 }
 
 .gh-tag-nav-container {
@@ -36,4 +38,26 @@
 .gh-tag-nav-indicator#active {
     @apply
     w-full opacity-100
+}
+
+.gh-full-header .icon {
+    @apply
+    flex items-center justify-center
+    h-11 w-11 md:h-14 md:w-14 rounded-full
+    bg-transparent transition ease-in-out opacity-100
+    hover:bg-greySet/10 dark:hover:bg-greySet-dark/10
+}
+
+.gh-full-header .icon > svg {
+    @apply
+    fill-greySet dark:fill-greySet-dark
+    stroke-greySet dark:stroke-greySet-dark
+    absolute h-4 w-4 md:h-5 md:w-5
+    transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
+}
+
+.gh-full-header .icon#theme-switch {
+    @apply
+    -mr-2
+    relative
 }

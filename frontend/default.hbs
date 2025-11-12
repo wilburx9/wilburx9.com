@@ -11,7 +11,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;1,300&family=Poppins:ital,wght@0,200;0,300;0,400;0,500;0,600;1,300;1,500&display=swap" rel="stylesheet">
     <title>{{meta_title}}</title>
-    <script src="{{asset "built/default.js"}}"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.11.0/lottie.min.js" integrity="sha512-XCthc/WzPfa+oa49Z3TI6MUK/zlqd67KwyRL9/R19z6uMqBNuv8iEnJ8FWHUFAjC6srr8w3FMZA91Tfn60T/9Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"></script>
@@ -21,22 +20,20 @@
 
 </head>
 <body class="{{body_class}} gh-body">
-<div class="gh-content">
+<div class="gh-viewport">
+    {{> "full-header"}}
     <main class="gh-main">
-
         {{{body}}}
         {{!-- All content gets inserted here, index.hbs, post.hbs, etc --}}
 
-    </main>
+</main>
 
-    <footer class="gh-footer-container">
-        {{> "footer"}}
-    </footer>
-
-</div>
-
+<footer class="gh-footer-container">
+    {{> "footer"}}
+</footer>
 {{!-- <foot> --}}
 
+<script src="{{asset "built/default.js"}}"></script>
 <script src="{{asset "built/prism.js"}}"></script>
 {{ghost_foot}}
 {{!-- Outputs important scripts - should always be included before closing body tag --}}

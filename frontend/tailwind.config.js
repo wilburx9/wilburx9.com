@@ -80,7 +80,7 @@ module.exports = {
                 'lineHeight': '28px',
             }],
             'headline2': ['20px', {
-                'lineHeight': '24px',
+                'lineHeight': '29px',
             }],
             'button': ['16px', {
                 'lineHeight': '20px',

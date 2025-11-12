@@ -17,7 +17,7 @@ class LoadMore {
         this.maxPages = maxPages
         this.pageTag = pageTag || ""
         this.baseUrl = `${document.location.origin}/blog/${pageTag}`
-        this.$scrollingContent = $('.gh-content')
+        this.$scrollingContent = $('.gh-viewport')
 
         this.cleanUp = this.cleanUp.bind(this)
         this.showLoader = this.showLoader.bind(this)

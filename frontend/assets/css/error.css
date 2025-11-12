@@ -1,5 +1,6 @@
 .error-page-content {
     @apply
+    h-full
     flex flex-col grow
     justify-center items-center
     pb-7 md:pb-12 lg:pb-9
