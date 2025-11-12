@@ -1215,6 +1215,67 @@ if (typeof global !== 'undefined') {
 	global.Prism = Prism;
 }
 
+Prism.hooks.add('before-sanity-check', env => {
+	const lang = env.language;
+	const grammar = Prism.languages[lang];
+
+	if (!grammar) return;
+
+	grammar['collapse-marker'] = {
+		pattern: /—(?:start|end)—/g,
+		greedy: true,
+	};
+});
+
+// div class="code-collapse">
+// 	<button class="code-collapse-toggle" type="button" aria-expanded="false">
+// 	<svg viewBox="0 -960 960 960" aria-hidden="true"><path d="M249.23-420q-24.75 0-42.37-17.63-17.63-17.62-17.63-42.37 0-24.75 17.63-42.37Q224.48-540 249.23-540q24.75 0 42.38 17.63 17.62 17.62 17.62 42.37 0 24.75-17.62 42.37Q273.98-420 249.23-420ZM480-420q-24.75 0-42.37-17.63Q420-455.25 420-480q0-24.75 17.63-42.37Q455.25-540 480-540q24.75 0 42.37 17.63Q540-504.75 540-480q0 24.75-17.63 42.37Q504.75-420 480-420Zm230.77 0q-24.75 0-42.38-17.63-17.62-17.62-17.62-42.37 0-24.75 17.62-42.37Q686.02-540 710.77-540q24.75 0 42.37 17.63 17.63 17.62 17.63 42.37 0 24.75-17.63 42.37Q735.52-420 710.77-420Z"/></svg>
+// </button>
+//
+// <div class="code-collapse-block">
+// 	…highlighted code from between —start— and —end—
+// </div>
+// </div>
+
+
+const collapseStart = `<span class="code-collapse">
+	<button class="code-collapse-toggle" type="button" aria-expanded="false">
+		<svg viewBox="0 -960 960 960" aria-hidden="true"><path d="M249.23-420q-24.75 0-42.37-17.63-17.63-17.62-17.63-42.37 0-24.75 17.63-42.37Q224.48-540 249.23-540q24.75 0 42.38 17.63 17.62 17.62 17.62 42.37 0 24.75-17.62 42.37Q273.98-420 249.23-420ZM480-420q-24.75 0-42.37-17.63Q420-455.25 420-480q0-24.75 17.63-42.37Q455.25-540 480-540q24.75 0 42.37 17.63Q540-504.75 540-480q0 24.75-17.63 42.37Q504.75-420 480-420Zm230.77 0q-24.75 0-42.38-17.63-17.62-17.62-17.62-42.37 0-24.75 17.62-42.37Q686.02-540 710.77-540q24.75 0 42.37 17.63 17.63 17.62 17.63 42.37 0 24.75-17.63 42.37Q735.52-420 710.77-420Z"/></svg>
+	</button>
+	<span class="code-collapse-block">`;
+
+const collapseEnd = `</span></span>`;
+
+Prism.hooks.add('before-insert', env => {
+	if (!env.highlightedCode || !env.highlightedCode.includes('<span class="token collapse-marker">')) {
+		return;
+	}
+
+	env.highlightedCode = env.highlightedCode
+		.replaceAll('<span class="token collapse-marker">—start—</span>', collapseStart)
+		.replaceAll('<span class="token collapse-marker">—end—</span>', collapseEnd);
+});
+
+Prism.hooks.add("complete", env => {
+	env.element.addEventListener('click', evt => {
+		const toggle = evt.target.closest('.code-collapse-toggle');
+		if (!toggle) return;
+
+		const wrapper = toggle.closest('.code-collapse');
+		const isCollapsed = wrapper.classList.toggle('is-collapsed');
+
+		toggle.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+		toggle.classList.toggle('hidden', !isCollapsed);
+	});
+
+	env.element.querySelectorAll('.code-collapse').forEach(wrapper => {
+		wrapper.classList.add('is-collapsed');
+		const toggle = wrapper.querySelector('.code-collapse-toggle');
+		toggle?.setAttribute('aria-expanded', 'false');
+		toggle?.classList.remove('hidden');
+	});
+})
+
 // some additional documentation/types
 
 /**

@@ -7,7 +7,7 @@
 
 .gh-post-content {
     @apply
-    text-text3 md:text-text2 xl:text-text1 font-light
+    text-text3 md:text-text2 font-light
     text-greySet dark:text-greySet-dark
 }
 
@@ -267,7 +267,7 @@ figcaption {
 
 .code-copy {
     @apply
-    text-body2 text-blackSet dark:text-blackSet-dark
+    text-body2 text-gray-500 dark:text-gray-400
     border-b border-borderSet/40 dark:border-borderSet-dark/40
     font-sans
 }
@@ -277,32 +277,34 @@ figcaption {
     grid
 }
 
+.code-copy svg {
+    @apply
+    w-5 h-5
+}
+
 .code-copy > div > span {
     @apply
-    row-start-1 row-end-2 col-start-1 col-end-2
+    row-start-1 row-end-2 col-start-1 col-end-2 px-2.5
     flex flex-row gap-2.5 cursor-pointer justify-self-end items-center
-    duration-500 py-2.5 justify-center relative
+    duration-300 py-2 justify-center relative
     transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 .code-copy > div > span#copy {
     @apply
-    cursor-pointer px-4
-    hover:text-blackSet/40 dark:hover:text-blackSet-dark/60
-    focus:text-blackSet/40 dark:focus:text-blackSet-dark/60
-    active:text-blackSet/40 dark:active:text-blackSet-dark/60
-    stroke-current z-20
+    cursor-pointer
+    hover:text-blackSet dark:hover:text-blackSet-dark/60
+    fill-current z-20
 }
 
 .code-copy > div > span#copied {
     @apply
     cursor-default z-10
-    px-4 sm:px-2
 }
 
-.code-copy > div > span > span {
+.code-copy > div > span#copied > svg {
     @apply
-    block
+    fill-greenSet dark:fill-greenSet-dark
 }
 
 .gh-card-tags {
