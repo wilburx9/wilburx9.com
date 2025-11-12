@@ -149,10 +149,6 @@ pre[class*="language-"] > code[class*="language-"] {
     inline align-sub;
 }
 
-.code-collapse.is-collapsed .code-collapse-block {
-    @apply hidden;
-}
-
 .code-collapse .code-collapse-icon {
     @apply
     col-start-1 row-start-1 justify-self-end self-center
@@ -166,8 +162,4 @@ pre[class*="language-"] > code[class*="language-"] {
     w-6
     fill-gray-800 dark:fill-gray-300
     dark:bg-slate-600 px-1 rounded-[2px]
-}
-
-.code-collapse:not(.is-collapsed) .code-collapse-icon {
-	@apply hidden;
 }
