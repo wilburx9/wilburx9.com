@@ -201,9 +201,8 @@ class ImageProcessor {
     });
 }();
 
-// Set click listeners for the back and share buttons.
+// Set click listener for the share button.
 !function () {
-    document.getElementById("back_icon").parentElement.href = `${window.location.origin}/blog`
     document.getElementById("post-link-copy").addEventListener("click", (event) => {
         let e = event.currentTarget;
         copy(e, window.location.href, () => {

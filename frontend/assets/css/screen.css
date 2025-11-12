@@ -46,20 +46,21 @@ h1, h2, h3, h4, h5, h6 {
 
 html, .gh-body {
     @apply
-    h-full w-screen min-h-screen min-h-[100dvh]
+    w-screen min-h-screen min-h-[100dvh]
     transition-colors ease-in-out motion-reduce:transition-none
 }
 
 .gh-viewport {
     @apply
-    h-full w-screen
-    flex flex-col overflow-y-auto
+    w-screen min-h-screen min-h-[100dvh]
+    flex flex-col
     px-4 sm:px-16 md:px-20 xl:px-8 2xl:px-0
     bg-bgSet dark:bg-bgSet-dark
 }
 
 .gh-main {
     @apply
+    flex flex-col
     w-full max-w-screen-xl grow mx-auto
     bg-bgSet dark:bg-bgSet-dark
 }

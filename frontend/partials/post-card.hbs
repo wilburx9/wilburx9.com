@@ -51,5 +51,7 @@
             </span>
         </div>
     </a>
-    <script>postProcessBookmarkCard(`{{{content}}}`, `{{{tags autolink="false" visibility="internal"}}}`, `card-link-{{id}}`, `card-image-{{id}}`)</script>
+    {{#has tag="#external"}}
+        <script>postProcessBookmarkCard(`{{{content}}}`, `{{{tags autolink="false" visibility="internal"}}}`, `card-link-{{id}}`, `card-image-{{id}}`)</script>
+    {{/has}}
 </article>
