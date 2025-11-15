@@ -107,18 +107,6 @@
     md:block
 }
 
-.gh-article-container > nav {
-    @apply
-    w-full fixed md:sticky
-    flex flex-row
-    justify-between
-    mt-0 md:mt-1.5
-    top-0 right-0 left-0 backdrop-blur md:backdrop-blur-0
-    py-0.5 md:pb-0 md:pt-10 z-[100] md:z-0
-    bg-bgSet/70 dark:bg-bgSet-dark/70
-    md:bg-transparent md:dark:bg-transparent
-}
-
 .gh-article-container > .gh-article {
     @apply
     w-full flex flex-col md:grow max-w-4xl
@@ -265,24 +253,26 @@ figcaption {
     mask-image: url('../images/exif_focal.svg');
 }
 
-.code-copy {
+.code-header {
     @apply
+    flex flex-row justify-end items-center
     text-body2 text-gray-500 dark:text-gray-400
     border-b border-borderSet/40 dark:border-borderSet-dark/40
     font-sans
 }
 
-.code-copy > div {
+.code-copy {
     @apply
-    grid
+    grid appearance-none bg-transparent border-none p-0 m-0 shadow-none
+    outline-none cursor-default;
 }
 
 .code-copy svg {
     @apply
     w-5 h-5
-}
+}xx
 
-.code-copy > div > span {
+.code-copy span {
     @apply
     row-start-1 row-end-2 col-start-1 col-end-2 px-2.5
     flex flex-row gap-2.5 cursor-pointer justify-self-end items-center
@@ -290,19 +280,18 @@ figcaption {
     transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
-.code-copy > div > span#copy {
+.code-copy span#copy {
     @apply
-    cursor-pointer
     hover:text-blackSet dark:hover:text-blackSet-dark/60
     fill-current z-20
 }
 
-.code-copy > div > span#copied {
+.code-copy span#copied {
     @apply
-    cursor-default z-10
+    z-10
 }
 
-.code-copy > div > span#copied > svg {
+.code-copy span#copied > svg {
     @apply
     fill-greenSet dark:fill-greenSet-dark
 }
