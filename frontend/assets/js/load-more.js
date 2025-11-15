@@ -15,9 +15,8 @@ class LoadMore {
 
     constructor(maxPages, pageTag) {
         this.maxPages = maxPages
-        this.pageTag = pageTag || ""
         this.baseUrl = `${document.location.origin}/blog/${pageTag}`
-        this.$scrollingContent = $('.gh-content')
+        this.$scrollTarget = $(window)
 
         this.cleanUp = this.cleanUp.bind(this)
         this.showLoader = this.showLoader.bind(this)
@@ -33,12 +32,12 @@ class LoadMore {
     }
 
     setEventListeners() {
-        this.$scrollingContent.on('scroll', this.handleScroll)
+        this.$scrollTarget.on('scroll', this.handleScroll)
         $(window).on('resize', this.handleResize)
     }
 
     removeEventListeners() {
-        this.$scrollingContent.off('scroll', this.handleScroll)
+        this.$scrollTarget.off('scroll', this.handleScroll)
         $(window).off('resize', this.handleResize)
     }
 
@@ -49,8 +48,9 @@ class LoadMore {
         if (this.loading || this.currentPage >= this.maxPages) return
 
         this.rafId = window.requestAnimationFrame(() => {
-            const bottom = this.$scrollingContent[0].scrollHeight - this.$scrollingContent.innerHeight() - this.offset
-            if (this.$scrollingContent.scrollTop() >= bottom) this.fetchPosts()
+            const { scrollTop, scrollHeight, viewportHeight } = this.getScrollMetrics()
+            const bottom = scrollHeight - viewportHeight - this.offset
+            if (scrollTop >= bottom) this.fetchPosts()
         })
 
     }
@@ -108,6 +108,14 @@ class LoadMore {
 
     handleResize() {
         this.loadMorePosts()
+    }
+
+    getScrollMetrics() {
+        return {
+            scrollTop: window.scrollY || document.documentElement.scrollTop,
+            scrollHeight: document.documentElement.scrollHeight,
+            viewportHeight: window.innerHeight
+        }
     }
 
     cleanUp() {

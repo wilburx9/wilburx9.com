@@ -16,9 +16,9 @@
 
 .primary-button {
     @apply
-    py-4 px-6 cursor-pointer grid text-center
+    py-2 md:py-4 px-6 cursor-pointer grid text-center
     bg-blackSet dark:bg-blackSet-dark rounded-xl
-    text-bgSet dark:text-bgSet-dark text-button
+    text-bgSet dark:text-bgSet-dark text-buttonSmall md:text-button
     hover:bg-orangeSet dark:hover:bg-orangeSet-dark
     active:bg-orangeSet dark:active:bg-orangeSet-dark
     focus:bg-orangeSet dark:focus:bg-orangeSet-dark
@@ -33,8 +33,8 @@
 
 .secondary-button {
     @apply
-    py-4 px-6 cursor-pointer grid text-center
-    text-blackSet dark:text-blackSet-dark text-button
+    py-2 md:py-4 px-6 cursor-pointer grid text-center
+    text-blackSet dark:text-blackSet-dark text-buttonSmall md:text-button
     border border-blackSet dark:border-blackSet-dark rounded-xl
     hover:border-orangeSet dark:hover:border-orangeSet-dark
     active:border-orangeSet dark:active:border-orangeSet-dark
@@ -66,35 +66,6 @@
     @apply
     border-greenSet dark:border-greenSet-dark
     pointer-events-none
-}
-
-/* Icons e.g the social icons in the footer */
-.icon {
-    @apply
-    basis-14 flex items-center justify-center
-    h-14 min-w-[3.5rem] rounded-full
-    bg-transparent transition ease-in-out opacity-100
-    hover:bg-greySet/10 dark:hover:bg-greySet-dark/10
-    active:bg-greySet/10 dark:active:bg-greySet-dark/10
-    focus:bg-greySet/10 dark:focus:bg-greySet-dark/10
-}
-
-.icon > svg {
-    @apply
-    fill-greySet dark:fill-greySet-dark
-    stroke-greySet dark:stroke-greySet-dark
-}
-
-.icon#theme-switch {
-    @apply
-    -mr-4
-    relative
-}
-
-.icon#theme-switch > svg {
-    @apply
-    absolute
-    transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
 

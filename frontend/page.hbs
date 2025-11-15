@@ -1,0 +1,23 @@
+{{!< default}}
+
+{{#post}}
+    <div class="gh-article-container {{post_class}}">
+        <div class="gh-article">
+            <article>
+                {{#match @page.show_title_and_feature_image}}
+                    <header>
+                        <h1 class="gh-title">{{title}}</h1>
+                        {{#if custom_excerpt}}
+                            <p class="gh-article-excerpt">{{custom_excerpt}}</p>
+                        {{/if}}
+                        {{> "feature-image"}}
+                    </header>
+                {{/match}}
+                <div class="gh-post-content">
+                    {{content}}
+                </div>
+            </article>
+        </div>
+    </div>
+
+{{/post}}

@@ -27,6 +27,7 @@ production stylesheet in assets/built/screen.css using: gulp dev
 body {
     @apply
     overflow-x-clip
+    bg-bgSet dark:bg-bgSet-dark
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -43,23 +44,23 @@ h1, h2, h3, h4, h5, h6 {
     scrollbar-corner:bg-transparent
 }
 
-html,
-.gh-body {
+html, .gh-body {
     @apply
-    h-full w-screen min-h-screen min-h-[100dvh]
+    w-screen min-h-screen min-h-[100dvh]
     transition-colors ease-in-out motion-reduce:transition-none
 }
 
-.gh-content {
+.gh-viewport {
     @apply
-    h-full w-screen
-    flex flex-col overflow-y-auto
+    w-screen min-h-screen min-h-[100dvh]
+    flex flex-col
     px-4 sm:px-16 md:px-20 xl:px-8 2xl:px-0
     bg-bgSet dark:bg-bgSet-dark
 }
 
 .gh-main {
     @apply
+    flex flex-col
     w-full max-w-screen-xl grow mx-auto
     bg-bgSet dark:bg-bgSet-dark
 }
@@ -82,7 +83,7 @@ html,
 
 .gh-post-loader {
     @apply
-    w-full h-full
+    w-full
     flex justify-center items-center
 }
 
@@ -146,7 +147,7 @@ hr {
 
 .gh-more-posts > h2 {
     @apply
-    text-headline1 font-semibold
+    text-headline2 md:text-headline1 font-semibold
     text-blackSet dark:text-blackSet-dark
     mb-4 mt-8
 }

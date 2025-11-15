@@ -73,16 +73,20 @@ module.exports = {
                 'lineHeight': '16px',
             }],
             'headline': ['36px', {
-                'lineHeight': '54px',
+                'lineHeight': '46px',
                 'fontWeight': '600'
             }],
             'headline1': ['24px', {
                 'lineHeight': '28px',
             }],
             'headline2': ['20px', {
-                'lineHeight': '24px',
+                'lineHeight': '29px',
             }],
             'button': ['16px', {
+                'lineHeight': '20px',
+                'fontWeight': '400'
+            }],
+            'buttonSmall': ['14px', {
                 'lineHeight': '20px',
                 'fontWeight': '400'
             }],
@@ -98,8 +102,8 @@ module.exports = {
                 'lineHeight': '22px',
                 'fontWeight': '300',
             }],
-            'largeCode': ['16px', {
-                'lineHeight': '27px',
+            'largeCode': ['14px', {
+                'lineHeight': '22px',
                 'fontWeight': '300',
             }],
             'title': ['58px', {

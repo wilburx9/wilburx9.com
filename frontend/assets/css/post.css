@@ -7,7 +7,7 @@
 
 .gh-post-content {
     @apply
-    text-text3 md:text-text2 xl:text-text1 font-light
+    text-text3 md:text-text2 font-light
     text-greySet dark:text-greySet-dark
 }
 
@@ -53,8 +53,40 @@
     text-body3 font-light line-clamp-1 mt-2
 }
 
-.gh-article .gh-post-meta {
-    @apply text-body3 md:text-body2 font-light
+.gh-article-excerpt {
+    @apply
+    w-full
+    text-body2 md:text-body1 font-light
+    text-greyLightSet dark:text-greyLightSet-dark
+    mt-3
+}
+
+.gh-article-meta {
+    @apply
+    flex items-center gap-2
+    mb-8 mt-6 md:mb-12
+}
+
+.gh-article-author-name {
+    @apply
+    font-medium text-body1
+    text-blackSet dark:text-blackSet-dark
+}
+
+.gh-article-meta-wrapper {
+    @apply
+    flex flex-col gap-1
+}
+.author-profile-image {
+    @apply
+    w-[56px] h-auto
+    object-cover rounded-full
+}
+
+.gh-article-meta {
+    @apply
+    text-body3 md:text-body2 font-light
+    text-greyLightSet dark:text-greyLightSet-dark
 }
 
 .gh-post-footer {
@@ -64,7 +96,7 @@
 
 .gh-post-footer > h2 {
     @apply
-    text-headline1 font-semibold
+    text-headline2 md:text-headline1 font-semibold
     text-blackSet dark:text-blackSet-dark
 }
 
@@ -75,22 +107,10 @@
     md:block
 }
 
-.gh-article-container > nav {
-    @apply
-    w-full fixed md:sticky
-    flex flex-row
-    justify-between
-    mt-0 md:mt-1.5
-    top-0 right-0 left-0 backdrop-blur md:backdrop-blur-0
-    py-0.5 md:pb-0 md:pt-10 z-[100] md:z-0
-    bg-bgSet/70 dark:bg-bgSet-dark/70
-    md:bg-transparent md:dark:bg-transparent
-}
-
 .gh-article-container > .gh-article {
     @apply
     w-full flex flex-col md:grow max-w-4xl
-    mt-16 md:-mt-12 mx-auto px-1 lg:px-10
+    mx-auto px-1 lg:px-10
 }
 
 .gh-feature-image {
@@ -233,45 +253,48 @@ figcaption {
     mask-image: url('../images/exif_focal.svg');
 }
 
-.code-copy {
+.code-header {
     @apply
-    text-button text-blackSet dark:text-blackSet-dark
+    flex flex-row justify-end items-center
+    text-body2 text-gray-500 dark:text-gray-400
+    border-b border-borderSet/40 dark:border-borderSet-dark/40
     font-sans
 }
 
-.code-copy > div {
+.code-copy {
     @apply
-    grid pt-1 pr-1 sm:pt-3 sm:pr-3
+    grid appearance-none bg-transparent border-none p-0 m-0 shadow-none
+    outline-none cursor-default;
 }
 
-.code-copy > div > span {
+.code-copy svg {
     @apply
-    row-start-1 row-end-2 col-start-1 col-end-2
-    flex flex-row gap-2.5 cursor-pointer justify-self-end
-    duration-500 py-2.5 justify-center relative rounded-md
+    w-5 h-5
+}
+
+.code-copy span {
+    @apply
+    row-start-1 row-end-2 col-start-1 col-end-2 px-2.5
+    flex flex-row gap-2.5 cursor-pointer justify-self-end items-center
+    duration-300 py-2 justify-center relative
     transition ease-in-out motion-reduce:transition-none motion-reduce:hover:transform-none
 }
 
-.code-copy > div > span#copy {
+.code-copy span#copy {
     @apply
-    cursor-pointer px-4
-    hover:bg-borderSet dark:hover:bg-borderSet-dark
-    focus:bg-borderSet dark:focus:bg-borderSet-dark
-    active:bg-borderSet dark:active:bg-borderSet-dark
-    stroke-current z-20
+    hover:text-blackSet dark:hover:text-blackSet-dark/60
+    fill-current z-20
 }
 
-.code-copy > div > span#copied {
+.code-copy span#copied {
     @apply
-    cursor-default z-10
-    px-4 sm:px-2
+    z-10
 }
 
-.code-copy > div > span > span {
+.code-copy span#copied > svg {
     @apply
-    hidden sm:block
+    fill-greenSet dark:fill-greenSet-dark
 }
-
 
 .gh-card-tags {
     @apply

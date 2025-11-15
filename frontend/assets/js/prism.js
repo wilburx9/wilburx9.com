@@ -1215,6 +1215,34 @@ if (typeof global !== 'undefined') {
 	global.Prism = Prism;
 }
 
+const collapseStart = `<span class="code-collapse is-collapsed"><button class="code-collapse-icon" type="button" aria-expanded="false"><svg viewBox="0 -960 960 960" aria-hidden="true"><path d="M249.23-420q-24.75 0-42.37-17.63-17.63-17.62-17.63-42.37 0-24.75 17.63-42.37Q224.48-540 249.23-540q24.75 0 42.38 17.63 17.62 17.62 17.62 42.37 0 24.75-17.62 42.37Q273.98-420 249.23-420ZM480-420q-24.75 0-42.37-17.63Q420-455.25 420-480q0-24.75 17.63-42.37Q455.25-540 480-540q24.75 0 42.37 17.63Q540-504.75 540-480q0 24.75-17.63 42.37Q504.75-420 480-420Zm230.77 0q-24.75 0-42.38-17.63-17.62-17.62-17.62-42.37 0-24.75 17.62-42.37Q686.02-540 710.77-540q24.75 0 42.37 17.63 17.63 17.62 17.63 42.37 0 24.75-17.63 42.37Q735.52-420 710.77-420Z"/></svg></button><span style="display: none" class="code-collapse-block">`;
+const collapseEnd = `</span></span>`;
+
+Prism.hooks.add('before-insert', env => {
+	if (!env.highlightedCode) {
+		return;
+	}
+
+	env.highlightedCode = env.highlightedCode
+		.replaceAll('—start—', collapseStart)
+		.replaceAll('—end—', collapseEnd);
+});
+
+Prism.hooks.add("complete", function(env) {
+	$(env.element).on('click', '.code-collapse-icon', function() {
+		const $icon = $(this);
+		const $wrapper = $icon.closest('.code-collapse');
+		const $codeBlock = $wrapper.find('.code-collapse-block');
+
+		const isCollapsed = $wrapper.toggleClass('is-collapsed').hasClass('is-collapsed');
+
+		$icon.attr('aria-expanded', isCollapsed ? 'false' : 'true');
+		$icon.hide();
+		$codeBlock.fadeIn(300);
+	});
+});
+
+
 // some additional documentation/types
 
 /**
