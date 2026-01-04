@@ -17,9 +17,8 @@
     font-semibold
 }
 
-.gh-post-content p {
-    @apply
-    my-5
+.gh-post-content p:not(figcaption p) {
+    @apply my-5;
 }
 
 .gh-post-content a {
@@ -129,7 +128,7 @@ figcaption {
     my-2 mx-1 md:mx-5 lg:mx-20
 }
 
-.kg-image-card {
+.kg-image-card, .kg-video-card {
     @apply
     w-full mt-8
 }
@@ -137,25 +136,36 @@ figcaption {
 .kg-image-card > div {
     @apply
     w-full h-full relative
-    bg-no-repeat
-    bg-center
-    bg-cover
-    before:bg-black/75
-    before:content-[""]
-    before:absolute
-    before:left-0
-    before:top-0
-    before:h-full
-    before:w-full
-    before:z-10
-    before:backdrop-blur-md
+    overflow-hidden
+}
+
+
+.kg-image-card > div > img.frosted-bg {
+    @apply
+    absolute inset-0 w-full h-full object-cover z-10
+    blur-xl
+}
+
+.kg-image-card > div > .scrim {
+    @apply absolute inset-0 w-full h-full z-20 bg-white/50 dark:bg-black/60
+}
+
+.kg-image-card > div > img:not(.frosted-bg) {
+    @apply relative z-30 w-auto h-full mx-auto;
+}
+
+/* Hide scrim and frosted image for non photography posts*/
+body:not(.tag-photography) .kg-image-card > div > .frosted-bg,
+body:not(.tag-photography) .kg-image-card > div > .scrim  {
+    @apply
+    hidden
 }
 
 .photo-zoom-in-handle,
 .photo-zoom-out-handle {
     @apply
     top-2 right-2 sm:top-4 sm:right-4 absolute
-    z-30 w-9 h-9 sm:w-11 sm:h-11 md:w-14 md:h-14 stroke-blackSet dark:stroke-blackSet-dark
+    z-40 w-9 h-9 sm:w-11 sm:h-11 md:w-14 md:h-14 stroke-blackSet dark:stroke-blackSet-dark
     bg-bgSet/50 dark:bg-bgSet-dark/50 rounded-full
     hidden group-focus:flex group-hover:flex justify-center items-center
     transition ease-in-out duration-300 motion-reduce:transition-none motion-reduce:hover:transform-none
@@ -196,12 +206,6 @@ figcaption {
 .photo-lightbox-content > div > img.scale-full {
     @apply
     scale-100
-}
-
-.kg-image-card > div > img {
-    @apply
-    h-full w-auto mx-auto
-    z-20 relative
 }
 
 .image-exif {
@@ -252,6 +256,19 @@ figcaption {
     -webkit-mask-image: url('../images/exif_focal.svg');
     mask-image: url('../images/exif_focal.svg');
 }
+
+
+.kg-width-regular > .kg-video-container {
+   @apply
+   !w-full !h-full !pb-0;
+}
+
+.kg-width-regular > .kg-video-container > video {
+    @apply
+    !w-auto !h-full relative !top-auto !bottom-auto
+    mx-auto
+}
+
 
 .code-header {
     @apply

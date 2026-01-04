@@ -90,7 +90,7 @@ module.exports = {
                 'lineHeight': '20px',
                 'fontWeight': '400'
             }],
-            'caption': ['12px', {
+            'caption': ['14px', {
                 'lineHeight': '15px',
                 'fontWeight': '300',
             }],
