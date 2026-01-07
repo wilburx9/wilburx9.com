@@ -1,0 +1,12 @@
+{{#primary_tag}}
+    <span class="gh-post-primary-tag">
+    {{#has slug="software"}}
+        {{> "icons/software"}}
+    {{else has slug="books"}}
+        {{> "icons/books"}}
+    {{else}}
+        {{> "icons/photography"}}
+    {{/has}}
+        <span>{{name}}</span>
+  </span>
+{{/primary_tag}}
