@@ -2,11 +2,16 @@
 
 // Wrap bookmarks cards in group classes so Tailwind's hover state styles can apply to them.
 !function () {
+    wrapBookmarks()
+    resizeVideos()
+}();
+
+function wrapBookmarks() {
     $('figure.kg-bookmark-card').each(function () {
         $(this).find('.kg-bookmark-thumbnail').append('<div><svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path stroke-width="2" class="stroke-orangeSet dark:stroke-orangeSet-dark" stroke-linecap="round" stroke-linejoin="round" d="M15.5 5.5v-5m0 0h-5m5 0L8.833 7.167m-2.5-5H4.5c-1.4 0-2.1 0-2.635.272A2.5 2.5 0 0 0 .772 3.532C.5 4.066.5 4.767.5 6.167V11.5c0 1.4 0 2.1.272 2.635a2.5 2.5 0 0 0 1.093 1.092C2.4 15.5 3.1 15.5 4.5 15.5h5.333c1.4 0 2.1 0 2.635-.273a2.5 2.5 0 0 0 1.093-1.092c.272-.535.272-1.235.272-2.635V9.667"/></svg><span>Open</span></div>');
         $(this).wrap('<div class="group"></div>');
     });
-}();
+}
 
 function addExternalArticleInfo(tagString) {
     let tags = tagString.split(',').map(tag => tag.trim());
@@ -32,7 +37,6 @@ class ImageProcessor {
 
             this.resizeAndWrap(image, $figure, $wrapper, width, height)
             if (!this.isPhotography) return // Don't add lightbox and exif data on images for non-photography posts
-
             this.addLightBox(image, $figure, $wrapper, width, height, `lightbox__photo__${i}`)
         });
     }
@@ -42,8 +46,7 @@ class ImageProcessor {
 
         // Ensure the container height is not larger than the image
         $wrapper.css({
-            "background-image": `url("${image.currentSrc || image.src}")`,
-            "aspect-ratio": Math.max((width / height), this.getMinAspectRatio()).toString(),
+            "aspect-ratio": Math.max((width / height), getMinAspectRatio()).toString(),
             "max-height": `${height}px`
         }).addClass("group"); // Add group for Tailwind group hover
 
@@ -54,7 +57,7 @@ class ImageProcessor {
         });
 
         $figure.prepend($wrapper);
-        $wrapper.append(image);
+        $wrapper.append(`<img src="${image.currentSrc || image.src}" class="frosted-bg"/><div class="scrim"/>`, image);
         return $figure
     }
 
@@ -151,12 +154,6 @@ class ImageProcessor {
         return style
     }
 
-    getMinAspectRatio() {
-        // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
-        if ($(window).width() > 768) return 1.5
-        return 0.6
-    }
-
     // Append an '_o' before the image extension
     getHighResUrl(imgUrl) {
         let url = new URL(imgUrl);
@@ -169,7 +166,12 @@ class ImageProcessor {
             return imgUrl;
         }
     }
+}
 
+function getMinAspectRatio() {
+    // 768 is tailwinds md breakpoint: https://tailwindcss.com/docs/responsive-design
+    if ($(window).width() > 768) return 1.2
+    return 0.6
 }
 
 
@@ -219,4 +221,25 @@ function copy(element, text, toggle) {
             if (typeof toggle === 'function') toggle()
         }, 2000);
     });
+}
+
+function resizeVideos() {
+    const containers = document.querySelectorAll('.kg-video-container');
+    containers.forEach(c => {
+        const parent = c.parentElement;
+
+        // No use-case for other types of videos, so processing on regular width videos for now.
+        if (!parent || !parent.classList.contains('kg-width-regular')) return;
+
+        const video = c.querySelector('video')
+        if (!video) return;
+
+        let width = parseFloat(video.getAttribute('width'));
+        let height = parseFloat(video.getAttribute('height'));
+
+        if (!width || !height) return;
+
+        const ar = width / height;
+        c.style.aspectRatio = Math.max(ar, getMinAspectRatio())
+    })
 }

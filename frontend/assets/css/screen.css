@@ -131,10 +131,29 @@ html, .gh-body {
     text-body2 font-light text-greyLightSet dark:text-greyLightSet-dark
 }
 
-hr {
+.gh-main hr {
     @apply
     w-full border opacity-10
     border-blackSet dark:border-blackSet-dark
+}
+
+.gh-main :is(ul, ol) {
+    list-style: decimal;
+    @apply
+    pl-10
+}
+
+.gh-main :is(li + li, li :is(ul, ol)) {
+    @apply
+    mt-2
+}
+
+.gh-main ol ol li {
+    list-style-type: lower-alpha;
+}
+
+.gh-main ol ol ol li {
+    list-style-type: lower-roman;
 }
 
 
@@ -156,5 +175,3 @@ hr {
     @apply
     opacity-0
 }
-
-

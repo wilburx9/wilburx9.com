@@ -45,9 +45,11 @@ figure.kg-code-card {
 }
 
 pre[class*="language-"] > code[class*="language-"] {
-    scrollbar-width: none;
     @apply
-    grow overflow-auto p-2.5
+    block overflow-y-hidden overflow-x-auto grow p-2.5
+    scrollbar:w-2.5 scrollbar:h-2.5
+    scrollbar-track:bg-gray-200 dark:scrollbar-track:bg-slate-800
+    scrollbar-thumb:bg-gray-400 dark:scrollbar-thumb:bg-slate-500
 }
 
 /* Inline code */
@@ -55,8 +57,8 @@ pre[class*="language-"] > code[class*="language-"] {
     :not(pre) > code {
         @apply
         whitespace-normal rounded
-        bg-boxSet dark:bg-boxSet-dark
-        font-mono text-code px-0.5
+        bg-gray-200 dark:bg-slate-700
+        font-mono text-code px-1 py-0.5
     }
 }
 

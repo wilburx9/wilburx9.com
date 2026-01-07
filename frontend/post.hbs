@@ -11,13 +11,7 @@
         <div class="gh-article">
             <article>
                 <header>
-                    {{#primary_tag}}
-                        <span class="gh-post-primary-tag">
-                            {{#match slug 'software'}} {{> "icons/software"}} {{else}} {{> "icons/photography"}}
-                            {{/match}}
-                            <span>{{name}}</span>
-                        </span>
-                    {{/primary_tag}}
+                    {{> "tag-icon"}}
                     <h1 class="gh-title">{{title}}</h1>
                     {{#if custom_excerpt}}
                         <p class="gh-article-excerpt">{{custom_excerpt}}</p>
