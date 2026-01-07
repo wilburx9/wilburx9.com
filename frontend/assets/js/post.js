@@ -224,30 +224,20 @@ function copy(element, text, toggle) {
 }
 
 function resizeVideos() {
-    console.log("resizeVideos")
     const containers = document.querySelectorAll('.kg-video-container');
     containers.forEach(c => {
         const parent = c.parentElement;
 
         // No use-case for other types of videos, so processing on regular width videos for now.
-        if (!parent || !parent.classList.contains('kg-width-regular')) {
-            console.log("No regular width videos")
-            return;
-        }
+        if (!parent || !parent.classList.contains('kg-width-regular')) return;
 
         const video = c.querySelector('video')
-        if (!video) {
-            console.log("No video video")
-            return;
-        }
+        if (!video) return;
 
         let width = parseFloat(video.getAttribute('width'));
         let height = parseFloat(video.getAttribute('height'));
 
-        if (!width || !height) {
-            console.log("No width or height for video")
-            return;
-        }
+        if (!width || !height) return;
 
         const ar = width / height;
         c.style.aspectRatio = Math.max(ar, getMinAspectRatio())
